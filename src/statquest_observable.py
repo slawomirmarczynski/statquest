@@ -19,6 +19,8 @@ from collections import defaultdict
 import numpy as np
 from scipy import stats
 
+import statquest_locale
+
 
 class Observable:
     """
@@ -236,16 +238,16 @@ class Observable:
         """
         if self.IS_CONTINUOUS or self.IS_ORDINAL:
             data = tuple(self.data.values())
-            return {'średnia': np.mean(data),
-                    'mediana': np.median(data),
-                    'dolny kwartyl': np.percentile(data, 25),
-                    'górny kwartyl': np.percentile(data, 75),
-                    'wartość najmniejsza': np.min(data),
-                    'wartość największa': np.max(data),
-                    'odchylenie standardowe': np.std(data),
-                    'wariancja': np.var(data),
-                    'asymetria': stats.skew(data),
-                    'kurtoza': stats.kurtosis(data)}
+            return {_('średnia'): np.mean(data),
+                    _('mediana'): np.median(data),
+                    _('dolny kwartyl'): np.percentile(data, 25),
+                    _('górny kwartyl'): np.percentile(data, 75),
+                    _('wartość najmniejsza'): np.min(data),
+                    _('wartość największa'): np.max(data),
+                    _('odchylenie standardowe'): np.std(data),
+                    _('wariancja'): np.var(data),
+                    _('asymetria'): stats.skew(data),
+                    _('kurtoza'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
 
     @staticmethod
@@ -320,8 +322,9 @@ class Observable:
         """
         return sorted(list(self.frequency_table().keys()))
 
+
+_ = statquest_locale.setup_locale()
 if __name__ == "__main__":
     import doctest
 
     doctest.testmod(optionflags=doctest.ELLIPSIS)
-    help(Observable)

@@ -1,303 +1,242 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Program do analizy danych z bazy danych SQLite ProQuest.db.
+The definition of statistical tests.
 
-Analizy statystyczne. Statystyki opisowe i testy statystyczne.
+There are defined three statistical tests: the chi-square independence test, 
+the Kruskal-Wallis test, the Pearson correlation test.
 
-@file: proquest_tests.py
-@version: 0.3.2.2
-@date: 10.07.2018
-@author: dr Sławomir Marczyński, slawek@zut.edu.pl
+File:
+    project: StatQuest
+    name: statquest_statistics.py
+    version: 0.4.0.0
+    date: 08.06.2022
+
+Authors:
+    Sławomir Marczyński, slawek@zut.edu.pl
 """
 
-
 from collections import defaultdict
+
 import numpy as np
 from scipy import stats
 
-
-# @todo Na razie nie jest do niczego używane.
-#
-def cast_continous_to_occurrences(data, tresholds, prefix='', postfix=''):
-    """
-    Rzutowanie ze zmiennej continous na zmieną nominal - dla zapodanych progów
-    tresholds tworzony jest słownik, którego klucze opisowo zapodają zakresy,
-    a wartości odpowiadają liczbom przypadków.
-
-    Dane:
-        data      -- słownik zawierający dane, interesujące są tylko wartości;
-        tresholds -- progi jako ciąg wartości,
-                     np. [-float(inf), -1, 0, 1, float(inf)]
-        perfix    -- prefiks dodawany przed zakresem;
-        postfix   -- postfix dodawany po zakresie.
-
-    Zwraca:
-        słownik, którego kluczami są np. 'waga od 1 do 5 kg' itd.
-
-    Przykład:
-
-        >>> data = {1: -1.0, 2: 5, 3: 7, 10: 999, 4: -0.5}
-        >>> trsh = [-float('inf'), 0, float('inf')]
-        >>> prefix = 'I = '
-        >>> postfix = ' [mA]'
-        >>> cast_continous_to_occurrences(data, trsh, prefix, postfix)
-        {'I = od -inf do 0 [mA]': 2, 'I = od 0 do inf [mA]': 3}
-    """
-    data = list(data.values())
-    buckets = dict()
-    for i in range(len(tresholds) - 1):
-        low = tresholds[i]
-        high = tresholds[i + 1]
-        count = 0
-        for value in data:
-            if value is not None and low <= value < high:
-                count += 1
-        key = prefix + 'od ' + str(low) + ' do ' + str(high) + postfix
-        buckets[key] = count
-    return buckets
-
-
-def frequency_table(data):
-    """
-    Dla zmiennych nie będących zmiennymi ciągłymi zlicza częstości
-    występowania poszczególnych wartości. Ze skali nominalnej w ten sposób
-    można dostać skalę porządkową/ciągłą.
-
-    >>> frequency_table({1:'A', 2:'A', 3:'B', 4:'A', 5:'B', 6:'C'})
-    {'A': 3, 'B': 2, 'C': 1}
-    """
-    freq = defaultdict(int)
-    for item in data.values():
-        freq[item] += 1
-    freq = dict(sorted(tuple(freq.items())))
-    return freq
-
-
-def descriptive_statistics(data):
-    """
-    Jeżeli to możliwe to oblicza statystyki opisowe.
-    """
-
-    # BTW, observable.values to zawsze powinien być słownik (lub None).
-    #
-    # Dane mogą być nominal, ordinal, continous, interval.
-
-    return {'średnia': np.mean(data),
-            'mediana': np.median(data),
-            'dolny kwartyl': np.percentile(data, 25),
-            'górny kwartyl': np.percentile(data, 75),
-            'wartość najmniejsza': np.min(data),
-            'wartość największa': np.max(data),
-            'odchylenie standardowe': np.std(data),
-            'wariancja': np.var(data),
-            'asymetria': stats.skew(data),
-            'kurtoza': stats.kurtosis(data)}
+import statquest_locale
 
 
 class Test:  # pylint: disable=C0111
-    description = """
-    Abstrakcyjna klasa bazowa dla testów statystycznych.
+    """
+    Abstract base class for statistical tests.
 
-    Tu powinien być opis testu, z odesłaniem do ew. materiałów źródłowych.
-    Opisy z wszystkich testów trafiają do pliku tekstowego jako dokumentacja
-    obliczen - dlatego ten docstring jest zaetykietowany jako description.
+    Here, in derived classes, should be a description of the test
+    procedure, with reference to sources etc.
 
-    Hipoteza zerowa (H0) to stwierdzenie że nie ma niczego znaczącego w danych.
-    Hipoteza alternatywna (H1) odwrotnie - że coś jest. Prawdopodobieństwo że
-    prawdziwa jest hipoteza zerowa (H0) jest oszacowane przez wartość p-value:
-    jeżeli p-value jest większe niż poziom istotności alfa, to znaczy że trzeba
-    przyjąć hipotezę zerową. Jeżeli p-value jest małe, tzn. p_value < alpha,
-    to prawdziwa jest hipoteza alternatywna.
+    The null hypothesis (H0) is that "there is nothing meaningful in
+    the data". Alternative hypothesis (H1) on the contrary - that "there
+    is something". Probability - that the null hypothesis (H0) is true
+    - is estimated by the p-value: if the p-value is greater than the
+    alpha significance level, then you must accept the null hypothesis.
+    If p-value is small, i.e. p_value < alpha, then the alternative
+    hypothesis is true.
 
-    Uwaga: niska wartość p-value jest silną przesłanką za odrzuceniem hipotezy
-    zerowej, ale wysoka wartość p-value jest słabą przesłanką za przyjęciem
-    hipotezy zerowej. Wartość równa progowi istotności... nie rozstrzyga.
+    Note: a low p-value is a strong premise for rejecting the hypothesis
+    a zero but high p-value is a poor premise for acceptance the null
+    hypothesis. A value equal to the threshold ... does not conclude.
 
-    Zwykle poziom istotności alpha = 0.05, czyli 5%.
+    Typically, the alpha significance level = 0.05 or 5%.
     """
 
     def __init__(self):
         """
-        Inicjalizacja testu.
+        Init test.
+
+        Note:
+            Why this initializer has no parameters (except self)? Each
+            test have completely different logic and must be hard-coded
+            from a scratch. It is useless call parametrized initializer.
+
+        Attributes:
+            name (str): test short name.
+            h0_thesis (str): short name for the null hypothesis.
+            h1_thesis (str): short name for the alternative hypothesis.
         """
-        self.name = 'test'
-        self.h0_thesis = 'hipoteza zerowa'  # p_value > alpha
-        self.h1_thesis = 'hipoteza alternatywna'  # p_value < alpha
+        self.name = _('test')
+        self.h0_thesis = _('hipoteza zerowa')  # p_value > alpha
+        self.h1_thesis = _('hipoteza alternatywna')  # p_value < alpha
 
     def __str__(self):
         """
-        Zwraca nazwę testu.
+        Return the name.
+
+        Return:
+            str: the name of this test.
         """
         return self.name
 
-    @staticmethod
-    def can_be_carried_out(a, b=None):  # pylint: disable=unused-argument
-        """
-        Sprawdza, czy test może być przeprowadzony na obserwablach a i b.
-        Szczególnym przypadkiem może być b=None. Abstrakcyjna.
-
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
-
-        Zwraca:
-            True jeżeli można zastosować test do danych a i b, False jeżeli
-            nie można zastosować testu (np. test wymaga zmiennych typu NOMINAL,
-            a dane są typu CONTINOUS). Jeżeli b == None (lub jest pominięte),
-            to test jest (ma być) przeprowadzany na jednej tylko obserwabli.
-        """
-        return False
-
-    @staticmethod
-    def print_descriptions(tests, file=None):
-        print('='*80, file=file)
-        for test in tests:
-            print(test, file=file)
-            print('-'*80, file=file)
-            print(test.description, file=file)
-            print('='*80, file=file)
-
     def __call__(self, a, b=None):
         """
-        Przeprowadza test statystyczny na obserwablach a i b.
+        Perform a statistical test on observations a and b.
 
-        Uwaga: zakłada się, że test taki da się wykonać - co sprawdzono
-               wcześniej przez can_be_carried_out() - dlatego dane wejściowe
-               nie są powtórnie weryfikowane. Abstrakcyjna.
+        Args:
+            a (Observable): Observable class object
+            b (Observable): an object of class Observable or None
 
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
+        Throws:
+            TypeError: when observables aren't compatible with the test.
 
-        Zwraca:
-            p_value    -- wartość p_value
-            stat_name  -- nazwę statystyki
-            stat_value -- wartość statystyki
+        Returns:
+            tuple: (p_value, stat_name, stat_value); in subclasses:
+                p_value (float): p_value value
+                stat_name (str): the name of the statistic
+                stat_value (float): the value of the statistic
         """
+        if not self.can_be_carried_out(a, b):
+            raise TypeError
         p_value = None
         stat_name = None
         stat_value = None
         return p_value, stat_name, stat_value
 
+    @staticmethod
+    def can_be_carried_out(a, b=None):  # pylint: disable=unused-argument
+        """
+        Check can test be preformed.
+
+        Checks whether the test can be performed on observations a and b.
+        A special case may be b = None. Abstract.
+
+        Note:
+            It is a static method - there is no need for a test object
+            - we can check can_be_carried_out(a,b) before test creation.
+
+        Args:
+            a (Observable): observable class object
+            b (Observable): an object of class Observable or None
+
+        Returns:
+            bool: True if the test can be applied to data a and b,
+                False if the test cannot be used (e.g. the test requires
+                NOMINAL variables, but data is CONTINUOUS type).
+        """
+        return False  # Should/must be overridden in subclasses.
+
+    @staticmethod
+    def print_descriptions(tests, file=None):
+        """
+        Print the description of the test to a file/console.
+
+        Args:
+            tests (iterable): a collection of test objects.
+            file (file): a text file; None redirects to a console.
+        """
+        print('=' * 80, file=file)
+        for test in tests:
+            print(test, file=file)
+            print('-' * 80, file=file)
+            print(test.__doc__, file=file)
+            print('=' * 80, file=file)
+
 
 class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
-    description = """
-    Test niezależności chi-kwadrat (Pearsona).
+    """
+    Chi-square test of independence (Pearson).
 
-    Mamy przypadki, które są opisane przy użyciu dwóch zmiennych kategorycznych
-    za pomocą odpowiednich skal nominalnych. Chcemy dowiedzieć się, czy zmienne
-    te są niezależne, tj. czy cechy opisane przez skale są istotnie różne.
+    We have cases that are described using two categorical variables
+    using appropriate nominal scales. We want to find out if these
+    variables are independent, i.e. whether the features described by
+    the scales are significantly different.
 
-    Formułujemy hipotezę zerową i hipotezę alternatywną:
+    We formulate the null hypothesis and the alternative hypothesis:
 
-        H0: nie ma związku między zmiennymi kategorycznymi
-        H1: zmienne kategoryczne nie są niezależne
+        H0: There is no relationship between the categorical variables
+        H1: Categorical variables are not independent
 
-    Obliczamy statystykę chi-kwadrat dla odpowiedniej tablicy krzyżowej
-    i następnie porównujemy p-value z poziomem istotności alpha. Zwyczajowo
-    poziom istotności alpha przyjmuje się równy 0.05 (czyli 5%), określając
-    go jako "znaczący". Poziom istotności równy 0.001 bywa określany jako
-    "wielce znaczący".
+    We calculate the chi-square statistic for the corresponding crosstab
+    and then we compare the p-value with the alpha significance level.
+    Customary the alpha significance level is assumed to be 0.05
+    (i.e. 5%), specifying it as "significant". A significance level of
+    0.001 is sometimes referred to as "highly significant".
 
-    Jeżeli p-value jest zbyt małe to odrzucamy hipotezę zerową, jeżeli p-value
-    jest duże to "nie mamy podstaw do odrzucenia hipotezy zerowej" (de facto po
-    prostu przyjmujemy hipotezę zerową). W tabelce wygląda to tak:
+    If p-value is too small, the test reject the null hypothesis if
+    p-value is  big - "we have no grounds to reject the null hypothesis"
+    - de facto after we just take the null hypothesis.
 
-                                H0      H1      wniosek
-            ----------------------------------------------------------
-            p_value < alpha:    nie     tak     zmienne zależne
-            p_value > alpha:    tak     nie     zmienne NIE SĄ zależne
+    In the table form it looks like this:
 
-    Przykładowo, tego rodzaju test mógłby posłużyć do sprawdzenia, czy kolor
-    włosów (określanych jako niebieskie, brązowe itp.) ma związek z bycia prawo
-    lub lewo-ręcznym. Gdybyśmy otrzymali p-value równe 0.00217 to, ponieważ
-    0.00217 < 0.05, odrzucamy hipotezę zerową "zmienne niezależne", a tym samym
-    przyjmujemy hipotezę alternatywną "zmienne sa zależne". Gdybyśmy natomiast
-    otrzymali p-value równe 0.13842 to, ponieważ 0.13842 > 0.05, stwierdzamy
-    asekuracyjnie "nie ma podstaw do odrzucenia hipotezy zerowej" - czyli po
-    prostu uznajemy że 13.842% szans na popełnienie błędu pierwszego rodzaju
-    (polegającego na uznaniu za fałszywą prawdziwej hipotezy zerowej) to więcej
-    niż założony poziom ryzyka 5% (poziom istotności alpha). Istnieje możliwość
-    (konkretnie 86.158%) popełnienia błędu drugiego rodzaju, polegającego na
-    uznaniu za prawdziwą fałszywej hipotezy zerowej.
+                                  H0    H1
+                -----------------------------------------------
+                p_value < alpha:  no    yes   are dependent
+                p_value > alpha:  yes   no    are NOT dependent
 
-
-        hipoteza    co stwierdzamy?     co jest naprawdę?   prawdopodobieństwo
-        ----------------------------------------------------------------------
-        H0          niezależne          niezależne          p_value > alpha
-        H0          niezależne          zmienne zależne     1 - p_value
-        H1          zmienne zależne     niezależne          1 - p_value
-        H1          zmienne zależne     zmienne zależne     p_value < alpha
+    For example, such a test could be used to check if a color of hair
+    (referred to as blue, brown etc.) has to do with being right-handed
+    or left-handed. If we were to get p-value equal to 0.00217 then
+    because 0.00217 < 0.05, we reject the null hypothesis of
+    "independent variables" and thus we adopt the alternative hypothesis
+    "variables are dependent". If we were  they got a p-value of 0.13842
+    that's because 0.13842 > 0.05, we find as insurance "there are no
+    grounds to reject the null hypothesis" - that is, after we simply
+    consider a 13.842% chance of making a first type error (consisting
+    in making the null hypothesis false) is more than the assumed risk
+    level of 5% (significance level alpha). It is possible (86.158%
+    specifically) making the second type of error, which is recognizing
+    the false null hypothesis as true.
 
 
-    Patrz także:
+        hypothesis    our conclusion    what is really?    probability
+        --------------------------------------------------------------
+        H0            independent       independent    p_value > alpha
+        H0            independent       dependent          1 - p_value
+        H1            dependent         variables          1 - p_value
+        H1            dependent         dependent      p_value < alpha
+
+    See also:
         https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
         https://onlinecourses.science.psu.edu/stat500/node/56/
     """
 
     def __init__(self):
         """
-        Inicjalizacja testu.
+        Init test.
         """
-        super().__init__()
-        self.name = 'test niezależności chi-kwadrat (Pearsona)'
-        self.h0_thesis = 'nie ma związku między zmiennymi kategorycznymi'
-        self.h1_thesis = 'zmienne kategoryczne nie są niezależne'
-
-    @staticmethod
-    def can_be_carried_out(a, b=None):
-        """
-        Sprawdza, czy test może być przeprowadzony na obserwablach a i b.
-        Szczególnym przypadkiem może być b=None.
-
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
-
-        Zwraca:
-            True jeżeli można zastosować test do danych a i b, False jeżeli
-            nie można zastosować testu (np. test wymaga zmiennych typu NOMINAL,
-            a dane są typu CONTINOUS).
-        """
-        if a and b:
-            good_a = a.is_nominal() or a.is_ordinal()
-            good_b = b.is_nominal() or b.is_ordinal()
-            if good_a and good_b:
-                return True
-        return False
+        super().__init__()  # not necessary, but it is safer
+        self.name = _('test niezależności chi-kwadrat (Pearsona)')
+        self.h0_thesis = _('nie ma związku między zmiennymi kategorycznymi')
+        self.h1_thesis = _('zmienne kategoryczne nie są niezależne')
 
     def __call__(self, a, b=None):
         """
-        Przeprowadza test statystyczny na obserwablach a i b.
+        Perform a statistical test on observations a and b.
 
-        Uwaga: zakłada się, że test taki da się wykonać - co sprawdzono
-               wcześniej przez can_be_carried_out() - dlatego dane wejściowe
-               nie są powtórnie weryfikowane.
+        Args:
+            a (Observable): Observable class object
+            b (Observable): an object of class Observable or None
 
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
+        Throws:
+            TypeError: when observables aren't compatible with the test.
 
-        Zwraca:
-            p_value    -- wartość p_value
-            stat_name  -- nazwę statystyki
-            stat_value -- wartość statystyki
+        Returns:
+            tuple: (p_value, stat_name, stat_value); in subclasses:
+                p_value (float): p_value value
+                stat_name (str): the name of the statistic
+                stat_value (float): the value of the statistic
         """
+        if not self.can_be_carried_out(a, b):
+            raise TypeError
 
-        # Zliczamy ile jest niezależnych wartości nominalnych (porządkowych)
-        # tak w obserwabli a jaki b.
+        # We count how many independent nominal(ordinal) values are so
+        # in observable and what b.
 
         da = a.values_to_indices_dict()
         db = b.values_to_indices_dict()
         observed = np.zeros((len(da), len(db)))
 
-        # W istocie rzeczy zbiory kluczy dla obserwabli a i b powinny być
-        # identyczne, tzn. cechy opisane przez obserwable powinny odnosić się
-        # do tych samych bytów. Część wspólna (unia zbiorów) gwarantuje że dla
-        # każdego klucza tak wybranego będzie on określał wartości w obu
-        # słownikach, tj. w słowniku a i w słowniku b.
-        #
+        # In fact, key sets for observables a and b should be identical,
+        # i.e.the features described by the observables should correspond
+        # to the same entity.The common part (union of collections)
+        # guarantees that for each key will be values in both dictionaries,
+        # i.e. in dictionary a and dictionary b.
+
         keys = set(a.data.keys()) & set(b.data.keys())
         for k in keys:
             observed[da[a[k]], db[b[k]]] += 1
@@ -311,97 +250,114 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
 
         return p_value, 'chi-sq', chi2
 
+    @staticmethod
+    def can_be_carried_out(a, b=None):
+        """
+        Check can test be preformed.
+
+        Checks whether the test can be performed on observations a and b.
+        A special case may be b = None. Abstract.
+
+        Note:
+            It is a static method - there is no need for a test object
+            - we can check can_be_carried_out(a,b) before test creation.
+
+        Args:
+            a (Observable): observable class object
+            b (Observable): an object of class Observable or None
+
+        Returns:
+            bool: True if the test can be applied to data a and b,
+                False if the test cannot be used (e.g. the test requires
+                NOMINAL variables, but data is CONTINUOUS type).
+        """
+        if a and b:
+            good_a = a.is_nominal() or a.is_ordinal()
+            good_b = b.is_nominal() or b.is_ordinal()
+            if good_a and good_b:
+                return True
+        return False
+
 
 class KruskalWallisTest(Test):  # pylint: disable=C0111
-    description = """
-    Test Kruskala-Wallisa.
+    """
+    Kruskal-Wallis test.
 
-    Mamy przypadki, które można sklasyfikować za pomocą skali nominalnej oraz
-    wartościami liczbowymi (liczbami zmiennoprzecinkowymi, ewentualnie liczbami
-    całkowitymi). Chcemy dowiedzieć się, czy rozkłady zmiennej ciągłej są
-    istotnie różne dla każdej grupy utworzonej przez wartości mające tę samą
-    wartość nominalną. Nie wiemy czy dane mają rozkład normalny. Formułujemy
-    hipotezę zerową i hipotezę alternatywną:
+    We have cases that can be classified using the nominal scale and
+    numerical values (floating point numbers, integers). We want to find
+    out if the distributions of a continuous variable are significantly
+    different for each group formed by values having the same nominal
+    value. We don't know if the data is normally distributed.
+    We formulate null hypothesis and alternative hypothesis:
 
-        H0: dystrybuanty są równe, brak istotnych różnic
-        H1: dystrybuanty nie są równe, są istotne różnice
+        H0: distribution functions are equal,
+            no significant differences
 
-    Jeżeli p-value jest zbyt małe to odrzucamy hipotezę zerową, jeżeli p-value
-    jest duże to "nie mamy podstaw do odrzucenia hipotezy zerowej" (de facto
-    po prostu przyjmujemy hipotezę zerową). W tabelce wygląda to tak:
+        H1: distribution functions are not equal,
+            there are significant differences
 
-                                H0      H1      wniosek
-            ----------------------------------------------------------
-            p_value < alpha:    nie     tak     rozkłady NIE SĄ takie same
-            p_value > alpha:    tak     nie     rozkłady są takie same
+    If p-value is too small, reject the null hypothesis if p-value it is
+    big, "we have no grounds to reject the null hypothesis" (de facto
+    we just take the null hypothesis.) In the table it looks like this:
+
+                          H0   H1    application
+        -------------------------------------------------- --------
+        p_value < alpha:  no   yes   the distributions are NOT the same
+        p_value > alpha:  yes  no    the distributions are the same
 
 
-    Przykładowo, tego rodzaju test mógłby posłużyć do sprawdzenia, czy wzrost
-    pacjenta (w centymerach) ma związek z bycia prawo lub lewo-ręcznym.
+    For example, such a test could be used to test whether the height of
+    patients (in centimeters) is related to be right or left-handed.
 
-    Patrz także
-    https://en.wikipedia.org/wiki/Kruskal-Wallis_one-way_analysis_of_variance
-    http://www.biostathandbook.com/kruskalwallis.html
+    See also:
+      https://en.wikipedia.org/wiki/Kruskal-Wallis_one-way_analysis_of_variance
+      http://www.biostathandbook.com/kruskalwallis.html
     """
 
     def __init__(self):
         """
-        Inicjalizacja testu.
+        Init test.
         """
         super().__init__()
-        self.name = 'test Kruskala-Wallisa'
-        self.h0_thesis = 'dystrybuanty są równe, brak istotnych różnic'
-        self.h1_thesis = 'dystrybuanty nie są równe, są istotne różnice'
-
-    @staticmethod
-    def can_be_carried_out(a, b=None):
-        """
-        Sprawdza, czy test może być przeprowadzony na obserwablach a i b.
-        Szczególnym przypadkiem może być b=None.
-
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
-
-        Zwraca:
-            True jeżeli można zastosować test do danych a i b, False jeżeli
-            nie można zastosować testu (np. test wymaga zmiennych typu NOMINAL,
-            a dane są typu CONTINOUS).
-        """
-        if a and b:
-            if (a.is_nominal() or a.is_ordinal()) and b.is_continous():
-                return True
-            if (b.is_nominal() or b.is_ordinal()) and a.is_continous():
-                return True
-        return False
+        self.name = _('test Kruskala-Wallisa')
+        self.h0_thesis = _('dystrybuanty są równe, brak istotnych różnic')
+        self.h1_thesis = _('dystrybuanty nie są równe, są istotne różnice')
 
     def __call__(self, a, b=None):
         """
-        Przeprowadza test statystyczny na obserwablach a i b.
+        Perform a statistical test on observations a and b.
 
-        Uwaga: zakłada się, że test taki da się wykonać - co sprawdzono
-               wcześniej przez can_be_carried_out() - dlatego dane wejściowe
-               nie są powtórnie weryfikowane.
+        Args:
+            a (Observable): Observable class object
+            b (Observable): an object of class Observable or None
 
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
+        Throws:
+            TypeError: when observables aren't compatible with the test.
 
-        Zwraca:
-            p_value    -- wartość p_value
-            stat_name  -- nazwę statystyki
-            stat_value -- wartość statystyki
+        Returns:
+            tuple: (p_value, stat_name, stat_value); in subclasses:
+                p_value (float): p_value value
+                stat_name (str): the name of the statistic
+                stat_value (float): the value of the statistic
         """
+        if not self.can_be_carried_out(a, b):
+            raise TypeError
 
-        # Jeżeli obserwabla b jest CONTINOUS, czyli obserwabla b jest (powinna
-        # być) NOMINAL lub ORDINAL, to zamieniane są a z b. W ten sposób zawsze
-        # (od tego miejsca) a jest wyrażone w skali nominalnej (porządkowej),
-        # b jest zawsze wyrażone przez wartości ciągłe (liczby rzeczywiste,
-        # ciekawe czy także mogą być to liczby zespolone?).
+        # We have two observables, namely a and b. One of them should be
+        # nominal or ordinal, one of them should be continuous. 
+        # If the observable a is continuous and the observable b is nominal
+        # (or ordinal) then we swap a and b. Since we can assume that
+        # the observable a is nominal/ordinal and observable b is continuous.
         #
-        if a.is_continous():
+        # We don't check all details here, because the check was already
+        # provided by self.can_be_carried_out(a, b).
+        #
+        if a.IS_CONTINUOS:
             a, b = b, a
 
+        # We collect all keys common for both observables.
+        # And construct a mapping (dictionary) from a-values to b-values.
+        #
         keys = set(a.data.keys()) & set(b.data.keys())
         observed = defaultdict(list)
         for k in keys:
@@ -415,40 +371,72 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
 
         return p_value, 'H', h
 
+    @staticmethod
+    def can_be_carried_out(a, b=None):
+        """
+        Check can test be preformed.
+
+        Checks whether the test can be performed on observations a and b.
+        A special case may be b = None. Abstract.
+
+        Note:
+            It is a static method - there is no need for a test object
+            - we can check can_be_carried_out(a,b) before test creation.
+
+        Args:
+            a (Observable): observable class object
+            b (Observable): an object of class Observable or None
+
+        Returns:
+            bool: True if the test can be applied to data a and b,
+                False if the test cannot be used (e.g. the test requires
+                NOMINAL variables, but data is CONTINUOUS type).
+        """
+        if a and b:
+            if (a.IS_NOMINAL or a.IS_ORDINAL) and b.IS_CONTINUOUS:
+                return True
+            if (b.IS_NOMINAL or b.IS_ORDINAL) and a.IS_CONTINUOUS:
+                return True
+        return False
+
 
 class PearsonCorrelationTest(Test):  # pylint: disable=C0111
-    description = """
-    Test korelacji r Pearsona.
+    """
+    Pearson r correlation test.
 
-    Mamy przypadki, które są opisane przy użyciu dwóch zmiennych ciągłych.
-    Chcemy dowiedzieć się, czy zmienne te są czy nie są skorelowane .
+    We have cases that are described using two continuous variables.
+    We want to find out if these variables are correlated or not.
 
-    Formułujemy hipotezę zerową i hipotezę alternatywną:
+    We formulate the null hypothesis and the alternative hypothesis:
 
-        H0: brak korelacji
-        H1: istnieje korelacja
+        H0: there is no correlation
+        H1: there is a correlation
 
-    Jeżeli p-value jest zbyt małe to odrzucamy hipotezę zerową, jeżeli p-value
-    jest duże to "nie mamy podstaw do odrzucenia hipotezy zerowej" (de facto
-    po  prostu przyjmujemy hipotezę zerową). W tabelce wygląda to tak:
+    If p-value is too small, reject the null hypothesis if p-value
+    it is big, "we have no grounds to reject the null hypothesis" 
+    (de facto we just take the null hypothesis).
 
-                                H0      H1      wniosek
-            ----------------------------------------------------------
-            p_value < alpha:    nie     tak     istnieje korelacja
-            p_value > alpha:    tak     nie     brak korelacji
+    It can be presented in table form:
 
-    Przykładowo, tego rodzaju test mógłby posłużyć do sprawdzenia, czy masa
-    ciała pacjenta jest zależna od jego wzrostu.
+                                H0      H1      conclusion
+            -----------------------------------------------------------
+            p_value < alpha:    no      yes     there is a correlation
+            p_value > alpha:    yes     no      there is no correlation
 
-    W przypadku testu korelacji r problematyczne są: wymóg normalności badanych
-    rozkładów; możliwość że zależność jest bardziej skomplikowana niż zależność
-    liniowa. Można dość łatwo stworzyć takie zestawy danych, dla których test
-    korelacji daje w oczywisty sposób błędne rezultaty.
+    For example, such a test could be used to check whether mass
+    the patient's body depends on his height.
+
+    In the case of the r correlation test, the problematic are: 
+        - the requirement of the normality of the respondents schedules;
+        - the possibility that dependency is not linear.
+     
+     You can quite easily create such datasets for which
+     test correlation clearly produces erroneous results.
     """
 
     def __init__(self):
         """
-        Inicjalizacja testu.
+        Init test.
         """
         super().__init__()
         self.name = 'test korelacji r Pearsona'
@@ -458,43 +446,48 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
     @staticmethod
     def can_be_carried_out(a, b=None):
         """
-        Sprawdza, czy test może być przeprowadzony na obserwablach a i b.
-        Szczególnym przypadkiem może być b=None.
+        Check can test be preformed.
 
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
+        Checks whether the test can be performed on observations a and b.
+        A special case may be b = None. Abstract.
 
-        Zwraca:
-            True jeżeli można zastosować test do danych a i b, False jeżeli
-            nie można zastosować testu (np. test wymaga zmiennych typu NOMINAL,
-            a dane są typu CONTINOUS).
+        Note:
+            It is a static method - there is no need for a test object
+            - we can check can_be_carried_out(a,b) before test creation.
+
+        Args:
+            a (Observable): observable class object
+            b (Observable): an object of class Observable or None
+
+        Returns:
+            bool: True if the test can be applied to data a and b,
+                False if the test cannot be used (e.g. the test requires
+                NOMINAL variables, but data is CONTINUOUS type).
         """
         if (a is not None) and (b is not None):
-            good_a = a.is_ordinal() or a.is_continous()
-            good_b = b.is_ordinal() or b.is_continous()
+            good_a = a.IS_ORDINAL or a.IS_CONTINUOUS
+            good_b = b.IS_ORDINAL or b.IS_CONTINUOUS
             if good_a and good_b:
                 return True
         return False
 
     def __call__(self, a, b=None):
         """
-        Przeprowadza test statystyczny na obserwablach a i b.
+        Perform a statistical test on observations a and b.
 
-        Uwaga: zakłada się, że test taki da się wykonać - co sprawdzono
-               wcześniej przez can_be_carried_out() - dlatego dane wejściowe
-               nie są powtórnie weryfikowane.
+        Args:
+            a (Observable): Observable class object
+            b (Observable): an object of class Observable or None
 
-        Dane:
-            a -- obiekt klasy Observable
-            b -- obiekt klasy Observable lub None
+        Throws:
+            TypeError: when observables aren't compatible with the test.
 
-        Zwraca:
-            p_value    -- wartość p_value
-            stat_name  -- nazwę statystyki
-            stat_value -- wartość statystyki
+        Returns:
+            tuple: (p_value, stat_name, stat_value); in subclasses:
+                p_value (float): p_value value
+                stat_name (str): the name of the statistic
+                stat_value (float): the value of the statistic
         """
-
         x = []
         y = []
         keys = set(a.data.keys()) & set(b.data.keys())
@@ -502,21 +495,17 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
             x.append(a[k])
             y.append(b[k])
         r, p_value = stats.pearsonr(x, y)
-
         return p_value, 'r', r
 
 
-# Zestaw testów jest tworzony niezależnie od tego jak wywołany będzie ten moduł
-#
+_ = statquest_locale.setup_locale()
+
 TESTS_SUITE = (ChiSquareIndependenceTest(),
                KruskalWallisTest(),
                PearsonCorrelationTest())
 
-
 if __name__ == "__main__":
-
-    # Jeżeli moduł będzie bezpośrednio uruchomiony, to przeprowadzone zostaną
-    # testy doctest wbudowane w docstring'i.
-
     import doctest
+
+    Test.print_descriptions(TESTS_SUITE)
     doctest.testmod(optionflags=doctest.ELLIPSIS)
