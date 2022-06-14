@@ -152,7 +152,7 @@ class Observable:
             >>> y.nominals()
             ['1', '2', '31']
         """
-        return list(map(str, self._values_as_sorted_list()))
+        return list(map(str, self.values_as_sorted_list()))
 
     def ordinals(self):
         """
@@ -175,7 +175,21 @@ class Observable:
             >>> y.ordinals()
             [1, 2, 5]
         """
-        return list(map(int, self._values_as_sorted_list()))
+        return sorted(list(map(int, self.values_as_sorted_list())))
+
+    def values_as_sorted_list(self):
+        """
+        Return the sorted list of unique values from self.data dictionary.
+
+        Returns:
+            list: sorted list of values.
+
+        Example:
+            >>> x = Observable('X', {'C': 'Celina', 'B': 'Basia', 'A': 'Ala'})
+            >>> x.values_as_sorted_list()
+            ['Ala', 'Basia', 'Celina']
+        """
+        return sorted(set(self.data.values()))
 
     def values_to_indices_dict(self):
         """
@@ -191,7 +205,7 @@ class Observable:
             >>> x.values_to_indices_dict()
             {'Ala': 0, 'Basia': 1, 'Celina': 2}
         """
-        values_as_keys = self._values_as_sorted_list()
+        values_as_keys = self.values_as_sorted_list()
         return {values_as_keys[i]: i for i in range(len(values_as_keys))}
 
     def frequency_table(self):
@@ -218,7 +232,10 @@ class Observable:
         freq = defaultdict(int)
         for item in self.data.values():
             freq[item] += 1
-        freq = dict(sorted(tuple(freq.items())))
+        try:
+            freq = dict(sorted(tuple(freq.items())))
+        except TypeError:
+            pass  # simply freq is unchanged, i.e. freq = freq
         return freq
 
     def descriptive_statistics(self):
@@ -233,7 +250,7 @@ class Observable:
 
         Examples:
             >>> obs = Observable('example', {1: 10.5, 2: 10.2, 3: 10.9})
-            >>> obs.descriptive_statistics()
+            >>> obs.descriptive_statistics()        # doctest: +ELLIPSIS
             {'średnia': 10.533333333333333, 'mediana': 10.5, ...
         """
         if self.IS_CONTINUOUS or self.IS_ORDINAL:
@@ -300,27 +317,11 @@ class Observable:
             >>> obs3._check_data_kind(float)
             False
         """
-        # The alternative approach::
+        # Notice that empty data (without elements) can not be checked for
+        # type of all elements, because "all" in this case mean "none".
         #
-        # for v in self.data.values():
-        #     if not isinstance(v, T):
-        #         return False
-        # return True
-        return all(isinstance(v, T) for v in self.data.values())
-
-    def _values_as_sorted_list(self):
-        """
-        Return the sorted list of values from self.data dictionary.
-
-        Returns:
-            list: sorted list of values.
-
-        Example:
-            >>> x = Observable('X', {'C': 'Celina', 'B': 'Basia', 'A': 'Ala'})
-            >>> x._values_as_sorted_list()
-            ['Ala', 'Basia', 'Celina']
-        """
-        return sorted(list(self.frequency_table().keys()))
+        return (len(self.data) > 0
+                and all(isinstance(v, T) for v in self.data.values()))
 
 
 _ = statquest_locale.setup_locale()

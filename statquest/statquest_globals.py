@@ -12,7 +12,9 @@ które mają być dostępne "wszędzie" (tj. tam gdzie zostaną zaimportowane).
 @file: proquest_globals.py
 @version: 0.3.2.2
 @date: 10.07.2018
-@author: dr Sławomir Marczyński, slawek@zut.edu.pl
+
+Authors:
+    dr Sławomir Marczyński, slawek@zut.edu.pl
 """
 
 
@@ -39,7 +41,8 @@ STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
 # Poziom istotności przyjmowany w obliczeniach.
 #
 # @todo Globalnie ustalony poziom istotności być może nie jest najlepszym
-# pomysłem. Być może należałoby przekazywać poziom istotności jako parametr.
+#        pomysłem. Być może należałoby przekazywać poziom istotności jako
+#        parametr.
 #
 ALPHA_LEVEL = 0.05             # poziom istotności alpha, musi być od 0 do 1.0
 

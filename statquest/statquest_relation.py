@@ -39,9 +39,9 @@ class Relation:
         # aby dowiedzieć się jak nazywał się dany test, jak nazwywają się dane,
         # jakiego rodzaju wartości są przez nie reprezentowane itp.
         #
-        self._observable1 = observable1
-        self._observable2 = observable2
-        self._test = test
+        self.observable1 = observable1
+        self.observable2 = observable2
+        self.test = test
 
         # Obliczana jest wartość p_value itp.
         #
@@ -49,9 +49,9 @@ class Relation:
 
     def __call__(self, a, b, symetric=True, alpha=ALPHA_LEVEL):
         if self.p_value <= alpha:
-            if a == self._observable1 and b == self._observable2:
+            if a == self.observable1 and b == self.observable2:
                 return True
-            if symetric and b == self._observable1 and a == self._observable2:
+            if symetric and b == self.observable1 and a == self.observable2:
                 return True
         return False
 
@@ -59,7 +59,7 @@ class Relation:
         """
         Rzutowanie na łańcuch znaków istotnych informacji z obiektu Relation.
         """
-        return '\t'.join(map(str, (self._observable1, self._observable2,
+        return '\t'.join(map(str, (self.observable1, self.observable2,
                                    self.p_value, self.name, self.value)))
 
     # Statyczne metody klasy, mające prawo sięgać do składowych chronionych.
@@ -89,10 +89,10 @@ class Relation:
 
         for r in relations:
             print(fmt.format(
-                r._observable1.name, r._observable2.name,
-                r._test.name, r.p_value, r.name, r.value,
-                r._test.h0_thesis if r.p_value >= ALPHA_LEVEL
-                else r._test.h1_thesis),
+                r.observable1.name, r.observable2.name,
+                r.test.name, r.p_value, r.name, r.value,
+                r.test.h0_thesis if r.p_value >= ALPHA_LEVEL
+                else r.test.h1_thesis),
                   file=file)
 
     @staticmethod
@@ -119,12 +119,21 @@ class Relation:
         print('graph {', file=file)
         for r in relations:
             if r.p_value <= ALPHA_LEVEL:
-                print('"', r._observable1.name, '"', ' -- ',
-                      '"', r._observable2.name, '"', sep='', file=file)
+                print('"', r.observable1.name, '"', ' -- ',
+                      '"', r.observable2.name, '"', sep='', file=file)
         print('}', file=file)
 
     @staticmethod
-    def create_relations(observables, tests, symetric=True):
+    def create_relations(observables, tests):
+        """
+
+        Args:
+            observables:
+            tests:
+
+        Returns:
+
+        """
         """
         Fabryka relacji. Tworzone są wszystkie możliwe relacje.
         Wszystkie relacje są traktowane jako symetryczne, tzn. gdy zbadana
@@ -151,20 +160,19 @@ class Relation:
         # już krotek ab_tuples_set dodawane są krotki (a, b) i (b, a). Chyba
         # że symetric=False.
 
+        # We don't need check (a, b) tuple, because uniques (a, b) in trials
+        # is granted by for-for loops. We need only check the reverse case,
+        # i.e. (b, a) tuple ba_tuples_set.
+
         relations = []
-        ab_tuples_set = set()
+        ba_tuples_set = set()
         for a in observables:
             for b in observables:
-                if not a.is_related(b) and (a, b) not in ab_tuples_set:
-#                if (a, b) not in ab_tuples_set:
-                    ab_tuples_set.add((a, b))
-                    if symetric:
-                        ab_tuples_set.add((b, a))
+                if b is not a and (b, a) not in ba_tuples_set:
+                    ba_tuples_set.add((a, b))
                     for test in tests:
                         if test.can_be_carried_out(a, b):
                             relations.append(Relation(a, b, test))
         return relations
 
-    # Koniec metod statycznych - mających prawo sięgać do prywatnych pól.
-    #
     # pylint: disable=W0212
