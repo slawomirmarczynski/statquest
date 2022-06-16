@@ -267,34 +267,6 @@ class Observable:
                     _('kurtoza'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
 
-    @staticmethod
-    def print_descriptive_statistics(observables, sep='\t', file=None):
-        """
-        Print descriptive statistics.
-
-        Prints descriptive statistics of given observables
-        in a human readable format.
-
-        Args:
-            observables (iterable): a collection of observables whose
-                statistics should be printed/exported to file.
-            sep: separator, may be set for a CSV-like format.
-            file: file for exported data or None for console output.
-
-        Examples:
-            @todo - examples/unit tests.
-        """
-        for obs in observables:
-            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-                keys = obs.descriptive_statistics().keys()
-                break
-        else:
-            return  # there is no key, nothing to print
-        print('dane', *keys, sep=sep, file=file)  # @todo i18n/l10n
-        for obs in observables:
-            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-                print(obs, *obs.descriptive_statistics().values(), sep=sep, file=file)
-
     def _check_data_kind(self, T):
         """
         Check if all values in self.data are type T.

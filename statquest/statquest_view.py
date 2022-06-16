@@ -1,38 +1,96 @@
-# Statyczne metody klasy, mające prawo sięgać do składowych chronionych.
-#
-# pylint: disable=W0212
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-@staticmethod
-def write_csv(relations, sep='\t', file=None):
+"""
+Output routines.
+
+File:
+    project: StatQuest
+    name: statquest_view.py
+    version: 0.4.0.0
+    date: 08.06.2022
+
+Authors:
+    Sławomir Marczyński, slawek@zut.edu.pl
+"""
+
+from statquest_globals import DEFAULT_ALPHA_LEVEL
+import statquest_locale
+
+
+def write_tests_descriptions(tests, file=None):
     """
-    Zapisuje informacje o wszystkich relacjach w formacie CSV (separatorem
-    jest '\t') do podanego pliku. Z założenia nazwy relacji nie powinny
-    mieć w sobie znaku sep (domyślnie znaku tabulacji).
+    Print the description of the test to a file/console.
 
-    Dane:
-        relations -- kolekcja relacji, np. lista relacji;
-        sep       -- separator, domyślnie znak tabulacji, oddzielający
-                     poszczególne pola w pliku CSV;
-        file      -- plik, otwarty przez open(), do którego zapisywane są
-                     dane.
+    Args:
+        tests (iterable): a collection of test objects.
+        file (file): a text file; None redirects to a console.
+    """
+    print('=' * 80, file=file)
+    for test in tests:
+        print(test, file=file)
+        print('-' * 80, file=file)
+        print(test.__doc__, file=file)
+        print('=' * 80, file=file)
+
+
+def write_descriptive_statistics(observables, sep='\t', file=None):
+    """
+    Print descriptive statistics.
+
+    Prints descriptive statistics of given observables collection
+    in a human readable format.
+
+    Args:
+        observables (iterable): a collection of observables whose
+            statistics should be printed/exported to file.
+        sep: separator, may be set for a CSV-like format.
+        file: file for exported data or None for console output.
+
+    Examples:
+        @todo - examples/unit tests.
+    """
+
+    for obs in observables:
+        if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+            keys = obs.descriptive_statistics().keys()
+            break
+    else:
+        return  # there is no key, nothing to print
+    print(_('dane'), *keys, sep=sep, file=file)
+    for obs in observables:
+        if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+            print(obs, *obs.descriptive_statistics().values(),
+                  sep=sep, file=file)
+
+
+def write_relations_csv(relations, alpha=DEFAULT_ALPHA_LEVEL,
+                        sep='\t', file=None):
+    """
+    Write all given relations in CSV format.
+
+    Note:
+        We assume that relation names have no sep character inside.
+
+    Args:
+        relations (iterable): a collection of relations.
+        alpha (float):
+        sep (str): CSV file separator.
+        file (file): file or null for console write.
     """
 
     fmt = '{:40}\t{:40}\t{:20}\t{:20}\t{:20}\t{:40}'.replace('\t', sep)
     print(fmt.format(
-        'dane1', 'dane2', 'test',
-        'p_value', 'statystyka', 'wartość', 'teza'),
+        _('dane1'), _('dane2'), _('test'),
+        _('p_value'), _('statystyka'), _('wartość'), _('teza')),
         file=file)
 
     for r in relations:
         print(fmt.format(
-            r.observable1.name, r.observable2.name,
-            r.test.name, r.p_value, r.name, r.value,
-            r.test.h0_thesis if r.p_value >= ALPHA_LEVEL
-            else r.test.h1_thesis),
+            r, r.conclusion(alpha)),
             file=file)
 
 
-@staticmethod
 def write_dot(relations, file=None):
     """
     Zapis danych w języku DOT - opisującym zależności jako graf.
@@ -60,3 +118,9 @@ def write_dot(relations, file=None):
                   '"', r.observable2.name, '"', sep='', file=file)
     print('}', file=file)
 
+
+_ = statquest_locale.setup_locale()
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(optionflags=doctest.ELLIPSIS)

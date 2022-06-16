@@ -125,24 +125,9 @@ class Relation:
         result = test(observable1, observable2)
         self.p_value, self.stat_name, self.stat_value = result
 
-    def __str__(self, sep='\t'):
-        """
-        Cast to string.
-
-        Args:
-            sep (str): a separator, default '\t'.
-
-        Returns:
-            str: readable string describing the relation.
-        """
-        return sep.join(map(
-            str,
-            (self.observable1, self.observable2,
-             self.p_value, self.stat_name, self.stat_value)))
-
     def is_significant(self, alpha=DEFAULT_ALPHA_LEVEL):
         """
-        Cast to bool.
+        ??? @todo.
 
         Args:
             alpha:
@@ -150,7 +135,13 @@ class Relation:
         Returns:
             bool: True if the relation is significant, False if it is not.
         """
-        return self.p_value <= alpha
+        return self.p_value <= alpha  # @todo sprawdzić, bo raczej jest
+                                      #       odwrotnie
+
+    def conclusion(self, alpha=DEFAULT_ALPHA_LEVEL):
+        # @todo should be <= or < ?
+        return (self.test.h0_thesis if self.is_significant(alpha)
+                else self.test.h1_thesis)
 
 
 _ = statquest_locale.setup_locale()

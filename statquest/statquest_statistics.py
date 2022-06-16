@@ -24,7 +24,7 @@ from scipy import stats
 import statquest_locale
 
 
-class Test:  # pylint: disable=C0111
+class Test:
     """
     Abstract base class for statistical tests.
 
@@ -119,22 +119,6 @@ class Test:  # pylint: disable=C0111
                 NOMINAL variables, but data is CONTINUOUS type).
         """
         return False  # Should/must be overridden in subclasses.
-
-    @staticmethod
-    def print_descriptions(tests, file=None):
-        """
-        Print the description of the test to a file/console.
-
-        Args:
-            tests (iterable): a collection of test objects.
-            file (file): a text file; None redirects to a console.
-        """
-        print('=' * 80, file=file)
-        for test in tests:
-            print(test, file=file)
-            print('-' * 80, file=file)
-            print(test.__doc__, file=file)
-            print('=' * 80, file=file)
 
 
 class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111

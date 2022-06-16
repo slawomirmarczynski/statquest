@@ -20,6 +20,9 @@
 
 # @todo Na razie nie jest do niczego używane.
 #
+import itertools
+
+
 def cast_continous_to_occurrences(data, tresholds, prefix='', postfix=''):
     """
     Rzutowanie ze zmiennej continous na zmieną nominal - dla zapodanych progów
@@ -58,4 +61,61 @@ def cast_continous_to_occurrences(data, tresholds, prefix='', postfix=''):
         buckets[key] = count
     return buckets
 
+
+
+
+
+observables_relations = {}
+sorted(itertools.chain.from_iterable(observables_relations.values()),
+       key=lambda)
+
+                 def test_print_descriptive_statistics_1(self):
+"""Write to file"""
+file = Mock()
+Observable.print_descriptive_statistics((
+    self.observable_ordinal,
+    self.observable_continuous,
+    self.observable_nominal), file=file)
+self.assertTrue(len(file.method_calls) > 0)
+
+
+def test_print_descriptive_statistics_2(self):
+    """Write to file"""
+    obs = Observable('obs', {1: 1.00, 2: 0.99, 3: 1.01, 4: 1.03, 5: 1.05})
+    file = Mock()
+    Observable.print_descriptive_statistics((obs,), file=file)
+    self.assertTrue(len(file.method_calls) > 0)
+
+
+def test_print_descriptive_statistics_3(self):
+    """Write to file"""
+    obs = Observable('empty observable', {})
+    file = Mock()
+    Observable.print_descriptive_statistics((obs,), file=file)
+    self.assertTrue(len(file.method_calls) == 0)
+
+
+    # usunięte z class Relation, bo niepotrzebne
+    #
+    # def __str__(self, sep='\t'):
+    #     """
+    #     Cast to string.
+    #
+    #     Args:
+    #         sep (str): a separator, default '\t'.
+    #
+    #     Returns:
+    #         str: readable string describing the relation.
+    #     """
+    #     return sep.join(map(
+    #         str,
+    #         (self.observable1, self.observable2, self.test.name,
+    #          self.p_value, self.stat_name, self.stat_value)))
+
+#=------
+relations = sorted(relations, key=lambda relation: relation.p_value)
+
+# relations_list = sorted(
+#     itertools.chain.from_iterable(relations.values()),
+#     key=lambda relation: relation.p_value )
 

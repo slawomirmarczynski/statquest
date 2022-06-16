@@ -323,29 +323,6 @@ class TestObservable(TestCase):
         result = obs.descriptive_statistics()
         self.assertIsNone(result)
 
-    def test_print_descriptive_statistics_1(self):
-        """Write to file"""
-        file = Mock()
-        Observable.print_descriptive_statistics((
-            self.observable_ordinal,
-            self.observable_continuous,
-            self.observable_nominal), file=file)
-        self.assertTrue(len(file.method_calls) > 0)
-
-    def test_print_descriptive_statistics_2(self):
-        """Write to file"""
-        obs = Observable('obs', {1: 1.00, 2: 0.99, 3: 1.01, 4: 1.03, 5: 1.05})
-        file = Mock()
-        Observable.print_descriptive_statistics((obs,), file=file)
-        self.assertTrue(len(file.method_calls) > 0)
-
-    def test_print_descriptive_statistics_3(self):
-        """Write to file"""
-        obs = Observable('empty observable', {})
-        file = Mock()
-        Observable.print_descriptive_statistics((obs,), file=file)
-        self.assertTrue(len(file.method_calls) == 0)
-
     def test__check_data_kind_1(self):
         """Recognize data type"""
         r_int = self.observable_ordinal._check_data_kind(int)

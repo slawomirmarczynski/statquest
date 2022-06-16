@@ -47,6 +47,8 @@ STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
 DEFAULT_ALPHA_LEVEL = 0.05             # poziom istotności alpha, musi być od
 # 0 do 1.0
 
+CSV_SEPARATOR = ';'
+
 # Stałe: średnia ilość tygodni na miesiąc, liczba tygodni rocznie.
 #
 WEEKS_PER_MONTH = 4.33
