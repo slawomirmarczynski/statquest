@@ -285,13 +285,15 @@ class Observable:
             @todo - examples/unit tests.
         """
         for obs in observables:
-            if obs.is_continuous() or obs.is_ordinal():
-                keys = obs.stat().keys()
+            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+                keys = obs.descriptive_statistics().keys()
                 break
+        else:
+            return  # there is no key, nothing to print
         print('dane', *keys, sep=sep, file=file)  # @todo i18n/l10n
         for obs in observables:
-            if obs.is_continuous() or obs.is_ordinal():
-                print(obs, *obs.stat().values(), sep=sep, file=file)
+            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+                print(obs, *obs.descriptive_statistics().values(), sep=sep, file=file)
 
     def _check_data_kind(self, T):
         """

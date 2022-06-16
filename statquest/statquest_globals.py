@@ -44,7 +44,8 @@ STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
 #        pomysłem. Być może należałoby przekazywać poziom istotności jako
 #        parametr.
 #
-ALPHA_LEVEL = 0.05             # poziom istotności alpha, musi być od 0 do 1.0
+DEFAULT_ALPHA_LEVEL = 0.05             # poziom istotności alpha, musi być od
+# 0 do 1.0
 
 # Stałe: średnia ilość tygodni na miesiąc, liczba tygodni rocznie.
 #

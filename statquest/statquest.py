@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Program do analizy danych z bazy danych SQLite ProQuest.db.
+The main module of StatQuest.
 
-Główna część programu - po uruchomieniu wykonuje wszystkie analizy.
+File:
+    project: StatQuest
+    name: statquest.py
+    version: 0.4.0.0
+    date: 08.06.2022
 
-Baza ta zawiera różne dane, w wielu tabelach, zawierające wyniki ankiet osób
-chorych na nowotwory prostaty. Dane są anonimowe - nie ma nazwisk, imion itp.
-danych osobowych. Baza ta powinna być w tym samym katalogu/folderze w którym
-jest też program proquest.
-
-@file: proquest.py
-@version: 0.3.2.2
-@date: 10.07.2018
-@author: dr Sławomir Marczyński, slawek@zut.edu.pl
+Authors:
+    Sławomir Marczyński, slawek@zut.edu.pl
 """
 
 from proquest_globals import ALPHA_LEVEL
@@ -31,24 +29,36 @@ def store(title, file_name, fun, iterable, **kwargs):
     with open(file_name, 'w') as file:
         fun(iterable, file=file, **kwargs)
 
+def print_to_file(description, file_name, writer, iterable, **kwargs):
+    print(description, _('są zapisywane do pliku'), file_name)
+    with open(file_name, 'wt', encoding='utf-8') as file:
+        writer(iterable, file=file, **kwargs)
 
+import statquest_locale
+_ = statquest_locale.setup_locale()
 if __name__ == '__main__':
 
-    # BTW, dane zostały już wczytane przez moduł proquest_data i zaimportowane
-    # przez form proquest_data import OBSERVABLES.
+    observables = import_observables()
+    observables = [Observable()]
+    # tests = create_tests_suite()
+    tests = TESTS_SUITE
 
-    store('Statystyki opisowe są zapisywane do pliku:',
-          STATS_CSV_FILE_NAME, Observable.print_stat, OBSERVABLES, sep=';')
+    CSV_SEPARATOR = ';'
 
-    store('Tablice częstości są zapisywane do pliku:',
-          FREQS_CSV_FILE_NAME, Observable.print_freq, OBSERVABLES, sep=';')
+    print_to_file(
+        _('statystyki opisowe'), STATS_CSV_FILE_NAME,
+        Observable.print_stat, observables, sep=CSV_SEPARATOR)
+    print_to_file(
+        _('tablice częstości'), FREQS_CSV_FILE_NAME,
+        Observable.print_freq, observables, sep=CSV_SEPARATOR)
+    print_to_file(
+        _('opisy testów'), TESTS_TXT_FILE_NAME,
+        Test.print_descriptions, tests)
 
-    store('Opisy testów są zapisywane do pliku:',
-          TESTS_TXT_FILE_NAME, Test.print_descriptions, TESTS_SUITE)
+    relations = Relation.create_relations(observables, tests)
 
-    # Przeprowadzanie testów statystycznych
+# problem - relacje zebrane jak lecą były sortowane po p-value
 
-    relations = Relation.create_relations(OBSERVABLES, TESTS_SUITE)
     relations = sorted(relations, key=lambda relation: relation.p_value)
 
     store('Zapis wyników testów do pliku',
