@@ -21,8 +21,18 @@ import locale
 def setup_locale():
     locale.setlocale(locale.LC_ALL, '')
     lang, _encoding = locale.getdefaultlocale()
-    translation = gettext.translation('statquest_observable',
-                                      localedir='locale',
+    translation = gettext.translation('statquest',
                                       languages=[lang],
                                       fallback=True)
     return translation.gettext
+
+
+# def setup_locale_main():
+#     locale.setlocale(locale.LC_ALL, '')
+#     lang, _encoding = locale.getdefaultlocale()
+#     translation = gettext.translation(('statquest',),
+#                                       localedir='locale',
+#                                       languages=[lang],
+#                                       fallback=True)
+#     translation.install('statquest')
+#     return translation.gettext

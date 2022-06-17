@@ -18,19 +18,13 @@ Authors:
 """
 
 
-# Uwaga: baza danych (w obecnej wersji programu) jest w tym samym katalogu
-# w ktorym jest program. Podobnie inne pliki i zasoby. Nazwy plików są więc
-# względne - odnoszą się do katalogu roboczego.
-#
-DATA_BASE_NAME = 'proquest.db'  # nazwa bazy danych SQLite3
-
 # Nazwy plików wyjściowych, program tworzyć będzie je bez ostrzeżenia,
 # czyli nie będzie sprawdzał czy już istnieją czy nie. Dlatego, co oczywiste,
 # program powinien być uruchamiany w wyodrębnionym katalogu roboczym.
 #
 # @todo Weryfikacja run-time czy nie nadpisuje się plików, wybór nazw plików,
-# wybór katalogu roboczego itp. itd. - z pewnością są do zrobienia, ale jest
-# kwestią wątpliwą czy to bardzo potrzebne (na obecnym etapie).
+#       wybór katalogu roboczego itp. itd. - z pewnością są do zrobienia,
+#       ale jest kwestią wątpliwą czy to bardzo potrzebne (na obecnym etapie).
 
 FREQS_CSV_FILE_NAME = 'freqs.csv'  # nazwa pliku dla statystyk częstości
 TESTS_CSV_FILE_NAME = 'tests.csv'  # nazwa pliku dla wyników testów
@@ -44,12 +38,4 @@ STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
 #        pomysłem. Być może należałoby przekazywać poziom istotności jako
 #        parametr.
 #
-DEFAULT_ALPHA_LEVEL = 0.05             # poziom istotności alpha, musi być od
-# 0 do 1.0
-
-CSV_SEPARATOR = ';'
-
-# Stałe: średnia ilość tygodni na miesiąc, liczba tygodni rocznie.
-#
-WEEKS_PER_MONTH = 4.33
-WEEKS_PER_YEAR = 52
+DEFAULT_ALPHA_LEVEL = 0.05  # poziom istotności alpha, musi być od 0 do 1.0

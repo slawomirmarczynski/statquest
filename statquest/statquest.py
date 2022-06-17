@@ -14,42 +14,26 @@ Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
 
-from statquest_globals import ALPHA_LEVEL
-from statquest_globals import STATS_CSV_FILE_NAME, FREQS_CSV_FILE_NAME
-from statuest_globals import TESTS_TXT_FILE_NAME, TESTS_CSV_FILE_NAME, \
-    TESTS_DOT_FILE_NAME
-from statquest_data import OBSERVABLES
-from statquest_observable import Observable
-from statquest_statistics import Test, TESTS_SUITE
-from statquest_relation import Relation
-from statquest_view import *
+from statquest_input import input_observables
+from statquest_globals import *
+from statquest_relations import Relations
+from statquest_statistics import ALL_STATISTICAL_TESTS
+from statquest_output import *
+
 import statquest_locale
-import itertools
-
-
-def print_to_file(description, file_name, writer, iterable, **kwargs):
-    print(description, _('są zapisywane do pliku'), file_name)
-    with open(file_name, 'wt', encoding='utf-8') as file:
-        writer(iterable, file=file, **kwargs)
-
-
 _ = statquest_locale.setup_locale()
+
 if __name__ == '__main__':
 
-    tests = create_tests_suite()
-    with open(TESTS_TXT_FILE_NAME, 'wt') as file:
-        write_tests_descriptions(tests, file)
+    tests = ALL_STATISTICAL_TESTS
+    output(TESTS_TXT_FILE_NAME, write_tests_descriptions, tests)
 
-    observables = import_observables()
-    with open(STATS_CSV_FILE_NAME, 'wt') as file:
-        write_descriptive_statistics(observables, file)
-    with open(FREQS_CSV_FILE_NAME, 'wt') as file:
-        write_elements_freq(observables, file)
+    observables = input_observables()
+    output(STATS_CSV_FILE_NAME, write_descriptive_statistics, observables)
+    output(FREQS_CSV_FILE_NAME, write_elements_freq, observables)
 
-    relations = Relation.create_relations(observables, tests)
-    with open(TESTS_CSV_FILE_NAME, 'wt') as file:
-        write_relations_csv(relations, file)
+    relations = Relations.create_relations(observables, tests)
+    output(TESTS_CSV_FILE_NAME, write_relations_csv, relations)
 
-    significant_relations = relations.filter(alpha)
-    with open(TESTS_DOT_FILE_NAME, 'wt') as file:
-        write_relations_dot(significant_relations, file)
+    significant_relations = relations.filter(DEFAULT_ALPHA_LEVEL)
+    output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)

@@ -16,6 +16,7 @@ Authors:
 
 from statquest_globals import DEFAULT_ALPHA_LEVEL
 import statquest_locale
+_ = statquest_locale.setup_locale()
 
 
 class Relations:
@@ -77,7 +78,7 @@ class Relations:
     #     """
     #     return self.relations[item]
 
-    def is_significant(self, alpha=DEFAULT_ALPHA_LEVEL):
+    def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
         """
         Cast to bool.
 
@@ -88,7 +89,7 @@ class Relations:
             bool: True if any relation is significant, False otherwise.
         """
         for relation in self.relations:
-            if relation.is_significant(alpha):
+            if relation.plausible(alpha):
                 return True
         return False
 
@@ -102,49 +103,46 @@ class Relation:
     and alpha level and also the computed p_value.
     """
 
-    def __init__(self, observable1, observable2, test):
+    def __init__(self, observable1, observable2,
+                 test, value, p_value, q_value):
         """
         Initialize relation.
 
         Args:
             observable1 (Observable): an observable.
             observable2 (Observable): an observable.
-            test (Test): a statistical test.
+            test (Test): the statistical test which has been proceeded.
+            value (float): a statistics value, for example chi-square.
+            p_value (float): probability of H0 thesis.
+            q_value (float): probability of the dependency; dependency
+                may be defined as true H0 or true H1, thus q_value may
+                be equal p_value or q_value may be equal 1.0 - p_value.
 
         Attributes:
             self.observable1 (Observable): an observable
             self.observable2 (Observable): an observable
             self.test (Test): an statistical test (IT IS NOT UNIT-TEST)
-            self.p_value: the p-value
-            self.stat_name: the name of the test statistics (like chi-sq)
-            self.stat_value: the value of the test statistics
+            self.value: the value of the test statistics.
+            self.p_value: the p-value, see above.
+            self.q_value: the q-value, see above.
         """
         self.observable1 = observable1
         self.observable2 = observable2
         self.test = test
-        result = test(observable1, observable2)
-        self.p_value, self.stat_name, self.stat_value = result
+        self.value = value
+        self.q_value = q_value
+        self.p_value = p_value
 
-    def is_significant(self, alpha=DEFAULT_ALPHA_LEVEL):
-        """
-        ??? @todo.
+    # def is_H0_true(self, alpha=DEFAULT_ALPHA_LEVEL):
+    #     return self.p_value > alpha
+    #
+    # def is_H1_true(self, alpha=DEFAULT_ALPHA_LEVEL):
+    #     return self.p_value <= alpha
 
-        Args:
-            alpha:
-
-        Returns:
-            bool: True if the relation is significant, False if it is not.
-        """
-        return self.p_value <= alpha  # @todo sprawdzić, bo raczej jest
-                                      #       odwrotnie
-
-    def conclusion(self, alpha=DEFAULT_ALPHA_LEVEL):
-        # @todo should be <= or < ?
-        return (self.test.h0_thesis if self.is_significant(alpha)
-                else self.test.h1_thesis)
+    def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
+        return self.q_value >= alpha
 
 
-_ = statquest_locale.setup_locale()
 if __name__ == "__main__":
     import doctest
 

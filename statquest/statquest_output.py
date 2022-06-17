@@ -6,7 +6,7 @@ Output routines.
 
 File:
     project: StatQuest
-    name: statquest_view.py
+    name: statquest_output.py
     version: 0.4.0.0
     date: 08.06.2022
 
@@ -18,6 +18,12 @@ from statquest_globals import DEFAULT_ALPHA_LEVEL
 import statquest_locale
 
 
+def output(file_name, writer, iterable):
+    with open(file_name, "wt") as file:
+        writer(iterable)
+        writer(iterable, file)
+
+
 def write_tests_descriptions(tests, file=None):
     """
     Print the description of the test to a file/console.
@@ -26,11 +32,12 @@ def write_tests_descriptions(tests, file=None):
         tests (iterable): a collection of test objects.
         file (file): a text file; None redirects to a console.
     """
-    print('=' * 80, file=file)
-    for test in tests:
-        print(test, file=file)
-        print('-' * 80, file=file)
-        print(test.__doc__, file=file)
+    if tests:
+        for test in tests:
+            print('=' * 80, file=file)
+            print(test, file=file)
+            print('-' * 80, file=file)
+            print(test.__doc__, file=file)
         print('=' * 80, file=file)
 
 
@@ -64,6 +71,10 @@ def write_descriptive_statistics(observables, sep='\t', file=None):
                   sep=sep, file=file)
 
 
+def write_elements_freq(observables, file):
+    pass
+
+
 def write_relations_csv(relations, alpha=DEFAULT_ALPHA_LEVEL,
                         sep='\t', file=None):
     """
@@ -91,7 +102,7 @@ def write_relations_csv(relations, alpha=DEFAULT_ALPHA_LEVEL,
             file=file)
 
 
-def write_dot(relations, file=None):
+def write_relations_dot(relations, file=None):
     """
     Zapis danych w języku DOT - opisującym zależności jako graf.
 

@@ -21,7 +21,10 @@ from collections import defaultdict
 import numpy as np
 from scipy import stats
 
+from statquest_relations import Relation
 import statquest_locale
+
+_ = statquest_locale.setup_locale()
 
 
 class Test:
@@ -73,8 +76,10 @@ class Test:
         """
         return self.name
 
-    def __call__(self, a, b=None):
+    def __call__(self, a, b):
         """
+        Relation factory.
+
         Perform a statistical test on observations a and b.
 
         Args:
@@ -85,17 +90,14 @@ class Test:
             TypeError: when observables aren't compatible with the test.
 
         Returns:
-            tuple: (p_value, stat_name, stat_value); in subclasses:
-                p_value (float): p_value value
-                stat_name (str): the name of the statistic
-                stat_value (float): the value of the statistic
+            Relation: the result of the test.
         """
         if not self.can_be_carried_out(a, b):
             raise TypeError
-        p_value = None
-        stat_name = None
-        stat_value = None
-        return p_value, stat_name, stat_value
+        value = 0
+        q_value = 0
+        p_value = 0
+        return Relation(a, b, self, value, p_value, q_value)
 
     @staticmethod
     def can_be_carried_out(a, b=None):  # pylint: disable=unused-argument
@@ -152,31 +154,12 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
                 p_value < alpha:  no    yes   are dependent
                 p_value > alpha:  yes   no    are NOT dependent
 
-    For example, such a test could be used to check if a color of hair
-    (referred to as blue, brown etc.) has to do with being right-handed
-    or left-handed. If we were to get p-value equal to 0.00217 then
-    because 0.00217 < 0.05, we reject the null hypothesis of
-    "independent variables" and thus we adopt the alternative hypothesis
-    "variables are dependent". If we were  they got a p-value of 0.13842
-    that's because 0.13842 > 0.05, we find as insurance "there are no
-    grounds to reject the null hypothesis" - that is, after we simply
-    consider a 13.842% chance of making a first type error (consisting
-    in making the null hypothesis false) is more than the assumed risk
-    level of 5% (significance level alpha). It is possible (86.158%
-    specifically) making the second type of error, which is recognizing
-    the false null hypothesis as true.
-
-
-        hypothesis    our conclusion    what is really?    probability
-        --------------------------------------------------------------
-        H0            independent       independent    p_value > alpha
-        H0            independent       dependent          1 - p_value
-        H1            dependent         variables          1 - p_value
-        H1            dependent         dependent      p_value < alpha
+    Therefore, the dependency exist when q_value > confidence level,
+    there q_value = 1 - p_value, and confidence_level = 1 - alpha.
 
     See also:
         https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
-        https://onlinecourses.science.psu.edu/stat500/node/56/
+        https://online.stat.psu.edu/stat500/lesson/8
     """
 
     def __init__(self):
@@ -188,19 +171,23 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         self.h0_thesis = _('nie ma związku między zmiennymi kategorycznymi')
         self.h1_thesis = _('zmienne kategoryczne nie są niezależne')
 
-    def __call__(self, a, b=None):
+    def __call__(self, a, b, alpha):
         """
+        Relation factory.
+
         Perform a statistical test on observations a and b.
 
         Args:
             a (Observable): Observable class object
             b (Observable): an object of class Observable or None
+            alpha (float): the significance level, 0.0 <= alpha <= 1.0
 
         Throws:
             TypeError: when observables aren't compatible with the test.
 
         Returns:
-            tuple: (p_value, stat_name, stat_value); in subclasses:
+            tuple:
+                q_value (float): q_value value
                 p_value (float): p_value value
                 stat_name (str): the name of the statistic
                 stat_value (float): the value of the statistic
@@ -227,12 +214,13 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
 
         try:
             # pylint: disable=unused-variable
-            chi2, p_value, dof, expected = stats.chi2_contingency(observed)
-        except Exception:  # pylint: disable=W0703
+            chisq, p_value, dof, expected = stats.chi2_contingency(observed)
+        except:  # pylint: disable=broad-except
             p_value = 1.0
-            chi2 = float('inf')
+            chisq = float('inf')
 
-        return p_value, 'chi-sq', chi2
+        q_value = 1.0 - p_value
+        return Relation(a, b, self, chisq, p_value, q_value)
 
     @staticmethod
     def can_be_carried_out(a, b=None):
@@ -274,11 +262,8 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
     value. We don't know if the data is normally distributed.
     We formulate null hypothesis and alternative hypothesis:
 
-        H0: distribution functions are equal,
-            no significant differences
-
-        H1: distribution functions are not equal,
-            there are significant differences
+        H0: Distribution functions are equal.
+        H1: Distribution functions are not equal.
 
     If p-value is too small, reject the null hypothesis if p-value it is
     big, "we have no grounds to reject the null hypothesis" (de facto
@@ -289,6 +274,8 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         p_value < alpha:  no   yes   the distributions are NOT the same
         p_value > alpha:  yes  no    the distributions are the same
 
+    Therefore, the dependency exist when q_value > confidence level,
+    there q_value = p_value, and confidence_level = 1 - alpha.
 
     For example, such a test could be used to test whether the height of
     patients (in centimeters) is related to be right or left-handed.
@@ -353,7 +340,8 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
             h = float('inf')
             p_value = 1.0
 
-        return p_value, 'H', h
+        q_value = p_value
+        return Relation(a, b, self, h, p_value, q_value)
 
     @staticmethod
     def can_be_carried_out(a, b=None):
@@ -386,15 +374,17 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
 
 class PearsonCorrelationTest(Test):  # pylint: disable=C0111
     """
+    Result factory.
+
     Pearson r correlation test.
 
-    We have cases that are described using two continuous variables.
-    We want to find out if these variables are correlated or not.
+    We have two continuous variables. We want to find out if these
+    variables are correlated or not.
 
     We formulate the null hypothesis and the alternative hypothesis:
 
-        H0: there is no correlation
-        H1: there is a correlation
+        H0: There is no correlation.
+        H1: There is a correlation.
 
     If p-value is too small, reject the null hypothesis if p-value
     it is big, "we have no grounds to reject the null hypothesis" 
@@ -479,17 +469,16 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
             x.append(a[k])
             y.append(b[k])
         r, p_value = stats.pearsonr(x, y)
-        return p_value, 'r', r
+        q_value = 1.0 - p_value
+        return Relation(a, b, self, r, p_value, q_value)
 
 
-_ = statquest_locale.setup_locale()
-
-TESTS_SUITE = (ChiSquareIndependenceTest(),
-               KruskalWallisTest(),
-               PearsonCorrelationTest())
+ALL_STATISTICAL_TESTS = (ChiSquareIndependenceTest(),
+                         KruskalWallisTest(),
+                         PearsonCorrelationTest())
 
 if __name__ == "__main__":
     import doctest
 
-    Test.print_descriptions(TESTS_SUITE)
+    Test.print_descriptions(ALL_STATISTICAL_TESTS)
     doctest.testmod(optionflags=doctest.ELLIPSIS)

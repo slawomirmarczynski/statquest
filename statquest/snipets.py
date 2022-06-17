@@ -119,3 +119,18 @@ relations = sorted(relations, key=lambda relation: relation.p_value)
 #     itertools.chain.from_iterable(relations.values()),
 #     key=lambda relation: relation.p_value )
 
+
+
+
+def print_to_file(description, file_name, writer, iterable, **kwargs):
+    print(description, _('są zapisywane do pliku'), file_name)
+    with open(file_name, 'wt', encoding='utf-8') as file:
+        writer(iterable, file=file, **kwargs)
+
+
+CSV_SEPARATOR = ';'
+
+# Stałe: średnia ilość tygodni na miesiąc, liczba tygodni rocznie.
+#
+WEEKS_PER_MONTH = 4.33
+WEEKS_PER_YEAR = 52

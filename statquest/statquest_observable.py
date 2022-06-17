@@ -20,6 +20,7 @@ import numpy as np
 from scipy import stats
 
 import statquest_locale
+_ = statquest_locale.setup_locale()
 
 
 class Observable:
@@ -298,7 +299,6 @@ class Observable:
                 and all(isinstance(v, T) for v in self.data.values()))
 
 
-_ = statquest_locale.setup_locale()
 if __name__ == "__main__":
     import doctest
 
