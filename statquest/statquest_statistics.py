@@ -16,37 +16,24 @@ Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
 
+
 from collections import defaultdict
 
 import numpy as np
 from scipy import stats
 
-from statquest_relations import Relation
 import statquest_locale
+from statquest_relations import Relation
 
 _ = statquest_locale.setup_locale()
 
 
 class Test:
     """
-    Abstract base class for statistical tests.
+    Abstract Statistical Test.
 
     Here, in derived classes, should be a description of the test
     procedure, with reference to sources etc.
-
-    The null hypothesis (H0) is that "there is nothing meaningful in
-    the data". Alternative hypothesis (H1) on the contrary - that "there
-    is something". Probability - that the null hypothesis (H0) is true
-    - is estimated by the p-value: if the p-value is greater than the
-    alpha significance level, then you must accept the null hypothesis.
-    If p-value is small, i.e. p_value < alpha, then the alternative
-    hypothesis is true.
-
-    Note: a low p-value is a strong premise for rejecting the hypothesis
-    a zero but high p-value is a poor premise for acceptance the null
-    hypothesis. A value equal to the threshold ... does not conclude.
-
-    Typically, the alpha significance level = 0.05 or 5%.
     """
 
     def __init__(self):
@@ -64,8 +51,8 @@ class Test:
             h1_thesis (str): short name for the alternative hypothesis.
         """
         self.name = _('test')
-        self.h0_thesis = _('hipoteza zerowa')  # p_value > alpha
-        self.h1_thesis = _('hipoteza alternatywna')  # p_value < alpha
+        self.h0_thesis = _('H0: null hypothesis')         # p_value > alpha
+        self.h1_thesis = _('H1: alternative hypothesis')  # p_value < alpha
 
     def __str__(self):
         """
@@ -99,17 +86,9 @@ class Test:
         p_value = 0
         return Relation(a, b, self, value, p_value, q_value)
 
-    @staticmethod
-    def can_be_carried_out(a, b=None):  # pylint: disable=unused-argument
+    def can_be_carried_out(self, a, b):  # pylint: disable=unused-argument
         """
-        Check can test be preformed.
-
-        Checks whether the test can be performed on observations a and b.
-        A special case may be b = None. Abstract.
-
-        Note:
-            It is a static method - there is no need for a test object
-            - we can check can_be_carried_out(a,b) before test creation.
+        Can test be carried out?
 
         Args:
             a (Observable): observable class object
@@ -125,7 +104,7 @@ class Test:
 
 class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
     """
-    Chi-square test of independence (Pearson).
+    Pearson's Chi-Square Test of Independence.
 
     We have cases that are described using two categorical variables
     using appropriate nominal scales. We want to find out if these
@@ -143,9 +122,10 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
     (i.e. 5%), specifying it as "significant". A significance level of
     0.001 is sometimes referred to as "highly significant".
 
-    If p-value is too small, the test reject the null hypothesis if
-    p-value is  big - "we have no grounds to reject the null hypothesis"
-    - de facto after we just take the null hypothesis.
+    If p-value is too small, the test reject the null hypothesis.
+
+    If p-value is  big - "we have no grounds to reject the null
+    hypothesis" - de facto we just take the null hypothesis.
 
     In the table form it looks like this:
 
@@ -153,9 +133,6 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
                 -----------------------------------------------
                 p_value < alpha:  no    yes   are dependent
                 p_value > alpha:  yes   no    are NOT dependent
-
-    Therefore, the dependency exist when q_value > confidence level,
-    there q_value = 1 - p_value, and confidence_level = 1 - alpha.
 
     See also:
         https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
@@ -167,9 +144,16 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         Init test.
         """
         super().__init__()  # not necessary, but it is safer
-        self.name = _('test niezależności chi-kwadrat (Pearsona)')
-        self.h0_thesis = _('nie ma związku między zmiennymi kategorycznymi')
-        self.h1_thesis = _('zmienne kategoryczne nie są niezależne')
+
+        # @todo: przenieść do plików z translacją
+        #
+        # self.name = _('test niezależności chi-kwadrat (Pearsona)')
+        # self.h0_thesis = _('nie ma związku między zmiennymi kategorycznymi')
+        # self.h1_thesis = _('zmienne kategoryczne nie są niezależne')
+
+        self.name = _("Pearson's Chi-Square Test of Independence")
+        self.h0_thesis = _('H0: variables are independent')
+        self.h1_thesis = _('H1: variables are not independent')
 
     def __call__(self, a, b, alpha):
         """
@@ -222,10 +206,9 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         q_value = 1.0 - p_value
         return Relation(a, b, self, chisq, p_value, q_value)
 
-    @staticmethod
-    def can_be_carried_out(a, b=None):
+    def can_be_carried_out(self, a, b):
         """
-        Check can test be preformed.
+        Can test be preformed?
 
         Checks whether the test can be performed on observations a and b.
         A special case may be b = None. Abstract.
@@ -255,7 +238,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
     """
     Kruskal-Wallis test.
 
-    We have cases that can be classified using the nominal scale and
+    We have data that can be classified using the nominal scale and
     numerical values (floating point numbers, integers). We want to find
     out if the distributions of a continuous variable are significantly
     different for each group formed by values having the same nominal
@@ -265,17 +248,17 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         H0: Distribution functions are equal.
         H1: Distribution functions are not equal.
 
-    If p-value is too small, reject the null hypothesis if p-value it is
-    big, "we have no grounds to reject the null hypothesis" (de facto
-    we just take the null hypothesis.) In the table it looks like this:
+    If p-value is too small, reject the null hypothesis.
+
+    If p-value it is big, "we have no grounds to reject the null
+    hypothesis" (de facto we just take the null hypothesis.)
+
+    In the table it looks like this:
 
                           H0   H1    application
         -------------------------------------------------- --------
         p_value < alpha:  no   yes   the distributions are NOT the same
         p_value > alpha:  yes  no    the distributions are the same
-
-    Therefore, the dependency exist when q_value > confidence level,
-    there q_value = p_value, and confidence_level = 1 - alpha.
 
     For example, such a test could be used to test whether the height of
     patients (in centimeters) is related to be right or left-handed.
@@ -290,9 +273,9 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         Init test.
         """
         super().__init__()
-        self.name = _('test Kruskala-Wallisa')
-        self.h0_thesis = _('dystrybuanty są równe, brak istotnych różnic')
-        self.h1_thesis = _('dystrybuanty nie są równe, są istotne różnice')
+        self.name = _('Kruskal-Wallis Test')
+        self.h0_thesis = _('H0: distributions are equal')
+        self.h1_thesis = _('H1: distributions are not equal')
 
     def __call__(self, a, b=None):
         """
@@ -374,9 +357,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
 
 class PearsonCorrelationTest(Test):  # pylint: disable=C0111
     """
-    Result factory.
-
-    Pearson r correlation test.
+    Pearson Correlation Test.
 
     We have two continuous variables. We want to find out if these
     variables are correlated or not.
@@ -413,9 +394,9 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         Init test.
         """
         super().__init__()
-        self.name = 'test korelacji r Pearsona'
-        self.h0_thesis = 'brak korelacji'
-        self.h1_thesis = 'istnieje korelacja'
+        self.name = 'Pearson Correlation Test'
+        self.h0_thesis = 'H0: data are not correlated'
+        self.h1_thesis = 'H1: data are correlated'
 
     @staticmethod
     def can_be_carried_out(a, b=None):

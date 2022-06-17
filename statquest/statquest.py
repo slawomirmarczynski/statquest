@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
 The main module of StatQuest.
 
@@ -14,17 +13,13 @@ Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
 
-from statquest_input import input_observables
 from statquest_globals import *
+from statquest_input import input_observables
+from statquest_output import *
 from statquest_relations import Relations
 from statquest_statistics import ALL_STATISTICAL_TESTS
-from statquest_output import *
-
-import statquest_locale
-_ = statquest_locale.setup_locale()
 
 if __name__ == '__main__':
-
     tests = ALL_STATISTICAL_TESTS
     output(TESTS_TXT_FILE_NAME, write_tests_descriptions, tests)
 

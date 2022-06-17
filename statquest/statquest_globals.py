@@ -1,22 +1,19 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Program do analizy danych z bazy danych SQLite ProQuest.db.
+The global variables to hold the configuration and defaults.
 
-Stałe globalne, używane w różnych miejscach programu.
-
-Z założenia żaden moduł nie importuje głównego modułu proquest. Przeniesienie
-stałych z proquest_globals do proquest spowodowałoby konieczność importowania
-jakiego nie chcemy. Dlatego istnieje proquest_globals - tu wrzucane są te dane
-które mają być dostępne "wszędzie" (tj. tam gdzie zostaną zaimportowane).
-
-@file: proquest_globals.py
-@version: 0.3.2.2
-@date: 10.07.2018
+File:
+    project: StatQuest
+    name: statquest_global.py
+    version: 0.4.0.0
+    date: 08.06.2022
 
 Authors:
-    dr Sławomir Marczyński, slawek@zut.edu.pl
+    Sławomir Marczyński, slawek@zut.edu.pl
 """
 
+# @todo: Przetłumaczyć komentarze z polskiego na angielski.
 
 # Nazwy plików wyjściowych, program tworzyć będzie je bez ostrzeżenia,
 # czyli nie będzie sprawdzał czy już istnieją czy nie. Dlatego, co oczywiste,
@@ -39,3 +36,7 @@ STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
 #        parametr.
 #
 DEFAULT_ALPHA_LEVEL = 0.05  # poziom istotności alpha, musi być od 0 do 1.0
+DEFAULT_BETA_LEVEL = 1.0 - DEFAULT_ALPHA_LEVEL
+
+assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
+assert 0 <= DEFAULT_BETA_LEVEL <= 1.0

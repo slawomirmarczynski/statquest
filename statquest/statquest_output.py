@@ -35,8 +35,8 @@ def write_tests_descriptions(tests, file=None):
     if tests:
         for test in tests:
             print('=' * 80, file=file)
-            print(test, file=file)
-            print('-' * 80, file=file)
+            # print(test, file=file)
+            # print('-' * 80, file=file)
             print(test.__doc__, file=file)
         print('=' * 80, file=file)
 
