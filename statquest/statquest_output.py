@@ -13,18 +13,21 @@ File:
 Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
+import sys
 
 from statquest_globals import DEFAULT_ALPHA_LEVEL
 import statquest_locale
 
 
+CSV_SEPARATOR = ';'
+
 def output(file_name, writer, iterable):
     with open(file_name, "wt") as file:
-        writer(iterable)
+        writer(iterable, sys.stdout)
         writer(iterable, file)
 
 
-def write_tests_descriptions(tests, file=None):
+def write_tests_doc(tests, file):
     """
     Print the description of the test to a file/console.
 
@@ -35,13 +38,11 @@ def write_tests_descriptions(tests, file=None):
     if tests:
         for test in tests:
             print('=' * 80, file=file)
-            # print(test, file=file)
-            # print('-' * 80, file=file)
             print(test.__doc__, file=file)
         print('=' * 80, file=file)
 
 
-def write_descriptive_statistics(observables, sep='\t', file=None):
+def write_descriptive_statistics(observables, file=None):
     """
     Print descriptive statistics.
 
@@ -64,11 +65,11 @@ def write_descriptive_statistics(observables, sep='\t', file=None):
             break
     else:
         return  # there is no key, nothing to print
-    print(_('dane'), *keys, sep=sep, file=file)
+    print(_('variable'), *keys, sep=CSV_SEPARATOR, file=file)
     for obs in observables:
         if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
             print(obs, *obs.descriptive_statistics().values(),
-                  sep=sep, file=file)
+                  sep=CSV_SEPARATOR, file=file)
 
 
 def write_elements_freq(observables, file):

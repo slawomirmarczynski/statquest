@@ -227,8 +227,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
                 NOMINAL variables, but data is CONTINUOUS type).
         """
         if a and b:
-            good_a = a.is_nominal() or a.is_ordinal()
-            good_b = b.is_nominal() or b.is_ordinal()
+            good_a = a.IS_NOMINAL or a.IS_ORDINAL
+            good_b = b.IS_NOMINAL or b.IS_ORDINAL
             if good_a and good_b:
                 return True
         return False
