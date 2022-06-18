@@ -36,7 +36,5 @@ STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
 #        parametr.
 #
 DEFAULT_ALPHA_LEVEL = 0.05  # poziom istotności alpha, musi być od 0 do 1.0
-DEFAULT_BETA_LEVEL = 1.0 - DEFAULT_ALPHA_LEVEL
 
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
-assert 0 <= DEFAULT_BETA_LEVEL <= 1.0

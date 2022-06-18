@@ -52,8 +52,7 @@ class Relations:
                     observable_relations = Relations()
                     for test in tests:
                         if test.can_be_carried_out(a, b):
-                            observable_relations.relations.append(
-                                Relation(a, b, test))
+                            observable_relations.relations.append(test(a, b))
                     observables_relations[(a, b)] = observable_relations
         return observables_relations
 
@@ -140,7 +139,10 @@ class Relation:
     #     return self.p_value <= alpha
 
     def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
-        return self.q_value >= alpha
+        if self.test.prove_relationship:
+            return self.p_value >= alpha
+        else:
+            return self.p_value < alpha
 
 
 if __name__ == "__main__":

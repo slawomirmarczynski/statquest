@@ -15,11 +15,11 @@ Authors:
 """
 import sys
 
-from statquest_globals import DEFAULT_ALPHA_LEVEL
 import statquest_locale
-
+from statquest_globals import DEFAULT_ALPHA_LEVEL
 
 CSV_SEPARATOR = ';'
+
 
 def output(file_name, writer, iterable):
     with open(file_name, "wt") as file:
@@ -73,7 +73,12 @@ def write_descriptive_statistics(observables, file=None):
 
 
 def write_elements_freq(observables, file):
-    pass
+    for obs in observables:
+        if obs.IS_ORDINAL or obs.IS_NOMINAL:
+            print(obs)
+            for key, value in obs.frequency_table().items():
+                print(key, value, sep=CSV_SEPARATOR, file=file)
+            print(file=file)
 
 
 def write_relations_csv(relations, alpha=DEFAULT_ALPHA_LEVEL,

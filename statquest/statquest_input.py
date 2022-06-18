@@ -20,7 +20,7 @@ from statquest_observable import Observable
 
 def input_observables():
     obs1 = Observable('Observable1', {1: 1, 2: 3, 3: 1, 4: 2, 5: 6})
-    obs2 = Observable('Observable1', {1: 1.0, 2: 3.2, 3: 1.1, 4: 2.1, 5: 6.1})
-    obs3 = Observable('Observable1',
+    obs2 = Observable('Observable2', {1: 1.0, 2: 3.2, 3: 1.1, 4: 2.1, 5: 6.1})
+    obs3 = Observable('Observable3',
                       {1: 'red', 2: 'blue', 3: 'x', 4: 'y', 5: 'z', 6: 't'})
     return obs1, obs2, obs3

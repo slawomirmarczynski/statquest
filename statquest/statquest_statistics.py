@@ -49,10 +49,14 @@ class Test:
             name (str): test short name.
             h0_thesis (str): short name for the null hypothesis.
             h1_thesis (str): short name for the alternative hypothesis.
+            prove_relationship (bool): True if true h0_thesis prove
+                observables relationship; False if true h0_thesis mean
+                that observables are independent.
         """
         self.name = _('test')
         self.h0_thesis = _('H0: null hypothesis')         # p_value > alpha
         self.h1_thesis = _('H1: alternative hypothesis')  # p_value < alpha
+        self.prove_relationship = True
 
     def __str__(self):
         """
@@ -82,9 +86,8 @@ class Test:
         if not self.can_be_carried_out(a, b):
             raise TypeError
         value = 0
-        q_value = 0
         p_value = 0
-        return Relation(a, b, self, value, p_value, q_value)
+        return Relation(a, b, self, value, p_value)
 
     def can_be_carried_out(self, a, b):  # pylint: disable=unused-argument
         """
@@ -142,6 +145,19 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
+
+        Note:
+            Why this initializer has no parameters (except self)? Each
+            test have completely different logic and must be hard-coded
+            from a scratch. It is useless call parametrized initializer.
+
+        Attributes:
+            name (str): test short name.
+            h0_thesis (str): short name for the null hypothesis.
+            h1_thesis (str): short name for the alternative hypothesis.
+            prove_relationship (bool): True if true h0_thesis prove
+                observables relationship; False if true h0_thesis deny
+                that observables are independent.
         """
         super().__init__()  # not necessary, but it is safer
 
@@ -154,6 +170,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         self.name = _("Pearson's Chi-Square Test of Independence")
         self.h0_thesis = _('H0: variables are independent')
         self.h1_thesis = _('H1: variables are not independent')
+        self.prove_relationship = False
 
     def __call__(self, a, b, alpha):
         """
@@ -271,11 +288,25 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
+
+        Note:
+            Why this initializer has no parameters (except self)? Each
+            test have completely different logic and must be hard-coded
+            from a scratch. It is useless call parametrized initializer.
+
+        Attributes:
+            name (str): test short name.
+            h0_thesis (str): short name for the null hypothesis.
+            h1_thesis (str): short name for the alternative hypothesis.
+            prove_relationship (bool): True if true h0_thesis prove
+                observables relationship; False if true h0_thesis mean
+                that observables are independent.
         """
         super().__init__()
         self.name = _('Kruskal-Wallis Test')
         self.h0_thesis = _('H0: distributions are equal')
         self.h1_thesis = _('H1: distributions are not equal')
+        self.prove_relationship = True
 
     def __call__(self, a, b=None):
         """
@@ -392,11 +423,25 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
+
+        Note:
+            Why this initializer has no parameters (except self)? Each
+            test have completely different logic and must be hard-coded
+            from a scratch. It is useless call parametrized initializer.
+
+        Attributes:
+            name (str): test short name.
+            h0_thesis (str): short name for the null hypothesis.
+            h1_thesis (str): short name for the alternative hypothesis.
+            prove_relationship (bool): True if true h0_thesis prove
+                observables relationship; False if true h0_thesis mean
+                that observables are independent.
         """
         super().__init__()
         self.name = 'Pearson Correlation Test'
         self.h0_thesis = 'H0: data are not correlated'
         self.h1_thesis = 'H1: data are correlated'
+        self.prove_relationship = False
 
     @staticmethod
     def can_be_carried_out(a, b=None):
