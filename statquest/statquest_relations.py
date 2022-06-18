@@ -14,8 +14,9 @@ Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
 
-from statquest_globals import DEFAULT_ALPHA_LEVEL
 import statquest_locale
+from statquest_globals import DEFAULT_ALPHA_LEVEL
+
 _ = statquest_locale.setup_locale()
 
 
@@ -56,26 +57,26 @@ class Relations:
                     observables_relations[(a, b)] = observable_relations
         return observables_relations
 
-    # def __len__(self):
-    #     """
-    #     Make relations transparent for len.
-    #
-    #     Returns:
-    #         Number of relations stored in Relations class object.
-    #     """
-    #     return len(self.relations)
-    #
-    # def __getitem__(self, item):
-    #     """
-    #     Make relations transparent for __getitem__
-    #     .
-    #     Args:
-    #         item: selector of relation.
-    #
-    #     Returns:
-    #         Relation: relation selected by item.
-    #     """
-    #     return self.relations[item]
+    def __len__(self):
+        """
+        Make relations transparent for len.
+
+        Returns:
+            Number of relations stored in Relations class object.
+        """
+        return len(self.relations)
+
+    def __getitem__(self, item):
+        """
+        Make relations transparent for __getitem__
+        .
+        Args:
+            item: selector of relation.
+
+        Returns:
+            Relation: relation selected by item.
+        """
+        return self.relations[item]
 
     def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
         """
@@ -103,7 +104,7 @@ class Relation:
     """
 
     def __init__(self, observable1, observable2,
-                 test, value, p_value, q_value):
+                 test, value, p_value):
         """
         Initialize relation.
 
@@ -113,9 +114,6 @@ class Relation:
             test (Test): the statistical test which has been proceeded.
             value (float): a statistics value, for example chi-square.
             p_value (float): probability of H0 thesis.
-            q_value (float): probability of the dependency; dependency
-                may be defined as true H0 or true H1, thus q_value may
-                be equal p_value or q_value may be equal 1.0 - p_value.
 
         Attributes:
             self.observable1 (Observable): an observable
@@ -129,14 +127,7 @@ class Relation:
         self.observable2 = observable2
         self.test = test
         self.value = value
-        self.q_value = q_value
         self.p_value = p_value
-
-    # def is_H0_true(self, alpha=DEFAULT_ALPHA_LEVEL):
-    #     return self.p_value > alpha
-    #
-    # def is_H1_true(self, alpha=DEFAULT_ALPHA_LEVEL):
-    #     return self.p_value <= alpha
 
     def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
         if self.test.prove_relationship:

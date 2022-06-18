@@ -14,6 +14,7 @@ Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
 import sys
+from itertools import chain
 
 import statquest_locale
 from statquest_globals import DEFAULT_ALPHA_LEVEL
@@ -81,8 +82,7 @@ def write_elements_freq(observables, file):
             print(file=file)
 
 
-def write_relations_csv(relations, alpha=DEFAULT_ALPHA_LEVEL,
-                        sep='\t', file=None):
+def write_relations_csv(relations, file):
     """
     Write all given relations in CSV format.
 
@@ -96,15 +96,20 @@ def write_relations_csv(relations, alpha=DEFAULT_ALPHA_LEVEL,
         file (file): file or null for console write.
     """
 
-    fmt = '{:40}\t{:40}\t{:20}\t{:20}\t{:20}\t{:40}'.replace('\t', sep)
+    fmt = '{:40}\t{:40}\t{:20}\t{:20}\t{:20}\t{:40}'
     print(fmt.format(
         _('dane1'), _('dane2'), _('test'),
         _('p_value'), _('statystyka'), _('wartość'), _('teza')),
         file=file)
 
-    for r in relations:
+    relations_list = list(chain.from_iterable(relations.values()))
+
+        # key=lambda r:
+        # r.p_value if r.test.prove_relationship else 1 - r.p_value)
+
+    for r in relations_list:
         print(fmt.format(
-            r, r.conclusion(alpha)),
+            r, r.plausible()),
             file=file)
 
 

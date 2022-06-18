@@ -25,14 +25,3 @@ def setup_locale():
                                       languages=[lang],
                                       fallback=True)
     return translation.gettext
-
-
-# def setup_locale_main():
-#     locale.setlocale(locale.LC_ALL, '')
-#     lang, _encoding = locale.getdefaultlocale()
-#     translation = gettext.translation(('statquest',),
-#                                       localedir='locale',
-#                                       languages=[lang],
-#                                       fallback=True)
-#     translation.install('statquest')
-#     return translation.gettext

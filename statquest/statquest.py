@@ -25,12 +25,12 @@ if __name__ == '__main__':
 
     observables = input_observables()
     output(STATS_CSV_FILE_NAME, write_descriptive_statistics, observables)
-
-    # @fixme Tu jesteśmy, dalej jest to co jeszcze nie...
-
     output(FREQS_CSV_FILE_NAME, write_elements_freq, observables)
 
     relations = Relations.create_relations(observables, tests)
+
+    # @fixme Tu jesteśmy, dalej jest to co jeszcze nie...
+
     output(TESTS_CSV_FILE_NAME, write_relations_csv, relations)
 
     significant_relations = relations.filter(DEFAULT_ALPHA_LEVEL)

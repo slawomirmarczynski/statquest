@@ -134,3 +134,15 @@ CSV_SEPARATOR = ';'
 #
 WEEKS_PER_MONTH = 4.33
 WEEKS_PER_YEAR = 52
+
+
+
+# def setup_locale_main():
+#     locale.setlocale(locale.LC_ALL, '')
+#     lang, _encoding = locale.getdefaultlocale()
+#     translation = gettext.translation(('statquest',),
+#                                       localedir='locale',
+#                                       languages=[lang],
+#                                       fallback=True)
+#     translation.install('statquest')
+#     return translation.gettext

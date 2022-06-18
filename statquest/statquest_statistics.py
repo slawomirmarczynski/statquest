@@ -75,7 +75,7 @@ class Test:
 
         Args:
             a (Observable): Observable class object
-            b (Observable): an object of class Observable or None
+            b (Observable): an object of class Observable
 
         Throws:
             TypeError: when observables aren't compatible with the test.
@@ -95,7 +95,7 @@ class Test:
 
         Args:
             a (Observable): observable class object
-            b (Observable): an object of class Observable or None
+            b (Observable): an object of class Observable
 
         Returns:
             bool: True if the test can be applied to data a and b,
@@ -172,7 +172,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         self.h1_thesis = _('H1: variables are not independent')
         self.prove_relationship = False
 
-    def __call__(self, a, b, alpha):
+    def __call__(self, a, b):
         """
         Relation factory.
 
@@ -180,8 +180,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
 
         Args:
             a (Observable): Observable class object
-            b (Observable): an object of class Observable or None
-            alpha (float): the significance level, 0.0 <= alpha <= 1.0
+            b (Observable): an object of class Observable
 
         Throws:
             TypeError: when observables aren't compatible with the test.
@@ -221,22 +220,21 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
             chisq = float('inf')
 
         q_value = 1.0 - p_value
-        return Relation(a, b, self, chisq, p_value, q_value)
+        return Relation(a, b, self, chisq, p_value)
 
     def can_be_carried_out(self, a, b):
         """
         Can test be preformed?
 
         Checks whether the test can be performed on observations a and b.
-        A special case may be b = None. Abstract.
 
         Note:
             It is a static method - there is no need for a test object
             - we can check can_be_carried_out(a,b) before test creation.
 
         Args:
-            a (Observable): observable class object
-            b (Observable): an object of class Observable or None
+            a (Observable): observable class object.
+            b (Observable): an object of class Observable.
 
         Returns:
             bool: True if the test can be applied to data a and b,
@@ -308,13 +306,13 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         self.h1_thesis = _('H1: distributions are not equal')
         self.prove_relationship = True
 
-    def __call__(self, a, b=None):
+    def __call__(self, a, b):
         """
         Perform a statistical test on observations a and b.
 
         Args:
-            a (Observable): Observable class object
-            b (Observable): an object of class Observable or None
+            a (Observable): Observable class object.
+            b (Observable): an object of class Observable.
 
         Throws:
             TypeError: when observables aren't compatible with the test.
@@ -337,7 +335,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         # We don't check all details here, because the check was already
         # provided by self.can_be_carried_out(a, b).
         #
-        if a.IS_CONTINUOS:
+        if a.IS_CONTINUOUS:
             a, b = b, a
 
         # We collect all keys common for both observables.
@@ -355,15 +353,14 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
             p_value = 1.0
 
         q_value = p_value
-        return Relation(a, b, self, h, p_value, q_value)
+        return Relation(a, b, self, h, p_value)
 
     @staticmethod
-    def can_be_carried_out(a, b=None):
+    def can_be_carried_out(a, b):
         """
         Check can test be preformed.
 
         Checks whether the test can be performed on observations a and b.
-        A special case may be b = None. Abstract.
 
         Note:
             It is a static method - there is no need for a test object
@@ -371,7 +368,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
 
         Args:
             a (Observable): observable class object
-            b (Observable): an object of class Observable or None
+            b (Observable): an object of class Observable.
 
         Returns:
             bool: True if the test can be applied to data a and b,
@@ -444,20 +441,19 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         self.prove_relationship = False
 
     @staticmethod
-    def can_be_carried_out(a, b=None):
+    def can_be_carried_out(a, b):
         """
         Check can test be preformed.
 
         Checks whether the test can be performed on observations a and b.
-        A special case may be b = None. Abstract.
 
         Note:
             It is a static method - there is no need for a test object
             - we can check can_be_carried_out(a,b) before test creation.
 
         Args:
-            a (Observable): observable class object
-            b (Observable): an object of class Observable or None
+            a (Observable): observable class object.
+            b (Observable): an object of class Observable.
 
         Returns:
             bool: True if the test can be applied to data a and b,
@@ -471,13 +467,13 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
                 return True
         return False
 
-    def __call__(self, a, b=None):
+    def __call__(self, a, b):
         """
         Perform a statistical test on observations a and b.
 
         Args:
-            a (Observable): Observable class object
-            b (Observable): an object of class Observable or None
+            a (Observable): Observable class object.
+            b (Observable): an object of class Observable.
 
         Throws:
             TypeError: when observables aren't compatible with the test.
@@ -496,7 +492,7 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
             y.append(b[k])
         r, p_value = stats.pearsonr(x, y)
         q_value = 1.0 - p_value
-        return Relation(a, b, self, r, p_value, q_value)
+        return Relation(a, b, self, r, p_value)
 
 
 ALL_STATISTICAL_TESTS = (ChiSquareIndependenceTest(),
