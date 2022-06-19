@@ -17,7 +17,7 @@ from statquest_globals import *
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
-from statquest_statistics import ALL_STATISTICAL_TESTS
+from statquest_tests import ALL_STATISTICAL_TESTS
 
 if __name__ == '__main__':
     tests = ALL_STATISTICAL_TESTS
@@ -29,8 +29,8 @@ if __name__ == '__main__':
 
     relations = Relations.create_relations(observables, tests)
     output(TESTS_CSV_FILE_NAME, write_relations_csv, relations)
-
-    # @fixme Tu jesteśmy, dalej jest to co jeszcze nie...
-
-    significant_relations = relations.filter(DEFAULT_ALPHA_LEVEL)
+    significant_relations = Relations.significant_only(
+        relations, DEFAULT_ALPHA_LEVEL)
+    output('s-' +TESTS_CSV_FILE_NAME, write_relations_csv,
+           significant_relations)
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)

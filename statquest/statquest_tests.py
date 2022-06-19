@@ -8,7 +8,7 @@ the Kruskal-Wallis test, the Pearson correlation test.
 
 File:
     project: StatQuest
-    name: statquest_statistics.py
+    name: statquest_tests.py
     version: 0.4.0.0
     date: 08.06.2022
 
@@ -54,6 +54,7 @@ class Test:
                 that observables are independent.
         """
         self.name = _('test')
+        self.stat_name = 'unknown'
         self.h0_thesis = _('H0: null hypothesis')         # p_value > alpha
         self.h1_thesis = _('H1: alternative hypothesis')  # p_value < alpha
         self.prove_relationship = True
@@ -168,6 +169,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         # self.h1_thesis = _('zmienne kategoryczne nie są niezależne')
 
         self.name = _("Pearson's Chi-Square Test of Independence")
+        self.stat_name = 'chi-square'
         self.h0_thesis = _('H0: variables are independent')
         self.h1_thesis = _('H1: variables are not independent')
         self.prove_relationship = False
@@ -302,6 +304,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         """
         super().__init__()
         self.name = _('Kruskal-Wallis Test')
+        self.stat_name = 'H'
         self.h0_thesis = _('H0: distributions are equal')
         self.h1_thesis = _('H1: distributions are not equal')
         self.prove_relationship = True
@@ -436,6 +439,7 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         """
         super().__init__()
         self.name = 'Pearson Correlation Test'
+        self.stat_name = 'r'
         self.h0_thesis = 'H0: data are not correlated'
         self.h1_thesis = 'H1: data are correlated'
         self.prove_relationship = False

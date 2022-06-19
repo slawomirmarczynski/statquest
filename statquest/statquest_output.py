@@ -81,7 +81,7 @@ def write_elements_freq_csv(observables, file):
             print_csv(file=file)
 
 
-def write_relations_csv(relations, file):
+def write_relations_csv(relations, file, alpha=DEFAULT_ALPHA_LEVEL):
     """
     Write all given relations in CSV format.
 
@@ -92,19 +92,22 @@ def write_relations_csv(relations, file):
         relations (iterable): a collection of relations.
         file (file): file or null for console write.
     """
-    print_csv(_('data1'), _('data2'), _('test'), _('value'), _('p_value'),
-              file=file)
+    print_csv(
+        _('data1'), _('data2'), _('test'),
+        _('stat'), _('value'), _('p_value'),
+        _('thesis'), _('related?'), file=file)
 
     relations_list = list(chain.from_iterable(relations.values()))
 
-    # @todo: sortowanie relation list
-        # key=lambda r:
-        # r.p_value if r.test.prove_relationship else 1 - r.p_value)
-
     for relation in relations_list:
+        if relation.p_value < alpha:
+            thesis = relation.test.h1_thesis
+        else:
+            thesis = relation.test.h0_thesis
         print_csv(
             relation.observable1, relation.observable2, relation.test.name,
-            relation.value, relation.p_value, file=file)
+            relation.test.stat_name, relation.value, relation.p_value,
+            thesis, relation.plausible(alpha), file=file)
 
 
 def write_relations_dot(relations, file=None):

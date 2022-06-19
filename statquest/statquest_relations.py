@@ -93,6 +93,14 @@ class Relations:
                 return True
         return False
 
+    @staticmethod
+    def significant_only(indexed_relations, alpha):
+        result = {}
+        for key, relations in indexed_relations.items():
+            if relations.plausible(alpha):
+                result[key] = [r for r in relations if r.plausible(alpha)]
+        return result
+
 
 class Relation:
     """
