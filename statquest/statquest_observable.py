@@ -8,11 +8,15 @@ File:
     project: StatQuest
     name: statquest_observable.py
     version: 0.4.0.0
-    date: 08.06.2022
+    date: 19.06.2022
 
 Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
+
+Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 """
+
+
 
 from collections import defaultdict
 

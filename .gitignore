@@ -1,3 +1,10 @@
+# StatQuest output files
+freqs.csv
+stats.csv
+tests.csv
+tests.gv
+tests.txt
+
 # MS Word/Excel files
 *.docx
 *.xlsx

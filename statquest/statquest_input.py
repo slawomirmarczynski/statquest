@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
 An example/template for statquest_input() function.
 
@@ -8,12 +7,13 @@ File:
     project: StatQuest
     name: statquest_input.py
     version: 0.4.0.0
-    date: 08.06.2022
+    date: 19.06.2022
 
 Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
-"""
 
+Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
+"""
 
 from statquest_observable import Observable
 

@@ -1,3 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+File:
+    project: StatQuest
+    name: test_statquest_observable.py
+    version: 0.4.0.0
+    date: 19.06.2022
+
+Authors:
+    Sławomir Marczyński, slawek@zut.edu.pl
+
+Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
+"""
+
 import random
 from unittest import TestCase
 from unittest.mock import Mock, MagicMock
