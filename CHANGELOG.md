@@ -4,8 +4,12 @@
 
 ### Changes
 
-- frequency tables etc. moved from statquest_statistics
-- statquest_statistic should now contain only statistical tests
+- fixed p-value meaning.
+- simplified, streamlined.
+- unit tests via doctest and unittest.
+- simplified i/o.
+- frequency tables etc. moved from statquest_tests.
+- statquest_tests.py should now contain only statistical tests,
 
 ### Restart
 

@@ -5,36 +5,30 @@ The global variables to hold the configuration and defaults.
 
 File:
     project: StatQuest
-    name: statquest_global.py
+    name: statquest_globals.py
     version: 0.4.0.0
-    date: 08.06.2022
+    date: 19.06.2022
 
 Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
+
+Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 """
 
-# @todo: Przetłumaczyć komentarze z polskiego na angielski.
+# Setup output files names. The program will use them without any warning
+# i.e. it will not check whether any files already exist or not.
+# Therefore, the program should be run in the appropriate working directory.
 
-# Nazwy plików wyjściowych, program tworzyć będzie je bez ostrzeżenia,
-# czyli nie będzie sprawdzał czy już istnieją czy nie. Dlatego, co oczywiste,
-# program powinien być uruchamiany w wyodrębnionym katalogu roboczym.
+# @todo: The overwrite protection, definition of working (sub)directory,
+#        better options to choose file names.
 #
-# @todo Weryfikacja run-time czy nie nadpisuje się plików, wybór nazw plików,
-#       wybór katalogu roboczego itp. itd. - z pewnością są do zrobienia,
-#       ale jest kwestią wątpliwą czy to bardzo potrzebne (na obecnym etapie).
+FREQS_CSV_FILE_NAME = 'freqs.csv'  # for the frequency statistics
+STATS_CSV_FILE_NAME = 'stats.csv'  # for means, variances, medians etc.
+TESTS_CSV_FILE_NAME = 'tests.csv'  # for detailed output of test results
+TESTS_DOT_FILE_NAME = 'tests.gv'   # for a graph in DOT language (GraphViz)
+TESTS_TXT_FILE_NAME = 'tests.txt'  # for write-ups of tests docs
 
-FREQS_CSV_FILE_NAME = 'freqs.csv'  # nazwa pliku dla statystyk częstości
-TESTS_CSV_FILE_NAME = 'tests.csv'  # nazwa pliku dla wyników testów
-TESTS_DOT_FILE_NAME = 'tests.gv'   # nazwa pliku dla zapisów w języku DOT
-TESTS_TXT_FILE_NAME = 'tests.txt'  # nazwa pliku dla opisu testów
-STATS_CSV_FILE_NAME = 'stats.csv'  # nazwa pliku dla statystyk opisowych
-
-# Poziom istotności przyjmowany w obliczeniach.
+# Default importance level alpha, it is a probability as a float number.
 #
-# @todo Globalnie ustalony poziom istotności być może nie jest najlepszym
-#        pomysłem. Być może należałoby przekazywać poziom istotności jako
-#        parametr.
-#
-DEFAULT_ALPHA_LEVEL = 0.05  # poziom istotności alpha, musi być od 0 do 1.0
-
+DEFAULT_ALPHA_LEVEL = 0.05
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0

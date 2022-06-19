@@ -3,19 +3,21 @@
 """
 The definition of statistical tests.
 
-There are defined three statistical tests: the chi-square independence test, 
-the Kruskal-Wallis test, the Pearson correlation test.
+There are definitions of three statistical tests: the chi-square
+independence test, the Kruskal-Wallis test, the Pearson correlation
+test. These tests are provided as a tuple ALL_STATISTICAL_TESTS.
 
 File:
     project: StatQuest
     name: statquest_tests.py
     version: 0.4.0.0
-    date: 08.06.2022
+    date: 19.06.2022
 
 Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
-"""
 
+Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
+"""
 
 from collections import defaultdict
 
@@ -34,6 +36,14 @@ class Test:
 
     Here, in derived classes, should be a description of the test
     procedure, with reference to sources etc.
+
+    Attributes:
+        name (str): test short name.
+        h0_thesis (str): short name for the null hypothesis.
+        h1_thesis (str): short name for the alternative hypothesis.
+        prove_relationship (bool): True if true h0_thesis prove
+            observables relationship; False if true h0_thesis mean
+            that observables are independent.
     """
 
     def __init__(self):
@@ -44,18 +54,10 @@ class Test:
             Why this initializer has no parameters (except self)? Each
             test have completely different logic and must be hard-coded
             from a scratch. It is useless call parametrized initializer.
-
-        Attributes:
-            name (str): test short name.
-            h0_thesis (str): short name for the null hypothesis.
-            h1_thesis (str): short name for the alternative hypothesis.
-            prove_relationship (bool): True if true h0_thesis prove
-                observables relationship; False if true h0_thesis mean
-                that observables are independent.
         """
         self.name = _('test')
         self.stat_name = 'unknown'
-        self.h0_thesis = _('H0: null hypothesis')         # p_value > alpha
+        self.h0_thesis = _('H0: null hypothesis')  # p_value > alpha
         self.h1_thesis = _('H1: alternative hypothesis')  # p_value < alpha
         self.prove_relationship = True
 
@@ -110,7 +112,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
     """
     Pearson's Chi-Square Test of Independence.
 
-    We have cases that are described using two categorical variables
+    We have got cases that are described using two categorical variables
     using appropriate nominal scales. We want to find out if these
     variables are independent, i.e. whether the features described by
     the scales are significantly different.
@@ -120,8 +122,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         H0: There is no relationship between the categorical variables
         H1: Categorical variables are not independent
 
-    We calculate the chi-square statistic for the corresponding crosstab
-    and then we compare the p-value with the alpha significance level.
+    We calculate the chi-square statistic for the corresponding crosstab,
+    then we compare the p-value with the alpha significance level.
     Customary the alpha significance level is assumed to be 0.05
     (i.e. 5%), specifying it as "significant". A significance level of
     0.001 is sometimes referred to as "highly significant".
@@ -151,14 +153,6 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
             Why this initializer has no parameters (except self)? Each
             test have completely different logic and must be hard-coded
             from a scratch. It is useless call parametrized initializer.
-
-        Attributes:
-            name (str): test short name.
-            h0_thesis (str): short name for the null hypothesis.
-            h1_thesis (str): short name for the alternative hypothesis.
-            prove_relationship (bool): True if true h0_thesis prove
-                observables relationship; False if true h0_thesis deny
-                that observables are independent.
         """
         super().__init__()  # not necessary, but it is safer
 
@@ -217,11 +211,10 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         try:
             # pylint: disable=unused-variable
             chisq, p_value, dof, expected = stats.chi2_contingency(observed)
-        except:  # pylint: disable=broad-except
+        except:  # pylint: disable=bare-except # noqa
             p_value = 1.0
             chisq = float('inf')
 
-        q_value = 1.0 - p_value
         return Relation(a, b, self, chisq, p_value)
 
     def can_be_carried_out(self, a, b):
@@ -293,14 +286,6 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
             Why this initializer has no parameters (except self)? Each
             test have completely different logic and must be hard-coded
             from a scratch. It is useless call parametrized initializer.
-
-        Attributes:
-            name (str): test short name.
-            h0_thesis (str): short name for the null hypothesis.
-            h1_thesis (str): short name for the alternative hypothesis.
-            prove_relationship (bool): True if true h0_thesis prove
-                observables relationship; False if true h0_thesis mean
-                that observables are independent.
         """
         super().__init__()
         self.name = _('Kruskal-Wallis Test')
@@ -351,15 +336,13 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
 
         try:
             h, p_value = stats.mstats.kruskalwallis(*list(observed.values()))
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=W0703 # noqa
             h = float('inf')
             p_value = 1.0
 
-        q_value = p_value
         return Relation(a, b, self, h, p_value)
 
-    @staticmethod
-    def can_be_carried_out(a, b):
+    def can_be_carried_out(self, a, b):
         """
         Check can test be preformed.
 
@@ -428,24 +411,15 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
             Why this initializer has no parameters (except self)? Each
             test have completely different logic and must be hard-coded
             from a scratch. It is useless call parametrized initializer.
-
-        Attributes:
-            name (str): test short name.
-            h0_thesis (str): short name for the null hypothesis.
-            h1_thesis (str): short name for the alternative hypothesis.
-            prove_relationship (bool): True if true h0_thesis prove
-                observables relationship; False if true h0_thesis mean
-                that observables are independent.
         """
         super().__init__()
-        self.name = 'Pearson Correlation Test'
-        self.stat_name = 'r'
-        self.h0_thesis = 'H0: data are not correlated'
-        self.h1_thesis = 'H1: data are correlated'
+        self.name = _('Pearson Correlation Test')
+        self.stat_name = _('r')
+        self.h0_thesis = _('H0: data are not correlated')
+        self.h1_thesis = _('H1: data are correlated')
         self.prove_relationship = False
 
-    @staticmethod
-    def can_be_carried_out(a, b):
+    def can_be_carried_out(self, a, b):
         """
         Check can test be preformed.
 
@@ -495,7 +469,6 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
             x.append(a[k])
             y.append(b[k])
         r, p_value = stats.pearsonr(x, y)
-        q_value = 1.0 - p_value
         return Relation(a, b, self, r, p_value)
 
 
@@ -506,5 +479,4 @@ ALL_STATISTICAL_TESTS = (ChiSquareIndependenceTest(),
 if __name__ == "__main__":
     import doctest
 
-    Test.print_descriptions(ALL_STATISTICAL_TESTS)
     doctest.testmod(optionflags=doctest.ELLIPSIS)

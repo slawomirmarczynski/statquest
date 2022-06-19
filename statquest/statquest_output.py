@@ -8,33 +8,54 @@ File:
     project: StatQuest
     name: statquest_output.py
     version: 0.4.0.0
-    date: 08.06.2022
+    date: 19.06.2022
 
 Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
+
+Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 """
-import sys
+
 from itertools import chain
 
 import statquest_locale
-from statquest_globals import DEFAULT_ALPHA_LEVEL
 
 CSV_SEPARATOR = ';'
 
 
-def output(file_name, writer, iterable):
+def output(file_name, writer, content, *args, **kwargs):
+    """
+    Use a writer to output a content to a text file.
+
+    Args:
+        file_name (str): file name.
+        writer (function): a function like fun(content, file).
+        content: a content to write.
+        args: extra arguments to pass to writer
+        kwargs: extra arguments to pass to writer
+    """
     with open(file_name, "wt") as file:
-        # writer(iterable, sys.stdout)
-        writer(iterable, file)
+        # writer(content, sys.stdout)  # uncomment to echo on sys.stdout
+        writer(content, file, *args, **kwargs)
 
 
 def print_csv(*args, **kwargs):
+    """
+    Print in CSV format.
+
+    Generally print_cvs(...) behave like print(...), but use delimiters
+    to separate fields.
+
+    Args:
+        *args: any args that con be forwarded to print
+        **kwargs: any kwargs that con be forwarded to print.
+    """
     print(*args, sep=CSV_SEPARATOR, **kwargs)
 
 
 def write_tests_doc(tests, file):
     """
-    Print the description of the test to a file/console.
+    Print the descriptions of the tests to a file/console.
 
     Args:
         tests (iterable): a collection of test objects.
@@ -47,7 +68,7 @@ def write_tests_doc(tests, file):
         print('=' * 80, file=file)
 
 
-def write_descriptive_statistics_csv(observables, file=None):
+def write_descriptive_statistics_csv(observables, file):
     """
     Print descriptive statistics.
 
@@ -73,6 +94,13 @@ def write_descriptive_statistics_csv(observables, file=None):
 
 
 def write_elements_freq_csv(observables, file):
+    """
+    Write how many times the specified values have appeared in the data.
+
+    Args:
+        observables (iterable): a collection of observables
+        file (file): output file.
+    """
     for obs in observables:
         if obs.IS_ORDINAL or obs.IS_NOMINAL:
             print_csv(obs, file=file)
@@ -81,7 +109,7 @@ def write_elements_freq_csv(observables, file):
             print_csv(file=file)
 
 
-def write_relations_csv(relations, file, alpha=DEFAULT_ALPHA_LEVEL):
+def write_relations_csv(relations, file, alpha):
     """
     Write all given relations in CSV format.
 
@@ -91,6 +119,7 @@ def write_relations_csv(relations, file, alpha=DEFAULT_ALPHA_LEVEL):
     Args:
         relations (iterable): a collection of relations.
         file (file): file or null for console write.
+        alpha (float): the alpha level
     """
     print_csv(
         _('data1'), _('data2'), _('test'),
