@@ -28,6 +28,10 @@ def output(file_name, writer, iterable):
         writer(iterable, file)
 
 
+def print_csv(*args, **kwargs):
+    print(*args, sep=CSV_SEPARATOR, **kwargs)
+
+
 def write_tests_doc(tests, file):
     """
     Print the description of the test to a file/console.
@@ -43,21 +47,17 @@ def write_tests_doc(tests, file):
         print('=' * 80, file=file)
 
 
-def write_descriptive_statistics(observables, file=None):
+def write_descriptive_statistics_csv(observables, file=None):
     """
     Print descriptive statistics.
 
     Prints descriptive statistics of given observables collection
-    in a human readable format.
+    in CSV format.
 
     Args:
         observables (iterable): a collection of observables whose
             statistics should be printed/exported to file.
-        sep: separator, may be set for a CSV-like format.
         file: file for exported data or None for console output.
-
-    Examples:
-        @todo - examples/unit tests.
     """
 
     for obs in observables:
@@ -66,20 +66,19 @@ def write_descriptive_statistics(observables, file=None):
             break
     else:
         return  # there is no key, nothing to print
-    print(_('variable'), *keys, sep=CSV_SEPARATOR, file=file)
+    print_csv(_('variable'), *keys, file=file)
     for obs in observables:
         if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            print(obs, *obs.descriptive_statistics().values(),
-                  sep=CSV_SEPARATOR, file=file)
+            print_csv(obs, *obs.descriptive_statistics().values(), file=file)
 
 
-def write_elements_freq(observables, file):
+def write_elements_freq_csv(observables, file):
     for obs in observables:
         if obs.IS_ORDINAL or obs.IS_NOMINAL:
-            print(obs)
+            print_csv(obs, file=file)
             for key, value in obs.frequency_table().items():
-                print(key, value, sep=CSV_SEPARATOR, file=file)
-            print(file=file)
+                print_csv(key, value, file=file)
+            print_csv(file=file)
 
 
 def write_relations_csv(relations, file):
@@ -91,26 +90,21 @@ def write_relations_csv(relations, file):
 
     Args:
         relations (iterable): a collection of relations.
-        alpha (float):
-        sep (str): CSV file separator.
         file (file): file or null for console write.
     """
-
-    fmt = '{:40}\t{:40}\t{:20}\t{:20}\t{:20}\t{:40}'
-    print(fmt.format(
-        _('dane1'), _('dane2'), _('test'),
-        _('p_value'), _('statystyka'), _('wartość'), _('teza')),
-        file=file)
+    print_csv(_('data1'), _('data2'), _('test'), _('value'), _('p_value'),
+              file=file)
 
     relations_list = list(chain.from_iterable(relations.values()))
 
+    # @todo: sortowanie relation list
         # key=lambda r:
         # r.p_value if r.test.prove_relationship else 1 - r.p_value)
 
-    for r in relations_list:
-        print(fmt.format(
-            r, r.plausible()),
-            file=file)
+    for relation in relations_list:
+        print_csv(
+            relation.observable1, relation.observable2, relation.test.name,
+            relation.value, relation.p_value, file=file)
 
 
 def write_relations_dot(relations, file=None):

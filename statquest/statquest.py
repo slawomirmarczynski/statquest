@@ -24,14 +24,13 @@ if __name__ == '__main__':
     output(TESTS_TXT_FILE_NAME, write_tests_doc, tests)
 
     observables = input_observables()
-    output(STATS_CSV_FILE_NAME, write_descriptive_statistics, observables)
-    output(FREQS_CSV_FILE_NAME, write_elements_freq, observables)
+    output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
+    output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
 
     relations = Relations.create_relations(observables, tests)
+    output(TESTS_CSV_FILE_NAME, write_relations_csv, relations)
 
     # @fixme Tu jesteśmy, dalej jest to co jeszcze nie...
-
-    output(TESTS_CSV_FILE_NAME, write_relations_csv, relations)
 
     significant_relations = relations.filter(DEFAULT_ALPHA_LEVEL)
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
