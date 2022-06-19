@@ -24,7 +24,7 @@ CSV_SEPARATOR = ';'
 
 def output(file_name, writer, iterable):
     with open(file_name, "wt") as file:
-        writer(iterable, sys.stdout)
+        # writer(iterable, sys.stdout)
         writer(iterable, file)
 
 
@@ -110,32 +110,41 @@ def write_relations_csv(relations, file, alpha=DEFAULT_ALPHA_LEVEL):
             thesis, relation.plausible(alpha), file=file)
 
 
-def write_relations_dot(relations, file=None):
+def write_relations_dot(relations, file):
     """
-    Zapis danych w języku DOT - opisującym zależności jako graf.
+    Write graph of relations.
+
+    Relations are written as graph data described in DOT language::
 
         graph {
                 "obs1" -- "obs2"
                 ...
         }
 
-    Dane:
-        relations -- relacje do zapisania jako iterable;
-        file      -- plik w którym mają być zapisane relacje.
+    Note:
+        Function write_relations_dot writes all relations given as
+        a parameter. However, it can be applied selectively to a subset
+        of relations. We can segregate relationships according to
+        established criteria before call write_dot and then use
+        write_dot to show only specifically selected relations.
 
-    Uwaga: write_dot zapisuje wszystkie relacje podane jako parametr,
-    nie oznacza to jednak że musi być używane do wypisywania nieselektywnie
-    wszystkich relacji jakie są w programie. Logika "piętro wyżej" może
-    dzielić/segregować relacje według założonych kryteriów i potem używać
-    write_dot() do wypisywania tylko określonych relacji, np. takich które
-    obejmują z góry wybrane obserwable.
+    Args:
+        relations (dict(Relations)): an dictionary where keys are
+            pair of relations (a, b) and values are Relations.
+            Notice that Relations are containers for Relation objects.
+        file (file):  output file.
     """
-    print('graph {', file=file)
-    for r in relations:
-        if r.p_value <= ALPHA_LEVEL:
-            print('"', r.observable1.name, '"', ' -- ',
-                  '"', r.observable2.name, '"', sep='', file=file)
-    print('}', file=file)
+    if relations:
+        print('graph {', file=file)
+        for (a, b), rlist in relations.items():
+            label = []
+            for r in rlist:
+                s = f'{r.test.name} (p = {r.p_value:#.4})'
+                s = s.replace('Test ', '')
+                label.append(s)
+            label = '\\n'.join(label)
+            print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
+        print('}', file=file)
 
 
 _ = statquest_locale.setup_locale()

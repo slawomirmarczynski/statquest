@@ -29,8 +29,7 @@ if __name__ == '__main__':
 
     relations = Relations.create_relations(observables, tests)
     output(TESTS_CSV_FILE_NAME, write_relations_csv, relations)
-    significant_relations = Relations.significant_only(
-        relations, DEFAULT_ALPHA_LEVEL)
-    output('s-' +TESTS_CSV_FILE_NAME, write_relations_csv,
-           significant_relations)
+
+    significant_relations = Relations.significant_only(relations,
+                                                       DEFAULT_ALPHA_LEVEL)
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
