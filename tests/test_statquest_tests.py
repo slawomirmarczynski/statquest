@@ -17,20 +17,48 @@ from unittest import TestCase
 
 
 class TestTest(TestCase):
+
+    def test___init__(self):
+        self.fail()
+
+    def test___call__(self):
+        self.fail()
+
     def test_can_be_carried_out(self):
         self.fail()
 
 
 class TestChiSquareIndependenceTest(TestCase):
+
+    def test___init__(self):
+        self.fail()
+
+    def test___call__(self):
+        self.fail()
+
     def test_can_be_carried_out(self):
         self.fail()
 
 
 class TestKruskalWallisTest(TestCase):
+
+    def test___init__(self):
+        self.fail()
+
+    def test___call__(self):
+        self.fail()
+
     def test_can_be_carried_out(self):
         self.fail()
 
 
 class TestPearsonCorrelationTest(TestCase):
+
+    def test___init__(self):
+        self.fail()
+
+    def test___call__(self):
+        self.fail()
+
     def test_can_be_carried_out(self):
         self.fail()

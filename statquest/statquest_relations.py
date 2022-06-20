@@ -15,7 +15,6 @@ Authors:
 """
 
 import statquest_locale
-from statquest_globals import DEFAULT_ALPHA_LEVEL
 
 _ = statquest_locale.setup_locale()
 
@@ -54,7 +53,7 @@ class Relation:
         self.value = value
         self.p_value = p_value
 
-    def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
+    def plausible(self, alpha):
         if self.test.prove_relationship:
             return self.p_value >= alpha
         else:
@@ -119,7 +118,7 @@ class Relations:
         """
         return self.relations[item]
 
-    def plausible(self, alpha=DEFAULT_ALPHA_LEVEL):
+    def plausible(self, alpha):
         """
         Cast to bool.
 

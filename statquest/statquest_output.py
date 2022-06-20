@@ -39,7 +39,7 @@ def output(file_name, writer, content, *args, **kwargs):
         writer(content, file, *args, **kwargs)
 
 
-def print_csv(*args, **kwargs):
+def _print_csv(*args, **kwargs):
     """
     Print in CSV format.
 
@@ -87,10 +87,10 @@ def write_descriptive_statistics_csv(observables, file):
             break
     else:
         return  # there is no key, nothing to print
-    print_csv(_('variable'), *keys, file=file)
+    _print_csv(_('variable'), *keys, file=file)
     for obs in observables:
         if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            print_csv(obs, *obs.descriptive_statistics().values(), file=file)
+            _print_csv(obs, *obs.descriptive_statistics().values(), file=file)
 
 
 def write_elements_freq_csv(observables, file):
@@ -103,10 +103,10 @@ def write_elements_freq_csv(observables, file):
     """
     for obs in observables:
         if obs.IS_ORDINAL or obs.IS_NOMINAL:
-            print_csv(obs, file=file)
+            _print_csv(obs, file=file)
             for key, value in obs.frequency_table().items():
-                print_csv(key, value, file=file)
-            print_csv(file=file)
+                _print_csv(key, value, file=file)
+            _print_csv(file=file)
 
 
 def write_relations_csv(relations, file, alpha):
@@ -121,7 +121,7 @@ def write_relations_csv(relations, file, alpha):
         file (file): file or null for console write.
         alpha (float): the alpha level
     """
-    print_csv(
+    _print_csv(
         _('data1'), _('data2'), _('test'),
         _('stat'), _('value'), _('p_value'),
         _('thesis'), _('related?'), file=file)
@@ -133,7 +133,7 @@ def write_relations_csv(relations, file, alpha):
             thesis = relation.test.h1_thesis
         else:
             thesis = relation.test.h0_thesis
-        print_csv(
+        _print_csv(
             relation.observable1, relation.observable2, relation.test.name,
             relation.test.stat_name, relation.value, relation.p_value,
             thesis, relation.plausible(alpha), file=file)

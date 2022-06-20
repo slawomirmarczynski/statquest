@@ -16,7 +16,26 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 from unittest import TestCase
 
 
+class TestRelation(TestCase):
+
+    def test___init__(self):
+        self.fail()
+
+    def test_plausible(self):
+        self.fail()
+
+
 class TestRelations(TestCase):
+
+    def test___init__(self):
+        self.fail()
+
+    def test___len__(self):
+        self.fail()
+
+    def test___getitem__(self, item):
+        self.fail()
+
     def test_create_relations(self):
         self.fail()
 
@@ -24,9 +43,4 @@ class TestRelations(TestCase):
         self.fail()
 
     def test_significant_only(self):
-        self.fail()
-
-
-class TestRelation(TestCase):
-    def test_plausible(self):
         self.fail()
