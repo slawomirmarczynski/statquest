@@ -16,14 +16,13 @@ Authors:
 Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 """
 
-
-
 from collections import defaultdict
 
 import numpy as np
 from scipy import stats
 
 import statquest_locale
+
 _ = statquest_locale.setup_locale()
 
 
@@ -272,12 +271,12 @@ class Observable:
                     _('kurtoza'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
 
-    def _check_data_kind(self, T):
+    def _check_data_kind(self, type_):
         """
         Check if all values in self.data are type T.
 
         Args:
-            T (type): int, float, str or other type
+            type_ (type): int, float, str or other type
 
         Returns:
             bool: True if all values in dictionary self.data is type T,
@@ -300,7 +299,7 @@ class Observable:
         # type of all elements, because "all" in this case mean "none".
         #
         return (len(self.data) > 0
-                and all(isinstance(v, T) for v in self.data.values()))
+                and all(isinstance(v, type_) for v in self.data.values()))
 
 
 if __name__ == "__main__":

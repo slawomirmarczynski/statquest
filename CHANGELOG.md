@@ -23,5 +23,5 @@
 
 ## 0.3.2.2
 
-- The last (and succesful) version of *ProQuest* 
+- The last (and successful) version of *ProQuest* 
   written by Sławomir Marczyński.

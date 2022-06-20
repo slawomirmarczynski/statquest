@@ -26,6 +26,13 @@ class Relation:
     For example, we have two observables (two data sets) and Anova test.
     The Relation object will contain references to observables, the test
     and alpha level and also the computed p_value.
+
+    Attributes:
+        observable1 (Observable): an observable
+        observable2 (Observable): an observable
+        test (Test): an statistical test (IT IS NOT UNIT-TEST)
+        value: the value of the test statistics.
+        p_value: the p-value, see above.
     """
 
     def __init__(self, observable1, observable2, test, value, p_value):
@@ -38,14 +45,6 @@ class Relation:
             test (Test): the statistical test which has been proceeded.
             value (float): a statistics value, for example chi-square.
             p_value (float): probability of H0 thesis.
-
-        Attributes:
-            self.observable1 (Observable): an observable
-            self.observable2 (Observable): an observable
-            self.test (Test): an statistical test (IT IS NOT UNIT-TEST)
-            self.value: the value of the test statistics.
-            self.p_value: the p-value, see above.
-            self.q_value: the q-value, see above.
         """
         self.observable1 = observable1
         self.observable2 = observable2

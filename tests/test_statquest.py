@@ -3,7 +3,7 @@
 """
 File:
     project: StatQuest
-    name: test_statquest_globals.py
+    name: test_statquest.py
     version: 0.4.0.0
     date: 19.06.2022
 
@@ -15,7 +15,7 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 
 from unittest import TestCase
 
-from statquest_globals import *
+from statquest import *
 
 
 class TestGlobals(TestCase):

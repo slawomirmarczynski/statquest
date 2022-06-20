@@ -146,7 +146,7 @@ def write_relations_dot(relations, file):
     Relations are written as graph data described in DOT language::
 
         graph {
-                "obs1" -- "obs2"
+                "obs1" -- "obs2" [ label= "Student (p = 0.0754)" ]
                 ...
         }
 
@@ -159,7 +159,7 @@ def write_relations_dot(relations, file):
 
     Args:
         relations (dict(Relations)): an dictionary where keys are
-            pair of relations (a, b) and values are Relations.
+            pairs of relations (a, b) and values are Relations.
             Notice that Relations are containers for Relation objects.
         file (file):  output file.
     """
