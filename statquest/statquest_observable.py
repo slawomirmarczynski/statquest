@@ -259,16 +259,16 @@ class Observable:
         """
         if self.IS_CONTINUOUS or self.IS_ORDINAL:
             data = tuple(self.data.values())
-            return {_('średnia'): np.mean(data),
-                    _('mediana'): np.median(data),
-                    _('dolny kwartyl'): np.percentile(data, 25),
-                    _('górny kwartyl'): np.percentile(data, 75),
-                    _('wartość najmniejsza'): np.min(data),
-                    _('wartość największa'): np.max(data),
-                    _('odchylenie standardowe'): np.std(data),
-                    _('wariancja'): np.var(data),
-                    _('asymetria'): stats.skew(data),
-                    _('kurtoza'): stats.kurtosis(data)}
+            return {_('mean'): np.mean(data),
+                    _('median'): np.median(data),
+                    _('lower quartile '): np.percentile(data, 25),
+                    _('upper quartile'): np.percentile(data, 75),
+                    _('minimum'): np.min(data),
+                    _('maximum'): np.max(data),
+                    _('standard deviation'): np.std(data),
+                    _('variation'): np.var(data),
+                    _('skewness'): stats.skew(data),
+                    _('kurtosis'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
 
     def _check_data_kind(self, type_):

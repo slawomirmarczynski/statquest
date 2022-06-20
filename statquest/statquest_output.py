@@ -90,7 +90,9 @@ def write_descriptive_statistics_csv(observables, file):
     _print_csv(_('variable'), *keys, file=file)
     for obs in observables:
         if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            _print_csv(obs, *obs.descriptive_statistics().values(), file=file)
+            values = obs.descriptive_statistics().values()
+            if values:
+                _print_csv(obs, *values, file=file)
 
 
 def write_elements_freq_csv(observables, file):
@@ -169,7 +171,8 @@ def write_relations_dot(relations, file):
             label = []
             for r in rlist:
                 s = f'{r.test.name} (p = {r.p_value:#.4})'
-                s = s.replace('Test ', '')
+                s = s.replace(_('Test '), '')
+                s = s.replace(_('test '), '')
                 label.append(s)
             label = '\\n'.join(label)
             print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
