@@ -15,6 +15,7 @@ Authors:
 Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 """
 
+
 #   BSD 3-Clause License
 #
 #   Copyright (c) 2022 Sławomir Marczyński
@@ -46,6 +47,15 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 #   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#   BSD 3-Clause License
+#
+#
+#   Redistribution and use in source and binary forms, with or without
+#   modification, are permitted provided that the following conditions are met:
+#
+#
+#
+#
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations

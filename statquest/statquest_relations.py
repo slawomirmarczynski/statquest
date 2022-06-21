@@ -6,7 +6,7 @@ The definition of Relation and Relations classes.
 File:
     project: StatQuest
     name: statquest_relations.py
-    version: 0.4.0.0
+    version: 0.4.0.1
     date: 08.06.2022
 
 Authors:

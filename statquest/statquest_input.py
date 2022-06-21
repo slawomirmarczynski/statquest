@@ -6,7 +6,7 @@ An example/template for statquest_input() function.
 File:
     project: StatQuest
     name: statquest_input.py
-    version: 0.4.0.0
+    version: 0.4.0.1
     date: 19.06.2022
 
 Authors:
