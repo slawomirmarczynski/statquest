@@ -14,8 +14,10 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 """
 import os
 from unittest import TestCase
+import io
 
 from statquest_output import *
+from statquest_output import _print_csv
 
 
 class TestOutput(TestCase):
@@ -38,11 +40,26 @@ class TestOutput(TestCase):
         file_name = os.devnull
         output(file_name, test_writer, test_content, *test_args, **test_kwargs)
 
-    def test_print_csv(self):
-        self.fail()
+    def test__print_csv_1(self):
+        string = 'anything'
+        sink = io.StringIO()
+        _print_csv(string, end='', file=sink)
+        self.assertEqual(string, sink.getvalue())
+
+    def test__print_csv_2(self):
+        string1 = 'anything1'
+        string2 = 'anything2'
+        sink = io.StringIO()
+        _print_csv(string1, string2, file=sink)
+        self.assertNotEqual(string1 + string2, sink.getvalue())
 
     def test_write_tests_doc(self):
-        self.fail()
+        class spam():
+            """Something important"""
+        sink = io.StringIO()
+        write_tests_doc((spam,), sink)
+        result = sink.getvalue()
+        self.assertNotEqual(-1, result.find("Something important"))
 
     def test_write_descriptive_statistics_csv(self):
         self.fail()
