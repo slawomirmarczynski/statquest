@@ -75,11 +75,23 @@ class Relation:
         self.value = value
         self.p_value = p_value
 
-    def plausible(self, alpha):
+    def credible(self, alpha):
+        """
+        Check if relation is credible.
+
+        Args:
+            alpha (float) : significance level.
+
+        Returns:
+            bool: True if H0 is true and H0 states that the relation is
+                credible; True if H0 is false and H0 states that the relation
+                is not credible; False if H0 is False and H0 states that the
+                relation is credible; False if H0 is True and H0 states that
+                the relation is not credible;
+        """
         if self.test.prove_relationship:
             return self.p_value >= alpha
-        else:
-            return self.p_value < alpha
+        return self.p_value < alpha
 
 
 class Relations:
@@ -105,7 +117,8 @@ class Relations:
         Returns:
             dict: the mapping of tuples (a, b) to relations.
         """
-        observables_relations = dict()
+        # pylint: disable=invalid-name  # short names a, b are ok
+        observables_relations = {}
         known_pairs = set((a, a) for a in observables)
         for a in observables:
             for b in observables:
@@ -140,7 +153,7 @@ class Relations:
         """
         return self.relations[item]
 
-    def plausible(self, alpha):
+    def credible(self, alpha):
         """
         Cast to bool.
 
@@ -151,16 +164,26 @@ class Relations:
             bool: True if any relation is significant, False otherwise.
         """
         for relation in self.relations:
-            if relation.plausible(alpha):
+            if relation.credible(alpha):
                 return True
         return False
 
     @staticmethod
-    def significant_only(indexed_relations, alpha):
+    def credible_only(indexed_relations, alpha):
+        """
+        Filter relation by significance
+
+        Args:
+            indexed_relations (dict[Relations]): an dictionary with Relations
+            alpha (float): significance level.
+
+        Returns:
+            dict[Relations]: the filtered dictionary of Relations
+        """
         result = {}
         for key, relations in indexed_relations.items():
-            if relations.plausible(alpha):
-                result[key] = [r for r in relations if r.plausible(alpha)]
+            if relations.credible(alpha):
+                result[key] = [r for r in relations if r.credible(alpha)]
         return result
 
 

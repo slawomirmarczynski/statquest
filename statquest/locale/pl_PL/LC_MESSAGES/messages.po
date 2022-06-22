@@ -10,7 +10,7 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=utf\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
@@ -111,6 +111,10 @@ msgstr "H1: hipoteza alternatywna"
 msgid "Pearson's Chi-Square Test of Independence"
 msgstr "Test niezależności chi-kwadrat Pearsona"
 
+#: statquest_tests.py:159
+msgid "chi-square"
+msgstr "chi-kwadrat"
+
 #: statquest_tests.py:167
 msgid "H0: variables are independent"
 msgstr "H0: zmienne są niezależne"
@@ -123,6 +127,10 @@ msgstr "H1: zmienne nie są niezależne"
 msgid "Kruskal-Wallis Test"
 msgstr "Test Kruskala-Waillisa"
 
+#: statquest_tests.py:286
+msgid "Kruskal-Wallis"
+msgstr "Kruskal-Wallis"
+
 #: statquest_tests.py:293
 msgid "H0: distributions are equal"
 msgstr "H0: rozkłady są takie same"
@@ -134,6 +142,10 @@ msgstr "H1: rozkłady nie są takie same"
 #: statquest_tests.py:416
 msgid "Pearson Correlation Test"
 msgstr "Test korelacji Pearsona"
+
+#: statquest_tests.py:412
+msgid "Pearson Correlation"
+msgstr "korelacja Pearsona"
 
 #: statquest_tests.py:417
 msgid "r"

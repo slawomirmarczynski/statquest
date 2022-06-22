@@ -95,5 +95,5 @@ if __name__ == '__main__':
     relations = Relations.create_relations(observables, tests)
     output(TESTS_CSV_FILE_NAME, write_relations_csv, relations, alpha)
 
-    significant_relations = Relations.significant_only(relations, alpha)
+    significant_relations = Relations.credible_only(relations, alpha)
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)

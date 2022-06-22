@@ -101,6 +101,7 @@ class Observable:
             >>> print(o3, o3.IS_ORDINAL, o3.IS_CONTINUOUS, o3.IS_NOMINAL)
             example3 False False True
         """
+        # pylint: disable=invalid-name  # uppercase for "final read-only"
         self.name = name
         self.data = dict(data)
         self.IS_CONTINUOUS = self._check_data_kind(float)

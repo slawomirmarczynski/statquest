@@ -57,7 +57,7 @@ def output(file_name, writer, content, *args, **kwargs):
         args: extra arguments to pass to writer
         kwargs: extra arguments to pass to writer
     """
-    with open(file_name, "wt") as file:
+    with open(file_name, "wt", encoding='utf-8') as file:
         # writer(content, sys.stdout)  # uncomment to echo on sys.stdout
         writer(content, file, *args, **kwargs)
 
@@ -161,7 +161,7 @@ def write_relations_csv(relations, file, alpha):
         _print_csv(
             relation.observable1, relation.observable2, relation.test.name,
             relation.test.stat_name, relation.value, relation.p_value,
-            thesis, relation.plausible(alpha), file=file)
+            thesis, relation.credible(alpha), file=file)
 
 
 def write_relations_dot(relations, file):
@@ -188,14 +188,16 @@ def write_relations_dot(relations, file):
             Notice that Relations are containers for Relation objects.
         file (file):  output file.
     """
+    # pylint: disable=invalid-name  # (a, b) are ok
     if relations:
         print('graph {', file=file)
         for (a, b), rlist in relations.items():
             label = []
             for r in rlist:
-                s = f'{r.test.name} (p = {r.p_value:#.4})'
-                s = s.replace(_('Test '), '')
-                s = s.replace(_('test '), '')
+                if r.test.prove_relationship:
+                    s = f'{r.test.name_short}  p = {r.p_value:#.4}'
+                else:
+                    s = f'{r.test.name_short}* p = {r.p_value:#.4}'
                 label.append(s)
             label = '\\n'.join(label)
             print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)

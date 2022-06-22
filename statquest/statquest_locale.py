@@ -32,7 +32,7 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 #  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
 #  THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 #  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 #  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 #  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -44,6 +44,12 @@ import locale
 
 
 def setup_locale():
+    """
+    Setup locale according to the system configuration.
+
+    Returns:
+        gettext function to translate strings.
+    """
     locale.setlocale(locale.LC_ALL, '')
     lang, _encoding = locale.getdefaultlocale()
     translation = gettext.translation('messages',

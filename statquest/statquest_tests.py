@@ -17,30 +17,6 @@ Authors:
     Sławomir Marczyński, slawek@zut.edu.pl
 """
 
-#  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions
-#  are met: 1. Redistributions of source code must retain the above
-#  copyright notice, this list of conditions and the following
-#  disclaimer. 2. Redistributions in binary form must reproduce the
-#  above copyright notice, this list of conditions and the following
-#  disclaimer in the documentation and/or other materials provided with
-#  the distribution. 3. Neither the name of the copyright holder nor
-#  the names of its contributors may be used to endorse or promote
-#  products derived from this software without specific prior written
-#  permission. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-#  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-#  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-#  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-#  THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-#  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-#  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-#  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-#  OF THE POSSIBILITY OF SUCH DAMAGE.
-
 from collections import defaultdict
 
 import numpy as np
@@ -78,6 +54,7 @@ class Test:
             from a scratch. It is useless call parametrized initializer.
         """
         self.name = _('test')
+        self.name_short = _('test')  # should not exceed n chars
         self.stat_name = 'unknown'
         self.h0_thesis = _('H0: null hypothesis')  # p_value > alpha
         self.h1_thesis = _('H1: alternative hypothesis')  # p_value < alpha
@@ -178,13 +155,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         """
         super().__init__()  # not necessary, but it is safer
 
-        # @todo: przenieść do plików z translacją
-        #
-        # self.name = _('test niezależności chi-kwadrat (Pearsona)')
-        # self.h0_thesis = _('nie ma związku między zmiennymi kategorycznymi')
-        # self.h1_thesis = _('zmienne kategoryczne nie są niezależne')
-
         self.name = _("Pearson's Chi-Square Test of Independence")
+        self.name_short = _("chi-square")  # should not exceed n chars
         self.stat_name = 'chi-square'
         self.h0_thesis = _('H0: variables are independent')
         self.h1_thesis = _('H1: variables are not independent')
@@ -311,6 +283,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         """
         super().__init__()
         self.name = _('Kruskal-Wallis Test')
+        self.name_short = _("Kruskal-Wallis")  # should not exceed n chars
         self.stat_name = 'H'
         self.h0_thesis = _('H0: distributions are equal')
         self.h1_thesis = _('H1: distributions are not equal')
@@ -436,6 +409,7 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         """
         super().__init__()
         self.name = _('Pearson Correlation Test')
+        self.name_short = _('Pearson Correlation')
         self.stat_name = _('r')
         self.h0_thesis = _('H0: data are not correlated')
         self.h1_thesis = _('H1: data are correlated')
