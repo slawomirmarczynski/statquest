@@ -332,11 +332,18 @@ class TestObservable(TestCase):
         result = self.observable_nominal.descriptive_statistics()
         self.assertIsNone(result)
 
-    def test_descriptive_statistics_3(self):
-        """Test that not-None dict object is returned"""
+    def test_descriptive_statistics_4(self):
+        """Test that None dict object is returned"""
         obs = Observable('empty observable', {})
         result = obs.descriptive_statistics()
         self.assertIsNone(result)
+
+    def test_descriptive_statistics_5(self):
+        """Test results for flat, constant, values."""
+        obs = Observable('empty observable', {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0})
+        expected = [0.0] * 9 + [-3.0]
+        result = list(obs.descriptive_statistics().values())
+        self.assertEqual(expected, result)
 
     def test__check_data_kind_1(self):
         """Recognize data type"""

@@ -12,9 +12,10 @@ Authors:
 
 Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 """
+
 import os
 from unittest import TestCase
-import io
+from unittest.mock import Mock, MagicMock, call, ANY
 
 from statquest_output import *
 
@@ -22,52 +23,44 @@ from statquest_output import *
 class TestOutput(TestCase):
 
     def test_output(self):
-        """Parameter transmission"""
-        test_args = tuple(k for k in range(10))
-        test_kwargs = {('p' + str(k)): k for k in range(10)}
-        test_content = ['test', 'content']
-
-        def test_writer(content, file_name, *args, **kwargs):
-            self.assertIsNotNone(file_name)
-            self.assertIsNotNone(content)
-            self.assertIsNotNone(args)
-            self.assertIsNotNone(kwargs)
-            self.assertListEqual(test_content, content)
-            self.assertTupleEqual(test_args, args)
-            self.assertDictEqual(test_kwargs, kwargs)
-
+        """Args transmission"""
         file_name = os.devnull
-        output(file_name, test_writer, test_content, *test_args, **test_kwargs)
-
-    def test__print_csv_1(self):
-        string = 'anything'
-        sink = io.StringIO()
-        _print_csv(string, end='', file=sink)
-        self.assertEqual(string, sink.getvalue())
-
-    def test__print_csv_2(self):
-        string1 = 'anything1'
-        string2 = 'anything2'
-        sink = io.StringIO()
-        _print_csv(string1, string2, file=sink)
-        self.assertNotEqual(string1 + string2, sink.getvalue())
+        writer = Mock()
+        content = Mock()
+        output(file_name, writer, content, 'param', key1=1)
+        writer.assert_any_call(content, ANY, 'param', key1=1)
 
     def test_write_tests_doc(self):
-        class spam():
-            """Something important"""
-        sink = io.StringIO()
-        write_tests_doc((spam,), sink)
-        result = sink.getvalue()
-        self.assertNotEqual(-1, result.find("Something important"))
+        """Writing from docstring to file"""
+        content = "Something important"
+        spamer = MagicMock()
+        spamer.__doc__ = content
+        sink = Mock()
+        write_tests_doc((spamer,), sink)
+        sink.write.assert_any_call(content)
 
     def test_write_descriptive_statistics_csv(self):
-        self.fail()
+        obs = Mock()
+        obs.IS_CONTINUOUS = True
+        obs.descriptive_statistics.return_value = {'A': 123.45, 'B': 777.89};
+        sink = Mock()
+        write_descriptive_statistics_csv((obs,), sink)
+        sink.write.assert_has_calls([
+            call(f'A{CSV_SEPARATOR}B\r\n'),
+            call(f'123.45{CSV_SEPARATOR}777.89\r\n')])
 
     def test_write_elements_freq_csv(self):
-        self.fail()
+        obs = Mock()
+        obs.IS_ORDINAL = True
+        obs.frequency_table.return_value = {1: 10, 2: 20, 3: 1}
+        sink = Mock()
+        write_elements_freq_csv((obs,), sink)
+        sink.write.assert_called()
 
-    def test_write_relations_csv(self):
-        self.fail()
-
-    def test_write_relations_dot(self):
-        self.fail()
+    # @todo: Unit tests for writers of relation/relations.
+    #
+    # def test_write_relations_csv(self):
+    #     self.fail()
+    #
+    # def test_write_relations_dot(self):
+    #     self.fail()

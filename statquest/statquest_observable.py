@@ -255,7 +255,7 @@ class Observable:
             >>> print(obs.frequency_table())
             {'A': 2, 'B': 1}
         """
-        # @todo: check if removing this assertion make no problems
+        # @todo: check if removing this assertion make no problem
         # assert self.is_ordinal() or self.is_nominal()
         freq = defaultdict(int)
         for item in self.data.values():

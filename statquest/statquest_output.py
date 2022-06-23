@@ -133,9 +133,10 @@ def write_relations_csv(relations, file, alpha):
     """
     csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
     csv_writer.writerow((
-        _('data1'), _('data2'), _('test'),
-        _('stat'), _('value'), _('p_value'),
-        _('thesis'), _('related?')))
+        _('data1'), _('data2'),
+        _('related?'),
+        _('test'), _('stat'),
+        _('value'), _('p_value'), _('thesis')))
     relations_list = list(chain.from_iterable(relations.values()))
     for relation in relations_list:
         if relation.p_value < alpha:
@@ -143,9 +144,10 @@ def write_relations_csv(relations, file, alpha):
         else:
             thesis = relation.test.h0_thesis
         csv_writer.writerow((
-            relation.observable1, relation.observable2, relation.test.name,
-            relation.test.stat_name, relation.value, relation.p_value,
-            thesis, relation.credible(alpha)))
+            relation.observable1, relation.observable2,
+            relation.credible(alpha),
+            relation.test.name, relation.test.stat_name,
+            relation.value, relation.p_value, thesis))
 
 
 def write_relations_dot(relations, file):

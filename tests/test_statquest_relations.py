@@ -21,7 +21,7 @@ class TestRelation(TestCase):
     def test___init__(self):
         self.fail()
 
-    def test_plausible(self):
+    def test_credible(self):
         self.fail()
 
 
@@ -39,8 +39,8 @@ class TestRelations(TestCase):
     def test_create_relations(self):
         self.fail()
 
-    def test_plausible(self):
+    def test_test_credible(self):
         self.fail()
 
-    def test_significant_only(self):
+    def test_credible_only(self):
         self.fail()
