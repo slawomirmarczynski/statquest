@@ -5,6 +5,14 @@ tests.csv
 tests.gv
 tests.txt
 
+# pylint files
+*/.pylint.d/*
+
+# i18n, l10n tools
+makelocalealias.py
+msgfmt.py
+pygettext.py
+
 # MS Word/Excel files
 *.docx
 *.xlsx

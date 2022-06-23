@@ -17,7 +17,6 @@ from unittest import TestCase
 import io
 
 from statquest_output import *
-from statquest_output import _print_csv
 
 
 class TestOutput(TestCase):

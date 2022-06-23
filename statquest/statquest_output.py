@@ -38,7 +38,7 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import csv
 from itertools import chain
 
 import statquest_locale
@@ -57,23 +57,9 @@ def output(file_name, writer, content, *args, **kwargs):
         args: extra arguments to pass to writer
         kwargs: extra arguments to pass to writer
     """
-    with open(file_name, "wt", encoding='utf-8') as file:
+    with open(file_name, "wt", encoding='utf-8', newline='') as file:
         # writer(content, sys.stdout)  # uncomment to echo on sys.stdout
         writer(content, file, *args, **kwargs)
-
-
-def _print_csv(*args, **kwargs):
-    """
-    Print in CSV format.
-
-    Generally print_cvs(...) behave like print(...), but use delimiters
-    to separate fields.
-
-    Args:
-        *args: any args that con be forwarded to print
-        **kwargs: any kwargs that con be forwarded to print.
-    """
-    print(*args, sep=CSV_SEPARATOR, **kwargs)
 
 
 def write_tests_doc(tests, file):
@@ -110,12 +96,11 @@ def write_descriptive_statistics_csv(observables, file):
             break
     else:
         return  # there is no key, nothing to print
-    _print_csv(_('variable'), *keys, file=file)
+    csv_writer = csv.DictWriter(file, keys, delimiter=CSV_SEPARATOR)
+    csv_writer.writeheader()
     for obs in observables:
         if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            values = obs.descriptive_statistics().values()
-            if values:
-                _print_csv(obs, *values, file=file)
+            csv_writer.writerow(obs.descriptive_statistics())
 
 
 def write_elements_freq_csv(observables, file):
@@ -126,12 +111,12 @@ def write_elements_freq_csv(observables, file):
         observables (iterable): a collection of observables
         file (file): output file.
     """
-    for obs in observables:
+    csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
+    for obs in sorted(observables, key=lambda observable: str(observable)):
         if obs.IS_ORDINAL or obs.IS_NOMINAL:
-            _print_csv(obs, file=file)
-            for key, value in obs.frequency_table().items():
-                _print_csv(key, value, file=file)
-            _print_csv(file=file)
+            csv_writer.writerow((obs,))
+            csv_writer.writerows(obs.frequency_table().items())
+            print(file=file)
 
 
 def write_relations_csv(relations, file, alpha):
@@ -146,22 +131,21 @@ def write_relations_csv(relations, file, alpha):
         file (file): file or null for console write.
         alpha (float): the alpha level
     """
-    _print_csv(
+    csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
+    csv_writer.writerow((
         _('data1'), _('data2'), _('test'),
         _('stat'), _('value'), _('p_value'),
-        _('thesis'), _('related?'), file=file)
-
+        _('thesis'), _('related?')))
     relations_list = list(chain.from_iterable(relations.values()))
-
     for relation in relations_list:
         if relation.p_value < alpha:
             thesis = relation.test.h1_thesis
         else:
             thesis = relation.test.h0_thesis
-        _print_csv(
+        csv_writer.writerow((
             relation.observable1, relation.observable2, relation.test.name,
             relation.test.stat_name, relation.value, relation.p_value,
-            thesis, relation.credible(alpha), file=file)
+            thesis, relation.credible(alpha)))
 
 
 def write_relations_dot(relations, file):
