@@ -40,7 +40,7 @@ Authors:
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import warnings
 from collections import defaultdict
 
 import numpy as np
@@ -488,7 +488,13 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         for k in keys:
             x.append(a[k])
             y.append(b[k])
-        r, p_value = stats.pearsonr(x, y)
+        # @fixme: If x is monovalued or y is monovalued then bad things happen.
+        #         The problem is not trivial, because monovalued data may be
+        #         a result of missing values removal. Below we only turn-off
+        #         warnings. More general approach is still needed.
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            r, p_value = stats.pearsonr(x, y)
         return Relation(a, b, self, r, p_value)
 
 
