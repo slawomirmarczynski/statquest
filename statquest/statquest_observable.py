@@ -32,7 +32,7 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 #  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
 #  THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 #  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 #  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 #  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
@@ -42,6 +42,7 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 from collections import defaultdict
 
 import numpy as np
+from numpy import float32, float64, int32, int64
 from scipy import stats
 
 import statquest_locale
@@ -75,6 +76,10 @@ class Observable:
         IS_ORDINAL (bool): read-only, True for an ordinal scale
     """
 
+    ORDINAL_TYPES = (int, int32, int64,)
+    CONTINUOUS_TYPES = (float, float32, float64,)
+    NOMINAL_TYPES = (str,)
+
     def __init__(self, name, data):
         """
         Initialize observable.
@@ -85,6 +90,10 @@ class Observable:
         Args:
             name (str): the observable name as a string of characters.
             data (dict): an dictionary or something that may be cast to dict.
+
+        Raises:
+            TypeError: the observable cannot be created due unknown type
+                of data values.
 
         Examples:
             Create observables and check their names and types.
@@ -104,9 +113,14 @@ class Observable:
         # pylint: disable=invalid-name  # uppercase for "final read-only"
         self.name = name
         self.data = dict(data)
-        self.IS_CONTINUOUS = self._check_data_kind(float)
-        self.IS_NOMINAL = self._check_data_kind(str)
-        self.IS_ORDINAL = self._check_data_kind(int)
+        self.IS_ORDINAL = any(
+            self._check_data_kind(T) for T in self.ORDINAL_TYPES)
+        self.IS_CONTINUOUS = any(
+            self._check_data_kind(T) for T in self.CONTINUOUS_TYPES)
+        self.IS_NOMINAL = any(
+            self._check_data_kind(T) for T in self.NOMINAL_TYPES)
+        if not (self.IS_ORDINAL or self.IS_CONTINUOUS or self.IS_NOMINAL):
+            raise TypeError
 
     def __getitem__(self, key):
         """

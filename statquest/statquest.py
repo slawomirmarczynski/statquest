@@ -33,36 +33,23 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 #  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
 #  THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 #  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 #  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 #  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-#   BSD 3-Clause License
-#
-#
-#   Redistribution and use in source and binary forms, with or without
-#   modification, are permitted provided that the following conditions are met:
-#
-#
-#
-#
-#   BSD 3-Clause License
-#
-#
-#   Redistribution and use in source and binary forms, with or without
-#   modification, are permitted provided that the following conditions are met:
-#
-#
-#
-#
+import pandas as pd
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
 from statquest_tests import ALL_STATISTICAL_TESTS
+
+# Input file name.
+# @todo: use argparse to get file name.
+#
+INPUT_CSV_FILE_NAME = 'titanic3.csv'
 
 # Setup output files names. The program will use them without any warning
 # i.e. it will not check whether any files already exist or not.
@@ -88,7 +75,7 @@ if __name__ == '__main__':
     tests = ALL_STATISTICAL_TESTS
     output(TESTS_TXT_FILE_NAME, write_tests_doc, tests)
 
-    observables = input_observables()
+    observables = input_observables(pd.read_csv(INPUT_CSV_FILE_NAME))
     output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
     output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
 
