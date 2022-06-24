@@ -96,11 +96,15 @@ def write_descriptive_statistics_csv(observables, file):
             break
     else:
         return  # there is no key, nothing to print
-    csv_writer = csv.DictWriter(file, keys, delimiter=CSV_SEPARATOR)
+    data_title = _('data')
+    entitled_keys = [data_title] + list(keys)
+    csv_writer = csv.DictWriter(file, entitled_keys, delimiter=CSV_SEPARATOR)
     csv_writer.writeheader()
     for obs in observables:
         if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            csv_writer.writerow(obs.descriptive_statistics())
+            descriptive_statistics = obs.descriptive_statistics()
+            descriptive_statistics[data_title] = str(obs)  # the name of obs
+            csv_writer.writerow(descriptive_statistics)
 
 
 def write_elements_freq_csv(observables, file):
