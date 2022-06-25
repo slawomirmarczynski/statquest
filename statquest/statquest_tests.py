@@ -40,7 +40,9 @@ Authors:
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import warnings
+from abc import ABC, abstractmethod
 from collections import defaultdict
 
 import numpy as np
@@ -52,7 +54,7 @@ from statquest_relations import Relation
 _ = statquest_locale.setup_locale()
 
 
-class Test:
+class Test(ABC):
     """
     Abstract Statistical Test.
 
@@ -68,6 +70,7 @@ class Test:
             that observables are independent.
     """
 
+    @abstractmethod
     def __init__(self):
         """
         Init test.
@@ -93,6 +96,7 @@ class Test:
         """
         return self.name
 
+    @abstractmethod
     def __call__(self, a, b):
         """
         Relation factory.
@@ -115,6 +119,7 @@ class Test:
         p_value = 0
         return Relation(a, b, self, value, p_value)
 
+    @abstractmethod
     def can_be_carried_out(self, a, b):  # pylint: disable=unused-argument
         """
         Can test be carried out?

@@ -59,6 +59,10 @@ msgstr "kurtoza"
 msgid "variable"
 msgstr "zmienna"
 
+#: statquest_output.py: 99
+msgid "data"
+msgstr "dane"
+
 #: statquest_output.py:127
 msgid "data1"
 msgstr "dane1"

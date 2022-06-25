@@ -15,7 +15,6 @@ Authors:
 Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 """
 
-
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -41,6 +40,7 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pandas as pd
+
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
