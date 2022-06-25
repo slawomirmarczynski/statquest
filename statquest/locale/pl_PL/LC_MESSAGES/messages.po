@@ -163,3 +163,7 @@ msgstr "H0: dane nie są skorelowane"
 msgid "H1: data are correlated"
 msgstr "H1: dane są skorelowane"
 
+#
+msgid "alpha probability as a number"
+msgstr "poziom istotności alfa"
+

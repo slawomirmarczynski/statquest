@@ -38,9 +38,13 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
+import gettext
+import os
+
+import locale
+import argparse
 
 import pandas as pd
-import argparse
 
 from statquest_input import input_observables
 from statquest_output import *
@@ -68,15 +72,19 @@ assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 if __name__ == '__main__':
 
+    _ = statquest_locale.setup_locale()
+    gettext.bindtextdomain('argparse', 'locale')
+    gettext.textdomain('argparse')
+
     parser = argparse.ArgumentParser(description='statquest filename')
     parser.add_argument(
         'input_csv_file_name', metavar='filename',
         type=str,
-        help='an input file in (CSV) format, for example titanic3.csv')
+        help=_('an input file in (CSV) format, for example titanic3.csv'))
     parser.add_argument(
         '-a', '--alpha', metavar='alpha', required=False,
         type=float, default=DEFAULT_ALPHA_LEVEL,
-        help=f'alpha probability as a number (default {DEFAULT_ALPHA_LEVEL})')
+        help=_('alpha probability as a number') + f' ({DEFAULT_ALPHA_LEVEL})')
     args = parser.parse_args()
 
     input_csv_file_name = args.input_csv_file_name

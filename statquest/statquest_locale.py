@@ -40,19 +40,53 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import gettext
+import os
+
 import locale
 
 
-def setup_locale():
+_setlocale_called = False
+
+
+def setup_locale(messages_domain='messages'):
     """
     Setup locale according to the system configuration.
+
+    Notes:
+        May change the environment. It is necessary for gettext,
+        because gettext get current language from  LANGUAGE,
+        LC_MESSAGES, LC_ALL or LAN environmental variables.
+
+    Args:
+        messages_domain (str): the name of the messages' domain,
+            i.e. a name of the mo-file.
 
     Returns:
         gettext function to translate strings.
     """
-    locale.setlocale(locale.LC_ALL, '')
-    lang, _encoding = locale.getdefaultlocale()
-    translation = gettext.translation('messages',
+
+    # Reset all locale settings to the user's default settings.
+    #
+    global _setlocale_called
+    if not _setlocale_called:
+        locale.setlocale(locale.LC_ALL, '')
+        _setlocale_called = True
+
+    # Get language for default locale. It is a kind of magic on MS Windows
+    # because locale.getdefaultlocale() CAN obtain this information without
+    # environmental variables (see below).
+    #
+    lang, encoding = locale.getdefaultlocale()
+
+    # 'LANG' environmental variable is changed only when it is really needed.
+    #
+    if all(x not in os.environ
+           for x in ('LANGUAGE', 'LC_MESSAGES', 'LC_ALL', 'LANG')):
+        os.environ['LANG'] = lang
+
+    # Construct and return translation object.
+    #
+    translation = gettext.translation(messages_domain,
                                       localedir='locale',
                                       languages=[lang],
                                       fallback=True)
