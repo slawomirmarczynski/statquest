@@ -40,16 +40,13 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pandas as pd
+import argparse
 
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
 from statquest_tests import ALL_STATISTICAL_TESTS
 
-# Input file name.
-# @todo: use argparse to get file name.
-#
-INPUT_CSV_FILE_NAME = 'titanic3.csv'
 
 # Setup output files names. The program will use them without any warning
 # i.e. it will not check whether any files already exist or not.
@@ -70,12 +67,25 @@ DEFAULT_ALPHA_LEVEL = 0.05
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 if __name__ == '__main__':
-    alpha = DEFAULT_ALPHA_LEVEL
+
+    parser = argparse.ArgumentParser(description='statquest filename')
+    parser.add_argument(
+        'input_csv_file_name', metavar='filename',
+        type=str,
+        help='an input file in (CSV) format, for example titanic3.csv')
+    parser.add_argument(
+        '-a', '--alpha', metavar='alpha', required=False,
+        type=float, default=DEFAULT_ALPHA_LEVEL,
+        help=f'alpha probability as a number (default {DEFAULT_ALPHA_LEVEL})')
+    args = parser.parse_args()
+
+    input_csv_file_name = args.input_csv_file_name
+    alpha = args.alpha
 
     tests = ALL_STATISTICAL_TESTS
     output(TESTS_TXT_FILE_NAME, write_tests_doc, tests)
 
-    observables = input_observables(pd.read_csv(INPUT_CSV_FILE_NAME))
+    observables = input_observables(pd.read_csv(input_csv_file_name))
     output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
     output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
 
