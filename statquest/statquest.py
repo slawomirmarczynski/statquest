@@ -15,6 +15,7 @@ Authors:
 Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 """
 
+import argparse
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -39,10 +40,6 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 import gettext
-import os
-
-import locale
-import argparse
 
 import pandas as pd
 
@@ -50,7 +47,6 @@ from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
 from statquest_tests import ALL_STATISTICAL_TESTS
-
 
 # Setup output files names. The program will use them without any warning
 # i.e. it will not check whether any files already exist or not.
@@ -71,7 +67,6 @@ DEFAULT_ALPHA_LEVEL = 0.05
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 if __name__ == '__main__':
-
     _ = statquest_locale.setup_locale()
     gettext.bindtextdomain('argparse', 'locale')
     gettext.textdomain('argparse')

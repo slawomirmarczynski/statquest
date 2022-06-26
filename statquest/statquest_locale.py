@@ -44,7 +44,6 @@ import os
 
 import locale
 
-
 _setlocale_called = False
 
 
