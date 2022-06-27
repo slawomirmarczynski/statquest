@@ -85,8 +85,10 @@ def setup_locale(messages_domain='messages'):
 
     # Construct and return translation object.
     #
+    directory = os.path.dirname(__file__)
+    localedir = os.path.join(directory, 'locale')
     translation = gettext.translation(messages_domain,
-                                      localedir='locale',
+                                      localedir=localedir,
                                       languages=[lang],
                                       fallback=True)
     return translation.gettext

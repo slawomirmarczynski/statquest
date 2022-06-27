@@ -40,6 +40,7 @@ import argparse
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 import gettext
+import os
 
 import pandas as pd
 
@@ -69,7 +70,9 @@ assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 def main():
     _ = statquest_locale.setup_locale()
-    gettext.bindtextdomain('argparse', 'locale')
+    directory = os.path.dirname(__file__)
+    localedir = os.path.join(directory, 'locale')
+    gettext.bindtextdomain('argparse', localedir)
     gettext.textdomain('argparse')
 
     parser = argparse.ArgumentParser(description='statquest filename')
