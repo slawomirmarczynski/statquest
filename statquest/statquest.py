@@ -66,7 +66,8 @@ TESTS_TXT_FILE_NAME = 'tests.txt'  # for write-ups of tests docs
 DEFAULT_ALPHA_LEVEL = 0.05
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
-if __name__ == '__main__':
+
+def main():
     _ = statquest_locale.setup_locale()
     gettext.bindtextdomain('argparse', 'locale')
     gettext.textdomain('argparse')
@@ -97,3 +98,7 @@ if __name__ == '__main__':
 
     significant_relations = Relations.credible_only(relations, alpha)
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
+
+
+if __name__ == '__main__':
+    main()
