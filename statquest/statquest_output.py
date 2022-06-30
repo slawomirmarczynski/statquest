@@ -42,6 +42,9 @@ Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
 import csv
 from itertools import chain
 
+import networkx as nx
+import matplotlib.pyplot as plt
+
 import statquest_locale
 
 CSV_SEPARATOR = ';'
@@ -193,6 +196,41 @@ def write_relations_dot(relations, file):
             label = '\\n'.join(label)
             print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
         print('}', file=file)
+
+
+def write_relations_nx(relations, file):
+    """
+    """
+    # pylint: disable=invalid-name  # (a, b) are ok
+    if relations:
+        graph = nx.Graph()  # todo: DiGraph?
+        for (a, b), rlist in relations.items():
+            label = []
+            for r in rlist:
+                if r.test.prove_relationship:
+                    s = f'{r.test.name_short}  p = {r.p_value:#.4}'
+                else:
+                    s = f'{r.test.name_short}* p = {r.p_value:#.4}'
+                label.append(s)
+            label = '\\n'.join(label)
+            graph.add_node(a)
+            graph.add_node(b)
+            graph.add_edge(a, b)
+    options = {
+        "font_size": 8,
+        "node_size": 1500,
+        "node_color": "white",
+        "edgecolors": "black",
+        "linewidths": 1,
+        "width": 1,
+    }
+    nx.draw_networkx(graph, **options)
+    #nx.draw(graph)
+    ax = plt.gca()
+    ax.margins(0.20)
+    plt.axis("off")
+    plt.show()
+
 
 
 _ = statquest_locale.setup_locale()

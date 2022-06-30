@@ -43,6 +43,7 @@ import gettext
 import os
 
 import pandas as pd
+import pandas_profiling
 
 from statquest_input import input_observables
 from statquest_output import *
@@ -56,6 +57,7 @@ from statquest_tests import ALL_STATISTICAL_TESTS
 # @todo: The overwrite protection, definition of working (sub)directory,
 #        better options to choose file names.
 #
+PAPRO_HTM_FILE_NAME = 'profi.html' # for panda profiles
 FREQS_CSV_FILE_NAME = 'freqs.csv'  # for the frequency statistics
 STATS_CSV_FILE_NAME = 'stats.csv'  # for means, variances, medians etc.
 TESTS_CSV_FILE_NAME = 'tests.csv'  # for detailed output of test results
@@ -92,7 +94,11 @@ def main():
     tests = ALL_STATISTICAL_TESTS
     output(TESTS_TXT_FILE_NAME, write_tests_doc, tests)
 
-    observables = input_observables(pd.read_csv(input_csv_file_name))
+    data_frame = pd.read_csv(input_csv_file_name)
+    profile_report = pandas_profiling.ProfileReport(data_frame)
+    profile_report.to_file(PAPRO_HTM_FILE_NAME)
+
+    observables = input_observables(data_frame)
     output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
     output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
 
@@ -101,6 +107,7 @@ def main():
 
     significant_relations = Relations.credible_only(relations, alpha)
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
+    output(TESTS_DOT_FILE_NAME, write_relations_nx, significant_relations)
 
 
 if __name__ == '__main__':
