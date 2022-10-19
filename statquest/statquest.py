@@ -10,12 +10,11 @@ File:
     date: 19.06.2022
 
 Authors:
-    Sławomir Marczyński, slawek@zut.edu.pl
+    Sławomir Marczyński
 
-Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl
+Copyright (c) 2022 Sławomir Marczyński
 """
 
-import argparse
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -39,6 +38,8 @@ import argparse
 #  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
+
+import argparse
 import gettext
 import os
 

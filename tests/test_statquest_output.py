@@ -8,9 +8,9 @@ File:
     date: 19.06.2022
 
 Authors:
-    Sławomir Marczyński, slawek@zut.edu.pl
+    Sławomir Marczyński
 
-Copyright (c) 2022 Sławomir Marczyński, slawek@zut.edu.pl.
+Copyright (c) 2022 Sławomir Marczyński.
 """
 
 import os
