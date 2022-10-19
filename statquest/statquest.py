@@ -96,6 +96,7 @@ def main():
 
     data_frame = pd.read_csv(input_csv_file_name)
     profile_report = pandas_profiling.ProfileReport(data_frame)
+    # plot={"dpi": 200, "image_format": "png"})
     profile_report.to_file(PAPRO_HTM_FILE_NAME)
 
     observables = input_observables(data_frame)
