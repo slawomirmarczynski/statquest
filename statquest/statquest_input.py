@@ -6,8 +6,8 @@ An example/template for statquest_input() function.
 File:
     project: StatQuest
     name: statquest_input.py
-    version: 0.4.0.1
-    date: 19.06.2022
+    version: 0.4.0.2
+    date: 19.10.2022
 
 Authors:
     Sławomir Marczyński
@@ -66,5 +66,13 @@ def input_observables(data_frame):
         name = str(index)
         series = data_frame[index]
         series = series.dropna()
-        observables.append(Observable(name, dict(series)))
+        try:
+            obs = Observable(name, dict(series));
+            if len(obs) > 2:
+                observables.append(obs)
+                print(f"{name} ok")
+            else:
+                print(f"{name} too short")
+        except:
+            print(f"{name} fail")
     return observables

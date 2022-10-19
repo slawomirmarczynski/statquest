@@ -6,8 +6,8 @@ The definition of Observable class.
 File:
     project: StatQuest
     name: statquest_observable.py
-    version: 0.4.0.1
-    date: 19.06.2022
+    version: 0.4.0.2
+    date: 19.10.2022
 
 Authors:
     Sławomir Marczyński

@@ -128,7 +128,10 @@ class Relations:
                     observable_relations = Relations()
                     for test in tests:
                         if test.can_be_carried_out(a, b):
-                            observable_relations.relations.append(test(a, b))
+                            try:
+                                observable_relations.relations.append(test(a, b))
+                            except:
+                                print('ups... something goes wrong')
                     observables_relations[(a, b)] = observable_relations
         return observables_relations
 
