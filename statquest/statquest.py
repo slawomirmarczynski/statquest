@@ -6,8 +6,8 @@ The main module of StatQuest.
 File:
     project: StatQuest
     name: statquest.py
-    version: 0.4.0.1
-    date: 19.06.2022
+    version: 0.4.0.2
+    date: 19.10.2022
 
 Authors:
     Sławomir Marczyński
@@ -95,7 +95,7 @@ def main():
     tests = ALL_STATISTICAL_TESTS
     output(TESTS_TXT_FILE_NAME, write_tests_doc, tests)
 
-    data_frame = pd.read_csv(input_csv_file_name)
+    data_frame = pd.read_csv(input_csv_file_name, encoding='cp1250', sep=';', decimal=',')
     profile_report = pandas_profiling.ProfileReport(data_frame)
     # plot={"dpi": 200, "image_format": "png"})
     profile_report.to_file(PAPRO_HTM_FILE_NAME)
@@ -108,8 +108,8 @@ def main():
     output(TESTS_CSV_FILE_NAME, write_relations_csv, relations, alpha)
 
     significant_relations = Relations.credible_only(relations, alpha)
-    output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
     output(TESTS_DOT_FILE_NAME, write_relations_nx, significant_relations)
+    output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
 
 
 if __name__ == '__main__':
