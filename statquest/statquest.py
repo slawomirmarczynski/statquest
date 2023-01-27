@@ -67,7 +67,7 @@ TESTS_TXT_FILE_NAME = 'tests.txt'  # for write-ups of tests docs
 
 # Default importance level alpha, it is a probability as a float number.
 #
-DEFAULT_ALPHA_LEVEL = 0.001
+DEFAULT_ALPHA_LEVEL = 0.99
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 
@@ -97,9 +97,9 @@ def main():
 
     data_frame = pd.read_csv(input_csv_file_name, encoding='cp1250', sep=';', decimal=',')
     data_frame = data_frame.copy()  # should defrag data_frame
-    profile_report = pandas_profiling.ProfileReport(data_frame)
-    # plot={"dpi": 200, "image_format": "png"})
-    profile_report.to_file(PAPRO_HTM_FILE_NAME)
+    # profile_report = pandas_profiling.ProfileReport(data_frame)
+    # # plot={"dpi": 200, "image_format": "png"})
+    # profile_report.to_file(PAPRO_HTM_FILE_NAME)
 
     print(data_frame)
 
