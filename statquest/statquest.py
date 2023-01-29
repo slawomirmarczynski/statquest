@@ -39,7 +39,6 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import argparse
 import gettext
 import os
 
@@ -50,20 +49,8 @@ from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
 from statquest_tests import ALL_STATISTICAL_TESTS
+from statquest_gui import FileNamesFromGUI
 
-# Setup output files names. The program will use them without any warning
-# i.e. it will not check whether any files already exist or not.
-# Therefore, the program should be run in the appropriate working directory.
-
-# @todo: The overwrite protection, definition of working (sub)directory,
-#        better options to choose file names.
-#
-PAPRO_HTM_FILE_NAME = 'profi.html' # for panda profiles
-FREQS_CSV_FILE_NAME = 'freqs.csv'  # for the frequency statistics
-STATS_CSV_FILE_NAME = 'stats.csv'  # for means, variances, medians etc.
-TESTS_CSV_FILE_NAME = 'tests.csv'  # for detailed output of test results
-TESTS_DOT_FILE_NAME = 'tests.gv'  # for a graph in DOT language (GraphViz)
-TESTS_TXT_FILE_NAME = 'tests.txt'  # for write-ups of tests docs
 
 # Default importance level alpha, it is a probability as a float number.
 #
@@ -71,31 +58,31 @@ DEFAULT_ALPHA_LEVEL = 0.99
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 
-def main():
+
+
+if __name__ == '__main__':
+
     _ = statquest_locale.setup_locale()
     directory = os.path.dirname(__file__)
     localedir = os.path.join(directory, 'locale')
     gettext.bindtextdomain('argparse', localedir)
     gettext.textdomain('argparse')
 
-    parser = argparse.ArgumentParser(description='statquest filename')
-    parser.add_argument(
-        'input_csv_file_name', metavar='filename',
-        type=str,
-        help=_('an input file in (CSV) format, for example titanic3.csv'))
-    parser.add_argument(
-        '-a', '--alpha', metavar='alpha', required=False,
-        type=float, default=DEFAULT_ALPHA_LEVEL,
-        help=_('alpha probability as a number') + f' ({DEFAULT_ALPHA_LEVEL})')
-    args = parser.parse_args()
-
-    input_csv_file_name = args.input_csv_file_name
-    alpha = args.alpha
+    files_names = FileNamesFromGUI()
 
     tests = ALL_STATISTICAL_TESTS
-    output(TESTS_TXT_FILE_NAME, write_tests_doc, tests)
+    output(files_names.tests_txt_file_name, write_tests_doc, tests)
 
-    data_frame = pd.read_csv(input_csv_file_name, encoding='cp1250', sep=';', decimal=',')
+    if files_names.input_file_name_is_csv_file():
+        data_frame = pd.read_csv(files_names.input_file_name,
+                                 encoding='cp1250', sep=';', decimal=',')
+    elif files_names.input_file_is_excel_file():
+        raise NotImplementedError
+    else:
+        raise NotImplementedError
+
+    alpha, can_profile, data_frame = SelectOptionsFromGUI()
+
     data_frame = data_frame.copy()  # should defrag data_frame
     # profile_report = pandas_profiling.ProfileReport(data_frame)
     # # plot={"dpi": 200, "image_format": "png"})
@@ -115,5 +102,4 @@ def main():
     output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
 
 
-if __name__ == '__main__':
-    main()
+#    main()
