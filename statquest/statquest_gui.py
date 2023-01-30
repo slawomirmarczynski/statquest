@@ -67,7 +67,7 @@ class FileNamesFromGUI:
             # test results, the graph in DOT language (GraphViz) and write-ups
             # of tests docs.
 
-            self.__files_collection= set()
+            self.__files_collection = set()
             self.profi_htm_file_name = self.__make_name('_profi', '.html')
             self.freqs_csv_file_name = self.__make_name('_freqs', '.csv')
             self.stats_csv_file_name = self.__make_name('_stats', '.csv')
@@ -75,8 +75,7 @@ class FileNamesFromGUI:
             self.tests_dot_file_name = self.__make_name('_links', '.gv')
             self.tests_txt_file_name = self.__make_name('_tests', '.txt')
             if any(map(os.path.exists, self.__files_collection)):
-                overwrite = tkinter.messagebox.askokcancel(
-                    parent=root,
+                overwrite = tkinter.messagebox.askokcancel(parent=root,
                     title='StatQuest',
                     message='Czy można nadpisać istniejące wyniki?')
                 if not overwrite:
@@ -104,22 +103,24 @@ class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
         canvas = tk.Canvas(self)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        scrollbar = ttk.Scrollbar(self, orient="vertical",
+                                  command=canvas.yview)
         self.scrollable_frame = ttk.Frame(canvas)
-
-        self.scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(
-                scrollregion=canvas.bbox("all")
-            )
-        )
-
+        self.scrollable_frame.bind("<Configure>", lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")))
         canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-
         canvas.configure(yscrollcommand=scrollbar.set)
-
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+
+
+class IntroFrame(ttk.Frame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super().pack(side='top')
+        label = ttk.Label(self, text="Łubu dubu łubu dubu", background='yellow')
+        label.pack()
+
 
 if __name__ == '__main__':
 
@@ -128,10 +129,8 @@ if __name__ == '__main__':
     root = tk.Tk()
     frame = ScrollableFrame(root)
     frame.grid()
-    inter = tk.Frame(frame.scrollable_frame)
-    inter.grid()
-    for i in range(30):
-        b = ttk.Button(inter, text='button ' + str(i))
-        b.grid(row=i, column=0)
+    intro_frame = IntroFrame(frame.scrollable_frame)
+    intro_frame.grid()
+
 
     root.mainloop()
