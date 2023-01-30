@@ -39,12 +39,16 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import gettext
+# import gettext
 import os
+import tkinter as tk
+import tkinter.messagebox
+from tkinter import filedialog, ttk
 
 import pandas as pd
 import pandas_profiling
 
+from statquest_gui import *
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
@@ -65,10 +69,24 @@ if __name__ == '__main__':
     _ = statquest_locale.setup_locale()
     directory = os.path.dirname(__file__)
     localedir = os.path.join(directory, 'locale')
-    gettext.bindtextdomain('argparse', localedir)
-    gettext.textdomain('argparse')
+    # gettext.bindtextdomain('argparse', localedir)
+    # gettext.textdomain('argparse')
 
-    files_names = FileNamesFromGUI()
+    root = tk.Tk()
+    root.title('StatQuest')
+    frame = ScrollableFrame(root)
+    frame.pack(fill='both', expand=True)
+    intro = IntroFrame(frame.scrollable_frame)
+    intro.pack(fill='both', expand=True)
+    file_frame = FileFrame(frame.scrollable_frame)
+    file_frame.pack(fill='x', expand=True)
+    parameters_frame = ParametersFrame(frame.scrollable_frame)
+    parameters_frame.pack(fill='x', expand=True)
+
+    for w in frame.scrollable_frame.winfo_children():
+        w.pack_configure(padx=5, pady=5)
+
+    root.mainloop()
 
     tests = ALL_STATISTICAL_TESTS
     output(files_names.tests_txt_file_name, write_tests_doc, tests)
