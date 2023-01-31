@@ -40,35 +40,21 @@ Copyright (c) 2022 Sławomir Marczyński
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import pandas as pd
+import statquest_locale
 
 
 class DataFrameProvider:
-    def __init__(self, locale='pl_PL'):
+    def __init__(self):
         self.__data_frame = pd.DataFrame()
-        if locale == 'pl_PL':
-            self.encoding = 'cp1250'
-            self.sep = ';'
-            self.decimal = ','
-        else:
-            self.encoding = 'utf-8'
-            self.sep = ','
-            self.decimal = '.'
+        self.__cvs_format = statquest_locale.setup_locale_csv_format()
+
+    def set_locale(self, locale='default'):
+        self.__cvs_format = statquest_locale.setup_locale_csv_format(locale)
+        return self
 
     def load(self, file_name):
-        self.__data_frame = pd.read_csv(file_name, encoding=self.encoding,
-                                        sep=self.sep, decimal=self.decimal)
+        self.__data_frame = pd.read_csv(file_name, **self.__locale_cvs_format)
+        return self
 
     def get(self):
         return self.__data_frame
-
-
-if __name__ == '__main__':
-
-    dfp = DataFrameProvider(locale='gb_GB')
-    #dfp.load('titanic3.csv')
-    d = dfp.get()
-    print(type(d), d)
-    d = tuple(d)
-    print(type(d), d)
-    for x in d:
-        print(type(x), x)

@@ -14,7 +14,7 @@ Authors:
 
 Copyright (c) 2022 Sławomir Marczyński
 """
-
+import gettext
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -39,21 +39,18 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# import gettext
-import os
-import tkinter as tk
-import tkinter.messagebox
-from tkinter import filedialog, ttk
+
 
 import pandas as pd
 import pandas_profiling
 
+import statquest_dataframe
 from statquest_gui import *
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations
 from statquest_tests import ALL_STATISTICAL_TESTS
-from statquest_gui import FileNamesFromGUI
+import statquest_gui
 
 
 # Default importance level alpha, it is a probability as a float number.
@@ -62,62 +59,43 @@ DEFAULT_ALPHA_LEVEL = 0.99
 assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 
+class ComputationEngine:
+    def main_worker_proc(self, *args, **kwargs):
+        pass
+        # tests = ALL_STATISTICAL_TESTS
+        # output(files_names.tests_txt_file_name, write_tests_doc, tests)
+        #
+        # if files_names.input_file_name_is_csv_file():
+        #     data_frame = pd.read_csv(files_names.input_file_name,
+        #                              encoding='cp1250', sep=';', decimal=',')
+        # elif files_names.input_file_is_excel_file():
+        #     raise NotImplementedError
+        # else:
+        #     raise NotImplementedError
+        #
+        # alpha, can_profile, data_frame = SelectOptionsFromGUI()
+        #
+        # data_frame = data_frame.copy()  # should defrag data_frame
+        # # profile_report = pandas_profiling.ProfileReport(data_frame)
+        # # # plot={"dpi": 200, "image_format": "png"})
+        # # profile_report.to_file(PAPRO_HTM_FILE_NAME)
+        #
+        # print(data_frame)
+        #
+        # observables = input_observables(data_frame)
+        # output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
+        # output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
+        #
+        # relations = Relations.create_relations(observables, tests)
+        # output(TESTS_CSV_FILE_NAME, write_relations_csv, relations, alpha)
+        #
+        # significant_relations = Relations.credible_only(relations, alpha)
+        # output(TESTS_DOT_FILE_NAME, write_relations_nx, significant_relations)
+        # output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
 
 
 if __name__ == '__main__':
 
-    _ = statquest_locale.setup_locale()
-    directory = os.path.dirname(__file__)
-    localedir = os.path.join(directory, 'locale')
-    # gettext.bindtextdomain('argparse', localedir)
-    # gettext.textdomain('argparse')
-
-    root = tk.Tk()
-    root.title('StatQuest')
-    frame = ScrollableFrame(root)
-    frame.pack(fill='both', expand=True)
-    intro = IntroFrame(frame.scrollable_frame)
-    intro.pack(fill='both', expand=True)
-    file_frame = FileFrame(frame.scrollable_frame)
-    file_frame.pack(fill='x', expand=True)
-    parameters_frame = ParametersFrame(frame.scrollable_frame)
-    parameters_frame.pack(fill='x', expand=True)
-
-    for w in frame.scrollable_frame.winfo_children():
-        w.pack_configure(padx=5, pady=5)
-
-    root.mainloop()
-
-    tests = ALL_STATISTICAL_TESTS
-    output(files_names.tests_txt_file_name, write_tests_doc, tests)
-
-    if files_names.input_file_name_is_csv_file():
-        data_frame = pd.read_csv(files_names.input_file_name,
-                                 encoding='cp1250', sep=';', decimal=',')
-    elif files_names.input_file_is_excel_file():
-        raise NotImplementedError
-    else:
-        raise NotImplementedError
-
-    alpha, can_profile, data_frame = SelectOptionsFromGUI()
-
-    data_frame = data_frame.copy()  # should defrag data_frame
-    # profile_report = pandas_profiling.ProfileReport(data_frame)
-    # # plot={"dpi": 200, "image_format": "png"})
-    # profile_report.to_file(PAPRO_HTM_FILE_NAME)
-
-    print(data_frame)
-
-    observables = input_observables(data_frame)
-    output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
-    output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
-
-    relations = Relations.create_relations(observables, tests)
-    output(TESTS_CSV_FILE_NAME, write_relations_csv, relations, alpha)
-
-    significant_relations = Relations.credible_only(relations, alpha)
-    output(TESTS_DOT_FILE_NAME, write_relations_nx, significant_relations)
-    output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
-
-
-#    main()
+    data_frame_provider = statquest_dataframe.DataFrameProvider()
+    computation_engine = ComputationEngine()
+    statquest_gui.run(data_frame_provider, computation_engine)

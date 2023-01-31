@@ -42,77 +42,25 @@ Copyright (c) 2022 Sławomir Marczyński
 
 import os
 import tkinter as tk
-import tkinter.messagebox
 from tkinter import filedialog, ttk
-import pandas as pd
-import statquest_dataframe
 
-
-class FileNamesFromGUI:
-    def __init__(self):
-        print("Swimming")
-        root = tk.Tk()
-        root.withdraw()
-        self.input_file_name = filedialog.askopenfilename(
-            filetypes=(('CSV', '*.csv'), ("Excel", "*.xlsx")))
-        if self.input_file_name:
-            self.input_file_name = os.path.normpath(self.input_file_name)
-            self.__head, self.__tail = os.path.split(self.input_file_name)
-            self.__name, self.__extension = os.path.splitext(self.__tail)
-            if self.__extension not in ('.csv', '.xlsx'):
-                raise ValueError
-
-            # File names for the input file, panda profiles, the frequency
-            # statistics, means-variances-medians-etc., the detailed output of
-            # test results, the graph in DOT language (GraphViz) and write-ups
-            # of tests docs.
-
-            self.__files_collection = set()
-            self.profi_htm_file_name = self.__make_name('_profi', '.html')
-            self.freqs_csv_file_name = self.__make_name('_freqs', '.csv')
-            self.stats_csv_file_name = self.__make_name('_stats', '.csv')
-            self.tests_csv_file_name = self.__make_name('_tests', '.csv')
-            self.tests_dot_file_name = self.__make_name('_links', '.gv')
-            self.tests_txt_file_name = self.__make_name('_tests', '.txt')
-            if any(map(os.path.exists, self.__files_collection)):
-                overwrite = tkinter.messagebox.askokcancel(parent=root,
-                                                           title='StatQuest',
-                                                           message='Czy można nadpisać istniejące wyniki?')
-                if not overwrite:
-                    raise FileExistsError
-
-            print(self.__files_collection)
-        else:
-            raise FileNotFoundError
-
-    def input_file_is_csv_file(self):
-        return self.__extension == '.csv'
-
-    def input_file_is_excel_file(self):
-        return self.__extension == '.xlsx'
-
-    def __make_name(self, postfix, extension):
-        name = os.path.join(self.__head, self.__name + postfix + extension)
-        if name in self.__files_collection:
-            raise RuntimeError
-        self.__files_collection.add(name)
-        return name
+from statquest import statquest_locale
 
 
 class ScrollableFrame(ttk.Frame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         canvas = tk.Canvas(self, width=0)
-        scrollbar = ttk.Scrollbar(self, orient='vertical',
-                                  command=canvas.yview)
+        sb = ttk.Scrollbar(self, orient='vertical', command=canvas.yview)
         self.scrollable_frame = ttk.Frame(canvas)
-        self.scrollable_frame.bind('<Configure>',
-                                   lambda event: canvas.configure(
-                                       scrollregion=canvas.bbox('all')))
+        self.scrollable_frame.bind(
+            '<Configure>',
+            lambda event: canvas.configure(scrollregion=canvas.bbox('all'))
+        )
         canvas.create_window((0, 0), window=self.scrollable_frame, anchor='nw')
-        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.configure(yscrollcommand=sb.set)
         canvas.pack(side='left', fill='both', expand=True)
-        scrollbar.pack(side='right', fill='y')
+        sb.pack(side='right', fill='y')
 
 
 class BorderedFrame(ttk.Frame):
@@ -120,10 +68,10 @@ class BorderedFrame(ttk.Frame):
         super().__init__(*args, relief='solid', borderwidth=5, **kwargs)
 
 
-class IntroFrame(BorderedFrame):
+class IntroFrame(ttk.Frame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        label = ttk.Label(self, text='Program do analizy danych')
+        label = ttk.Label(self, text=_('Program do analizy danych'))
         label.pack(fill='x', expand=True)
 
 
@@ -182,10 +130,6 @@ class FileFrame(BorderedFrame):
                 self.tests_txt.set(
                     os.path.join(head, name + '_tests' + '.txt'))
 
-                data_frame = pd.read_csv(files_names.input_file_name,
-                                         encoding='cp1250', sep=';',
-                                         decimal=',')
-
         def pick_save(variable, file_type):
             known_types = {'.txt': 'text', '.csv': 'CSV', '.xlmx': 'Excel',
                            '.html': 'HTML', '.gv': 'DOT', }
@@ -215,7 +159,6 @@ class FileFrame(BorderedFrame):
         button_tests_txt = ttk.Button(self, text='change',
                                       command=lambda: pick_save(self.tests_txt,
                                                                 ".txt"))
-
         label_input_csv.grid(row=0, column=0, sticky='e')
         label_profi_htm.grid(row=1, column=0, sticky='e')
         label_freqs_csv.grid(row=2, column=0, sticky='e')
@@ -265,22 +208,28 @@ class ParametersFrame(BorderedFrame):
         checkbox_profile.grid(row=0, column=3)
 
 
-if __name__ == '__main__':
-
-    dfp = statquest_dataframe.DataFrameProvider()
-
+def run(data_frame_provider, computation_engine):
     root = tk.Tk()
     root.title('StatQuest')
+
     frame = ScrollableFrame(root)
-    frame.pack(fill='both', expand=True)
     intro = IntroFrame(frame.scrollable_frame)
-    intro.pack(fill='both', expand=True)
-    file_frame = FileFrame(frame.scrollable_frame)
-    file_frame.pack(fill='x', expand=True)
     parameters_frame = ParametersFrame(frame.scrollable_frame)
-    parameters_frame.pack(fill='x', expand=True)
+    file_frame = FileFrame(frame.scrollable_frame)
+
+    frame.pack(fill='both', expand=True)
+    intro.pack(fill='x')
+    parameters_frame.pack(fill='x')
+    file_frame.pack(fill='x')
 
     for w in frame.scrollable_frame.winfo_children():
         w.pack_configure(padx=5, pady=5)
 
     root.mainloop()
+
+
+_ = statquest_locale.setup_locale_translation_gettext()
+# directory = os.path.dirname(__file__)
+# localedir = os.path.join(directory, 'locale')
+# gettext.bindtextdomain('argparse', localedir)
+# gettext.textdomain('argparse')

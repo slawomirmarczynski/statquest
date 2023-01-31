@@ -233,7 +233,7 @@ def write_relations_nx(relations, file):
 
 
 
-_ = statquest_locale.setup_locale()
+_ = statquest_locale.setup_locale_translation_gettext()
 if __name__ == "__main__":
     import doctest
 

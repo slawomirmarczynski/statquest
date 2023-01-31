@@ -51,7 +51,7 @@ from scipy import stats
 import statquest_locale
 from statquest_relations import Relation
 
-_ = statquest_locale.setup_locale()
+_ = statquest_locale.setup_locale_translation_gettext()
 
 
 class Test(ABC):

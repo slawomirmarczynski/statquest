@@ -47,7 +47,7 @@ from scipy import stats
 
 import statquest_locale
 
-_ = statquest_locale.setup_locale()
+_ = statquest_locale.setup_locale_translation_gettext()
 
 
 class Observable:

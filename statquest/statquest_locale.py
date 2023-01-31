@@ -40,14 +40,13 @@ Copyright (c) 2022 Sławomir Marczyński.
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import gettext
-import os
-
 import locale
+import os
 
 _setlocale_called = False
 
 
-def setup_locale(messages_domain='messages'):
+def setup_locale_translation_gettext(messages_domain='messages'):
     """
     Setup locale according to the system configuration.
 
@@ -71,7 +70,7 @@ def setup_locale(messages_domain='messages'):
         locale.setlocale(locale.LC_ALL, '')
         _setlocale_called = True
 
-    # Get language for default locale. It is a kind of magic on MS Windows
+    # Set language for default locale. It is a kind of magic on MS Windows
     # because locale.getdefaultlocale() CAN obtain this information without
     # environmental variables (see below).
     #
@@ -79,16 +78,36 @@ def setup_locale(messages_domain='messages'):
 
     # 'LANG' environmental variable is changed only when it is really needed.
     #
-    if all(x not in os.environ
-           for x in ('LANGUAGE', 'LC_MESSAGES', 'LC_ALL', 'LANG')):
+    if all(x not in os.environ for x in
+           ('LANGUAGE', 'LC_MESSAGES', 'LC_ALL', 'LANG')):
         os.environ['LANG'] = lang
 
     # Construct and return translation object.
     #
     directory = os.path.dirname(__file__)
     localedir = os.path.join(directory, 'locale')
-    translation = gettext.translation(messages_domain,
-                                      localedir=localedir,
-                                      languages=[lang],
-                                      fallback=True)
+    translation = gettext.translation(messages_domain, localedir=localedir,
+                                      languages=[lang], fallback=True)
     return translation.gettext
+
+
+def setup_locale_csv_format(locale_code='default'):
+    """
+    Get settings for reading CSV files.
+
+    Args:
+        locale: locale code like 'pl_PL'; 'default' for system-default.
+
+    Returns:
+        kwargs dictionary with appropriate settings for pandas.read_csv()
+    """
+    if locale_code == 'default':
+        locale_code, encoding = locale.getdefaultlocale()
+    kwargs = {}
+    if locale_code is None:
+        kwargs = {}
+    elif locale_code == 'pl_PL':
+        kwargs = {'encoding': 'cp1250', 'sep': ';', 'decimal': ','}
+    elif locale_code == 'en_US':
+        kwargs = {}
+    return kwargs
