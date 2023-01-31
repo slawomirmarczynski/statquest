@@ -48,6 +48,10 @@ from statquest import statquest_locale
 
 
 class ScrollableFrame(ttk.Frame):
+    """
+    Widget umożliwiający pionowe przewijanie zawartości.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         canvas = tk.Canvas(self, width=0)
@@ -64,28 +68,87 @@ class ScrollableFrame(ttk.Frame):
 
 
 class BorderedFrame(ttk.Frame):
+    """
+    Klasa ubogacająca zwykłe ttk.Frame o widoczną ramkę.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, relief='solid', borderwidth=5, **kwargs)
 
 
 class IntroFrame(ttk.Frame):
+    """
+    Krótki opis co program robi.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         label = ttk.Label(self, text=_('Program do analizy danych'))
         label.pack(fill='x', expand=True)
 
 
-class FileFrame(BorderedFrame):
+class ParametersFrame(BorderedFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        label_input_csv = ttk.Label(self, text="Input file name:")
-        label_profi_htm = ttk.Label(self, text="Output profile:")
-        label_freqs_csv = ttk.Label(self, text="Output frequency table:")
-        label_stats_csv = ttk.Label(self, text="Output statistics:")
-        label_tests_csv = ttk.Label(self, text="Output test results:")
-        label_tests_dot = ttk.Label(self, text="Output graph:")
-        label_tests_txt = ttk.Label(self, text="Output documentation:")
+        def callback(*args):
+            if columns_frame:
+                columns_frame.parameters_frame_observer(self.locale_code.get())
+
+        self.alpha = tk.DoubleVar(value=0.95)
+        self.profile = tk.BooleanVar(value=False)
+        self.locale_code = tk.StringVar()
+        self.locale_code.trace('w', callback)
+
+        label = ttk.Label(self, text='Parametry')
+        label.grid(row=0, column=0, sticky='w')
+
+        label_alpha = ttk.Label(
+            self, text='α jako krytyczna wartość dla p-value: ')
+        label_alpha.grid(row=1, column=0, sticky='e')
+        entry_alpha = ttk.Entry(self, width=20, textvariable=self.alpha)
+        entry_alpha.grid(row=1, column=1, sticky='w')
+
+        checkbox_profile = ttk.Checkbutton(
+            self, text='generowanie raportu Pandas Profile',
+            variable=self.profile, onvalue=True, offvalue=False)
+        checkbox_profile.grid(row=2, column=0, sticky='w')
+
+        label_locale = ttk.Label(self, text='Ustawienia regionalne:')
+        label_locale.grid(row=3, column=0, sticky='e')
+        combobox_locale = ttk.Combobox(self, width=8,
+                                       textvariable=self.locale_code)
+        combobox_locale.grid(row=3, column=1, sticky='w')
+        combobox_locale['values'] = ('pl_PL', 'en_US')
+        combobox_locale.current(0)
+
+        for w in self.winfo_children():
+            w.grid_configure(padx=5, pady=5)
+
+    def export_data_to_object(self, obj):
+        obj.alpha = self.alpha.get()
+        obj.should_compute_pandas_profile = self.profile.get()
+        obj.locale_code = self.locale_code.get()
+
+
+class FileFrame(BorderedFrame):
+    """
+    Wybór plików.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.observed_by = None
+
+        label_input = ttk.Label(self, text="Dane wejściowe")
+        label_output = ttk.Label(self, text="Wyniki obliczeń")
+        label_input_csv = ttk.Label(self, text="Dane (CSV lub XSLX):")
+        label_profi_htm = ttk.Label(self, text="Profil (HTML):")
+        label_freqs_csv = ttk.Label(self, text="Tablica częstości (CSV):")
+        label_stats_csv = ttk.Label(self, text="Statystyki (CSV):")
+        label_tests_csv = ttk.Label(self, text="Wyniki testów (CSV):")
+        label_tests_dot = ttk.Label(self, text="Graf zależności (GV):")
+        label_tests_txt = ttk.Label(self, text="Opis testów (TXT):")
 
         self.input_csv = tk.StringVar()
         self.profi_htm = tk.StringVar()
@@ -94,6 +157,25 @@ class FileFrame(BorderedFrame):
         self.tests_csv = tk.StringVar()
         self.tests_dot = tk.StringVar()
         self.tests_txt = tk.StringVar()
+
+        def callback(*args):
+            head, tail = os.path.split(self.input_csv.get())
+            name, extension = os.path.splitext(tail)
+            self.profi_htm.set(
+                os.path.join(head, name + '_profi' + '.html'))
+            self.freqs_csv.set(
+                os.path.join(head, name + '_freqs' + '.csv'))
+            self.stats_csv.set(
+                os.path.join(head, name + '_stats' + '.csv'))
+            self.tests_csv.set(
+                os.path.join(head, name + '_tests' + '.csv'))
+            self.tests_dot.set(os.path.join(head, name + '_links' + '.gv'))
+            self.tests_txt.set(
+                os.path.join(head, name + '_tests' + '.txt'))
+            if columns_frame:
+                columns_frame.file_frame_observer(self.input_csv.get())
+
+        self.input_csv.trace('w', callback)
 
         entry_input_csv = ttk.Entry(self, width=80,
                                     textvariable=self.input_csv)
@@ -110,25 +192,12 @@ class FileFrame(BorderedFrame):
         entry_tests_txt = ttk.Entry(self, width=80,
                                     textvariable=self.tests_txt)
 
-        def setup_all():
+        def pick_open():
             full_name = filedialog.askopenfilename(
                 filetypes=(('CSV', '*.csv'), ("Excel", "*.xlsx")))
             if full_name:
                 full_name = os.path.normpath(full_name)
                 self.input_csv.set(full_name)
-                head, tail = os.path.split(full_name)
-                name, extension = os.path.splitext(tail)
-                self.profi_htm.set(
-                    os.path.join(head, name + '_profi' + '.html'))
-                self.freqs_csv.set(
-                    os.path.join(head, name + '_freqs' + '.csv'))
-                self.stats_csv.set(
-                    os.path.join(head, name + '_stats' + '.csv'))
-                self.tests_csv.set(
-                    os.path.join(head, name + '_tests' + '.csv'))
-                self.tests_dot.set(os.path.join(head, name + '_links' + '.gv'))
-                self.tests_txt.set(
-                    os.path.join(head, name + '_tests' + '.txt'))
 
         def pick_save(variable, file_type):
             known_types = {'.txt': 'text', '.csv': 'CSV', '.xlmx': 'Excel',
@@ -139,91 +208,134 @@ class FileFrame(BorderedFrame):
                 name = os.path.normpath(name)
                 variable.set(name)
 
-        button_input_csv = ttk.Button(self, text='change all',
-                                      command=lambda: setup_all())
-        button_profi_htm = ttk.Button(self, text='change',
+        button_input_csv = ttk.Button(self, text='zmień wszystko',
+                                      command=lambda: pick_open())
+        button_profi_htm = ttk.Button(self, text='zmień',
                                       command=lambda: pick_save(self.profi_htm,
                                                                 ".html"))
-        button_freqs_csv = ttk.Button(self, text='change',
+        button_freqs_csv = ttk.Button(self, text='zmień',
                                       command=lambda: pick_save(self.freqs_csv,
                                                                 ".csv"))
-        button_stats_csv = ttk.Button(self, text='change',
+        button_stats_csv = ttk.Button(self, text='zmień',
                                       command=lambda: pick_save(self.stats_csv,
                                                                 ".csv"))
-        button_tests_csv = ttk.Button(self, text='change',
+        button_tests_csv = ttk.Button(self, text='zmień',
                                       command=lambda: pick_save(self.tests_csv,
                                                                 ".csv"))
-        button_tests_dot = ttk.Button(self, text='change',
+        button_tests_dot = ttk.Button(self, text='zmień',
                                       command=lambda: pick_save(self.tests_dot,
                                                                 ".gv"))
-        button_tests_txt = ttk.Button(self, text='change',
+        button_tests_txt = ttk.Button(self, text='zmień',
                                       command=lambda: pick_save(self.tests_txt,
                                                                 ".txt"))
-        label_input_csv.grid(row=0, column=0, sticky='e')
-        label_profi_htm.grid(row=1, column=0, sticky='e')
-        label_freqs_csv.grid(row=2, column=0, sticky='e')
-        label_stats_csv.grid(row=3, column=0, sticky='e')
-        label_tests_csv.grid(row=4, column=0, sticky='e')
-        label_tests_dot.grid(row=5, column=0, sticky='e')
-        label_tests_txt.grid(row=6, column=0, sticky='e')
+        label_input.grid(row=0, column=0, sticky='w')
+        label_output.grid(row=2, column=0, sticky='w')
+        label_input_csv.grid(row=1, column=1, sticky='e')
+        label_profi_htm.grid(row=3, column=1, sticky='e')
+        label_freqs_csv.grid(row=4, column=1, sticky='e')
+        label_stats_csv.grid(row=5, column=1, sticky='e')
+        label_tests_csv.grid(row=6, column=1, sticky='e')
+        label_tests_dot.grid(row=7, column=1, sticky='e')
+        label_tests_txt.grid(row=8, column=1, sticky='e')
 
-        entry_input_csv.grid(row=0, column=1, sticky='w')
-        entry_profi_htm.grid(row=1, column=1, sticky='w')
-        entry_freqs_csv.grid(row=2, column=1, sticky='w')
-        entry_stats_csv.grid(row=3, column=1, sticky='w')
-        entry_tests_csv.grid(row=4, column=1, sticky='w')
-        entry_tests_dot.grid(row=5, column=1, sticky='w')
-        entry_tests_txt.grid(row=6, column=1, sticky='w')
+        entry_input_csv.grid(row=1, column=2, sticky='w')
+        entry_profi_htm.grid(row=3, column=2, sticky='w')
+        entry_freqs_csv.grid(row=4, column=2, sticky='w')
+        entry_stats_csv.grid(row=5, column=2, sticky='w')
+        entry_tests_csv.grid(row=6, column=2, sticky='w')
+        entry_tests_dot.grid(row=7, column=2, sticky='w')
+        entry_tests_txt.grid(row=8, column=2, sticky='w')
 
-        button_input_csv.grid(row=0, column=2, sticky='ew')
-        button_profi_htm.grid(row=1, column=2, sticky='ew')
-        button_freqs_csv.grid(row=2, column=2, sticky='ew')
-        button_stats_csv.grid(row=3, column=2, sticky='ew')
-        button_tests_csv.grid(row=4, column=2, sticky='ew')
-        button_tests_dot.grid(row=5, column=2, sticky='ew')
-        button_tests_txt.grid(row=6, column=2, sticky='ew')
+        button_input_csv.grid(row=1, column=3, sticky='ew')
+        button_profi_htm.grid(row=3, column=3, sticky='ew')
+        button_freqs_csv.grid(row=4, column=3, sticky='ew')
+        button_stats_csv.grid(row=5, column=3, sticky='ew')
+        button_tests_csv.grid(row=6, column=3, sticky='ew')
+        button_tests_dot.grid(row=7, column=3, sticky='ew')
+        button_tests_txt.grid(row=8, column=3, sticky='ew')
 
         for w in self.winfo_children():
-            w.grid_configure(padx=2, pady=2)
+            w.grid_configure(padx=5, pady=5)
+
+    def export_data_to_object(self, obj):
+        obj.input_csv_file_name = self.input_csv.get()
+        obj.profi_htm_file_name = self.profi_htm.get()
+        obj.freqs_csv_file_name = self.freqs_csv.get()
+        obj.stats_csv_file_name = self.stats_csv.get()
+        obj.tests_csv_file_name = self.tests_csv.get()
+        obj.tests_dot_file_name = self.tests_dot.get()
+        obj.tests_txt_file_name = self.tests_txt.get()
 
 
-class ParametersFrame(BorderedFrame):
+class ColumnsFrame(BorderedFrame):
+    """
+    Wybór plików.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.data_frame_provider = None
+        label = ttk.Label(self, text='Wybór kolumn')
+        label.grid(row=0, column=0, sticky='w', pady=5)
+        self.__cbs = []
 
-        self.alpha = tk.DoubleVar(value=0.95)
-        self.profile = tk.BooleanVar(value=False)
+    def populate(self, column_headers_list):
+        for name, variable, checkbox in self.__cbs:
+            checkbox.destroy()
+            del variable
+        i = 0
+        for name in column_headers_list:
+            i += 1
+            variable = tk.BooleanVar()
+            variable.set(True)
+            checkbox = ttk.Checkbutton(self, text=name, variable=variable,
+                                       onvalue=True, offvalue=False)
+            checkbox.grid(row=i, column=1, sticky='we')
+            self.__cbs.append((name, variable, checkbox))
 
-        label_alpha = ttk.Label(self, text='alpha:')
-        label_alpha.grid(row=0, column=0, sticky="e")
-        entry_alpha = ttk.Entry(self, width=20, textvariable=self.alpha)
-        entry_alpha.grid(row=0, column=1, sticky='w')
+    def parameters_frame_observer(self, locale_code):
+        if self.data_frame_provider:
+            self.data_frame_provider.set_locale(locale_code)
+            df = tuple(self.data_frame_provider.get())
+            self.populate(df)
 
-        spacer = ttk.Label(self, width=20)
-        spacer.grid(row=0, column=2)
+    def file_frame_observer(self, file_name):
+        if self.data_frame_provider:
+            self.data_frame_provider.set_file_name(file_name)
+            df = tuple(self.data_frame_provider.get())
+            self.populate(df)
 
-        checkbox_profile = ttk.Checkbutton(
-            self, text='profile',
-            variable=self.profile, onvalue=True, offvalue=False)
-        checkbox_profile.grid(row=0, column=3)
+
+intro = None
+parameters_frame = None
+file_frame = None
+columns_frame = None
 
 
 def run(data_frame_provider, computation_engine):
     root = tk.Tk()
     root.title('StatQuest')
 
+    global intro, parameters_frame, file_frame, columns_frame
+
     frame = ScrollableFrame(root)
     intro = IntroFrame(frame.scrollable_frame)
     parameters_frame = ParametersFrame(frame.scrollable_frame)
     file_frame = FileFrame(frame.scrollable_frame)
+    columns_frame = ColumnsFrame(frame.scrollable_frame)
+    columns_frame.data_frame_provider = data_frame_provider
 
     frame.pack(fill='both', expand=True)
     intro.pack(fill='x')
     parameters_frame.pack(fill='x')
     file_frame.pack(fill='x')
+    columns_frame.pack(fill='x')
 
     for w in frame.scrollable_frame.winfo_children():
-        w.pack_configure(padx=5, pady=5)
+        w.pack_configure(padx=10, pady=10)
+
+    parameters_frame.export_data_to_object(computation_engine)
+    file_frame.export_data_to_object(computation_engine)
 
     root.mainloop()
 

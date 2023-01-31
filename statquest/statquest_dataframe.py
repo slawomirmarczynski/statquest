@@ -39,22 +39,39 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import pandas as pd
 import statquest_locale
 
 
 class DataFrameProvider:
     def __init__(self):
-        self.__data_frame = pd.DataFrame()
+        self.__empty_data_frame = pd.DataFrame()
+        self.__data_frame = self.__empty_data_frame
+        self.__file_name = None
         self.__cvs_format = statquest_locale.setup_locale_csv_format()
+        self.is_csv_file = False
+        self.is_excel_file = False
 
-    def set_locale(self, locale='default'):
-        self.__cvs_format = statquest_locale.setup_locale_csv_format(locale)
-        return self
+    def set_locale(self, locale_='default'):
+        self.__cvs_format = statquest_locale.setup_locale_csv_format(locale_)
+        self.reload()
 
-    def load(self, file_name):
-        self.__data_frame = pd.read_csv(file_name, **self.__locale_cvs_format)
-        return self
+    def set_file_name(self, file_name):
+        self.__file_name = file_name
+        self.reload()
+
+    def reload(self):
+        try:
+            if self.__file_name and os.path.exists(self.__file_name):
+                df = pd.read_csv(self.__file_name, **self.__cvs_format)
+                self.__data_frame = df
+                self.is_csv_file = True
+        except Exception as ex:
+            print(ex)
+            self.__data_frame = self.__empty_data_frame
+            self.is_csv_file = False
+            self.is_excel_file = False
 
     def get(self):
         return self.__data_frame

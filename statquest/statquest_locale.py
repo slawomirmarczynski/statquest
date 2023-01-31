@@ -109,5 +109,5 @@ def setup_locale_csv_format(locale_code='default'):
     elif locale_code == 'pl_PL':
         kwargs = {'encoding': 'cp1250', 'sep': ';', 'decimal': ','}
     elif locale_code == 'en_US':
-        kwargs = {}
+        kwargs = {'encoding': 'utf-8', 'sep': ',', 'decimal': '.'}
     return kwargs
