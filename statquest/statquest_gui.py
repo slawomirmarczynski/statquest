@@ -45,6 +45,7 @@ import tkinter as tk
 import tkinter.messagebox
 from tkinter import filedialog, ttk
 import pandas as pd
+import statquest_dataframe
 
 
 class FileNamesFromGUI:
@@ -265,6 +266,8 @@ class ParametersFrame(BorderedFrame):
 
 
 if __name__ == '__main__':
+
+    dfp = statquest_dataframe.DataFrameProvider()
 
     root = tk.Tk()
     root.title('StatQuest')
