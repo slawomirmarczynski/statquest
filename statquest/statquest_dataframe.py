@@ -67,11 +67,19 @@ class DataFrameProvider:
                 df = pd.read_csv(self.__file_name, **self.__cvs_format)
                 self.__data_frame = df
                 self.is_csv_file = True
-        except Exception as ex:
-            print(ex)
+                print('reloaded...')
+        except:
             self.__data_frame = self.__empty_data_frame
             self.is_csv_file = False
             self.is_excel_file = False
+            print('reload failed...')
 
     def get(self):
         return self.__data_frame
+
+    def get_selected(self, headers):
+        try:
+            df = self.__data_frame.loc[:, headers]
+        except:
+            df = self.__empty_data_frame
+        return df

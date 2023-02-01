@@ -138,7 +138,6 @@ class FileFrame(BorderedFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.observed_by = None
 
         label_input = ttk.Label(self, text="Dane wejściowe")
         label_output = ttk.Label(self, text="Wyniki obliczeń")
@@ -274,9 +273,22 @@ class ColumnsFrame(BorderedFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.data_frame_provider = None
+
+        def select_all(*args):
+            for name, variable, checkbox in self.__cbs:
+                variable.set(True)
+
+        def select_none(*args):
+            for name, variable, checkbox in self.__cbs:
+                variable.set(False)
+
         label = ttk.Label(self, text='Wybór kolumn')
+        button_all = ttk.Button(self, text='wszystkie', command=select_all)
+        button_none = ttk.Button(self, text='żadna', command=select_none)
         label.grid(row=0, column=0, sticky='w', pady=5)
+        button_all.grid(row=0, column=2, padx=20)
+        button_none.grid(row=0, column=3, padx=20)
+
         self.__cbs = []
 
     def populate(self, column_headers_list):
@@ -288,48 +300,83 @@ class ColumnsFrame(BorderedFrame):
             i += 1
             variable = tk.BooleanVar()
             variable.set(True)
+            print(name)
             checkbox = ttk.Checkbutton(self, text=name, variable=variable,
                                        onvalue=True, offvalue=False)
             checkbox.grid(row=i, column=1, sticky='we')
             self.__cbs.append((name, variable, checkbox))
 
     def parameters_frame_observer(self, locale_code):
-        if self.data_frame_provider:
-            self.data_frame_provider.set_locale(locale_code)
-            df = tuple(self.data_frame_provider.get())
-            self.populate(df)
+        data_frame_provider.set_locale(locale_code)
+        df = tuple(data_frame_provider.get())
+        self.populate(df)
 
     def file_frame_observer(self, file_name):
-        if self.data_frame_provider:
-            self.data_frame_provider.set_file_name(file_name)
-            df = tuple(self.data_frame_provider.get())
-            self.populate(df)
+        data_frame_provider.set_file_name(file_name)
+        df = tuple(data_frame_provider.get())
+        self.populate(df)
 
+    def export_data_to_object(self, obj):
+        selected = []
+        for name, variable, checkbox in self.__cbs:
+            if variable.get():
+                print(name)
+                selected.append(name)
+        obj.selected_columns = selected
+
+class LauncherFrame(ttk.Frame):
+    """
+    Wybór plików.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        def callback(*args):
+            parameters_frame.export_data_to_object(computation_engine)
+            file_frame.export_data_to_object(computation_engine)
+            columns_frame.export_data_to_object(computation_engine)
+            computation_engine.run()
+
+        button = ttk.Button(self, text="Uruchom obliczenia", command=callback)
+        button.pack(side='left', pady=(10, 50))
+
+
+data_frame_provider = None
+computation_engine = None
 
 intro = None
 parameters_frame = None
 file_frame = None
 columns_frame = None
+launcher_frame = None
 
 
-def run(data_frame_provider, computation_engine):
+def run(data_frame_provider_arg, computation_engine_arg):
+
+    global data_frame_provider, computation_engine
+
+    data_frame_provider = data_frame_provider_arg
+    computation_engine = computation_engine_arg
+
     root = tk.Tk()
     root.title('StatQuest')
 
-    global intro, parameters_frame, file_frame, columns_frame
+    global intro, parameters_frame, file_frame, columns_frame, launcher_frame
 
     frame = ScrollableFrame(root)
     intro = IntroFrame(frame.scrollable_frame)
     parameters_frame = ParametersFrame(frame.scrollable_frame)
     file_frame = FileFrame(frame.scrollable_frame)
     columns_frame = ColumnsFrame(frame.scrollable_frame)
-    columns_frame.data_frame_provider = data_frame_provider
+    launcher_frame = LauncherFrame(frame.scrollable_frame)
 
     frame.pack(fill='both', expand=True)
     intro.pack(fill='x')
     parameters_frame.pack(fill='x')
     file_frame.pack(fill='x')
     columns_frame.pack(fill='x')
+    launcher_frame.pack(fill='x')
 
     for w in frame.scrollable_frame.winfo_children():
         w.pack_configure(padx=10, pady=10)

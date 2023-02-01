@@ -60,42 +60,50 @@ assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
 
 class ComputationEngine:
-    def main_worker_proc(self, *args, **kwargs):
-        pass
-        # tests = ALL_STATISTICAL_TESTS
-        # output(files_names.tests_txt_file_name, write_tests_doc, tests)
-        #
-        # if files_names.input_file_name_is_csv_file():
-        #     data_frame = pd.read_csv(files_names.input_file_name,
-        #                              encoding='cp1250', sep=';', decimal=',')
-        # elif files_names.input_file_is_excel_file():
-        #     raise NotImplementedError
-        # else:
-        #     raise NotImplementedError
-        #
-        # alpha, can_profile, data_frame = SelectOptionsFromGUI()
-        #
-        # data_frame = data_frame.copy()  # should defrag data_frame
-        # # profile_report = pandas_profiling.ProfileReport(data_frame)
-        # # # plot={"dpi": 200, "image_format": "png"})
-        # # profile_report.to_file(PAPRO_HTM_FILE_NAME)
-        #
-        # print(data_frame)
-        #
-        # observables = input_observables(data_frame)
-        # output(STATS_CSV_FILE_NAME, write_descriptive_statistics_csv, observables)
-        # output(FREQS_CSV_FILE_NAME, write_elements_freq_csv, observables)
-        #
-        # relations = Relations.create_relations(observables, tests)
-        # output(TESTS_CSV_FILE_NAME, write_relations_csv, relations, alpha)
-        #
-        # significant_relations = Relations.credible_only(relations, alpha)
-        # output(TESTS_DOT_FILE_NAME, write_relations_nx, significant_relations)
-        # output(TESTS_DOT_FILE_NAME, write_relations_dot, significant_relations)
+    def run(self):
+        tests = ALL_STATISTICAL_TESTS
+        output(self.tests_txt_file_name,
+               write_tests_doc,
+               tests)
+
+        data_frame = data_frame_provider.get_selected(self.selected_columns)
+        if not data_frame.empty:
+            data_frame = data_frame.copy()  # should defrag data_frame
+
+        if self.should_compute_pandas_profile:
+            profile_report = pandas_profiling.ProfileReport(data_frame)
+            profile_report.to_file(self.profi_htm_file_name)
+
+        # plot={"dpi": 200, "image_format": "png"} ???
+
+        print(data_frame)
+
+        observables = input_observables(data_frame)
+        output(self.stats_csv_file_name,
+               write_descriptive_statistics_csv,
+               observables)
+        output(self.freqs_csv_file_name,
+               write_elements_freq_csv,
+               observables)
+
+        relations = Relations.create_relations(observables, tests)
+        output(self.tests_csv_file_name,
+               write_relations_csv,
+               relations,
+               self.alpha)
+
+        significant_relations = Relations.credible_only(relations, self.alpha)
+        output(self.tests_dot_file_name,
+               write_relations_nx,
+               significant_relations)
+        output(self.tests_dot_file_name,
+               write_relations_dot,
+               significant_relations)
 
 
 if __name__ == '__main__':
-
+    import matplotlib
+    matplotlib.use('TkAgg')
     data_frame_provider = statquest_dataframe.DataFrameProvider()
     computation_engine = ComputationEngine()
     statquest_gui.run(data_frame_provider, computation_engine)
