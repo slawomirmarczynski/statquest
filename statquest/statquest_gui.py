@@ -41,6 +41,7 @@ Copyright (c) 2022 Sławomir Marczyński
 
 
 import os
+import textwrap
 import tkinter as tk
 from tkinter import filedialog, ttk
 
@@ -122,6 +123,7 @@ class ScrollableFrame(ttk.Frame):
             if self._scrollable_frame.winfo_reqwidth() != canvas.winfo_width():
                 canvas.itemconfigure(
                     scrollable_frame_canvas_id, width=canvas.winfo_width())
+
         canvas.bind('<Configure>', update_scrollable_frame_width)
 
         # Moglibyśmy to zrobić nieco wcześniej, ale robimy to na koniec:
@@ -158,7 +160,22 @@ class IntroFrame(BorderedFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pack(side='top', fill='x', expand=True)
-        label = ttk.Label(self, text=_('Program do analizy danych'))
+
+        text = textwrap.dedent(
+        '''
+        StatQuest, aplikacja metod statystycznych do analizy danych.\n
+        Program StatQuest służy do analizy danych wskaźnikowych, porządkowych i kategorycznych.
+
+        Mogą to być dane w których liczby całkowite określają
+        Mogą to być dane liczbowe takie napięcie elektryczne wyrażone
+        w woltach. Czyli określone przez liczby zmiennoprzecinkowe.
+        Mogą to być dane kategoryczne takie jak  (na przykład marka samochodu).
+        Aby program mógł je przetwarzać powinny one być zapisane w pliku CSV.''')\
+            .replace('\n\n', '\0').replace('\n','').replace('\0', '\n').strip()
+
+        label = ttk.Label(self, wraplength=300, text=text)
+        label.bind('<Configure>',
+                   lambda event: label.config(wraplength=label.winfo_width()))
         label.pack(fill='x', expand=True)
 
 
