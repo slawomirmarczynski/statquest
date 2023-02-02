@@ -41,6 +41,7 @@ Copyright (c) 2022 Sławomir Marczyński
 
 
 import os
+import re
 import textwrap
 import tkinter as tk
 from tkinter import filedialog, ttk
@@ -159,19 +160,38 @@ class BorderedFrame(ttk.Frame):
         super().__init__(*args, relief='solid', borderwidth=5, **kwargs)
 
 
+def dedentln(string):
+    """
+    Funkcja pomocna do przygotowywania do wstawiania do kontrolek
+    tkinter tekstu zapisanego jako literał w wielu liniach.
+
+    Args:
+        string (str): łańcuch znaków z niepotrzebnymi wcięciami i nadmiarem
+            znaków nowej linii.
+
+    Returns:
+        łańcuch znaków lepiej sformatowany, znaki nowej linii są usunięte
+        jeżeli występowały pojedynczo.
+    """
+    pattern = '(?<!\n)\n(?!\n)'
+    return re.sub(pattern, ' ', textwrap.dedent(string)).strip()
+
+
 class IntroFrame(BorderedFrame):
     """
     Krótki opis co program robi.
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Inicjalizator.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
         super().__init__(*args, **kwargs)
         self.pack(side='top', fill='x', expand=True)
-
-        def dedentln(string):
-            import re
-            pattern = '(?<!\n)\n(?!\n)'
-            return re.sub(pattern, ' ', textwrap.dedent(string)).strip()
 
         text = dedentln(
         '''
@@ -203,25 +223,35 @@ class IntroFrame(BorderedFrame):
         '''
         )
 
-
-        label = ttk.Label(self, wraplength=300, text=text)
+        label = ttk.Label(self, text=text)
         label.bind('<Configure>',
                    lambda event: label.config(wraplength=label.winfo_width()))
         label.pack(fill='x', expand=True)
 
 
 class ParametersFrame(BorderedFrame):
+    """
+    Konfigurowanie parametrów pracy programu.
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Inicjalizator.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
         super().__init__(*args, **kwargs)
 
         def callback(*args):
             if columns_frame:
-                columns_frame.parameters_frame_observer(self.locale_code.get())
+                columns_frame.locale_code_observer(self.locale_code.get())
 
         self.alpha = tk.DoubleVar(value=0.95)
         self.profile = tk.BooleanVar(value=False)
-        self.locale_code = tk.StringVar()
-        self.locale_code.trace('w', callback)
+        self.locale_code = tk.StringVar(value='pl_PL')
+        self.locale_code.trace_add('write', callback)
 
         label = ttk.Label(self, text='Parametry')
         label.grid(row=0, column=0, sticky='w')
@@ -233,11 +263,11 @@ class ParametersFrame(BorderedFrame):
         entry_alpha.grid(row=1, column=1, sticky='w')
 
         checkbox_profile = ttk.Checkbutton(
-            self, text='generowanie raportu Pandas Profile',
+            self, text='generowanie raportu Ydata Profile',
             variable=self.profile, onvalue=True, offvalue=False)
         checkbox_profile.grid(row=2, column=0, sticky='w')
 
-        label_locale = ttk.Label(self, text='Ustawienia regionalne:')
+        label_locale = ttk.Label(self, text='ustawienia regionalne:')
         label_locale.grid(row=3, column=0, sticky='e')
         combobox_locale = ttk.Combobox(self, width=8,
                                        textvariable=self.locale_code)
