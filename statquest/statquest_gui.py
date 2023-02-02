@@ -168,17 +168,41 @@ class IntroFrame(BorderedFrame):
         super().__init__(*args, **kwargs)
         self.pack(side='top', fill='x', expand=True)
 
-        text = textwrap.dedent(
-        '''
-        StatQuest, aplikacja metod statystycznych do analizy danych.\n
-        Program StatQuest służy do analizy danych wskaźnikowych, porządkowych i kategorycznych.
+        def dedentln(string):
+            import re
+            pattern = '(?<!\n)\n(?!\n)'
+            return re.sub(pattern, ' ', textwrap.dedent(string)).strip()
 
-        Mogą to być dane w których liczby całkowite określają
-        Mogą to być dane liczbowe takie napięcie elektryczne wyrażone
-        w woltach. Czyli określone przez liczby zmiennoprzecinkowe.
-        Mogą to być dane kategoryczne takie jak  (na przykład marka samochodu).
-        Aby program mógł je przetwarzać powinny one być zapisane w pliku CSV.''')\
-            .replace('\n\n', '\0').replace('\n','').replace('\0', '\n').strip()
+        text = dedentln(
+        '''
+        StatQuest, aplikacja metod statystycznych do analizy danych.
+        
+        Program StatQuest służy do analizy danych wskaźnikowych, porządkowych
+        i kategorycznych. Nie obsługiwane są w nim dane przedziałowe.
+
+        Przykładem danych wskaźnikowych może być wartości napięcia ogniw AAA 
+        mierzone w woltach. Będą to wartości wyrażone liczbami 
+        zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52. W takim przypadku
+        mamy wartości dla których sens ma obliczanie średniej arytmetycznej,
+        odchylenia standardowego itp.
+        
+        Dane porządkowe są w programie StatQuest rozumiane jako takie które
+        można opisać liczbami całkowitymi. Czy ma sens obliczanie średniej
+        dla takich danych? Może mieć, może nie mieć. Przykładowo jeżeli 
+        osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
+        dla danej populacji średnia coś mówi o tym jaki procent ludzi jest
+        wysokich w tej populacji. Jeżeli dodamy jeszcze kod 2 dla rudych
+        oraz kod 3 dla mieszkańców małych miasteczek... to obliczona technikami
+        statystycznymi średnia nie ma sensu. Choć same obliczenia są/byłyby
+        dość proste.
+        
+        Dane kategoryczne to takie dane które nie są wyrażalne liczbami.
+        Dobrym przykładem może być kolor oczu: niebieskie, brązowe, zielone...
+        Każda wartość jest wyrażona nie-liczbowo, nie da się obliczyć
+        średniej czy odchylenia standardowego.
+        '''
+        )
+
 
         label = ttk.Label(self, wraplength=300, text=text)
         label.bind('<Configure>',
