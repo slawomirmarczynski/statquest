@@ -244,6 +244,14 @@ class ParametersFrame(BorderedFrame):
         """
         super().__init__(*args, **kwargs)
 
+        def validator(alpha_string):
+            try:
+                value = float(alpha_string)
+                return 0 <= value <= 1
+            except:
+                return False
+        registred_validator = self.register(validator)
+
         def callback(*args):
             if columns_frame:
                 columns_frame.locale_code_observer(self.locale_code.get())
@@ -259,7 +267,9 @@ class ParametersFrame(BorderedFrame):
         label_alpha = ttk.Label(
             self, text='α jako krytyczna wartość dla p-value: ')
         label_alpha.grid(row=1, column=0, sticky='e')
-        entry_alpha = ttk.Entry(self, width=20, textvariable=self.alpha)
+        entry_alpha = ttk.Entry(self, width=20, textvariable=self.alpha,
+                                validate='all',
+                                validatecommand=(registred_validator, '%P'))
         entry_alpha.grid(row=1, column=1, sticky='w')
 
         checkbox_profile = ttk.Checkbutton(
