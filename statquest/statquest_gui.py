@@ -49,22 +49,96 @@ from statquest import statquest_locale
 
 class ScrollableFrame(ttk.Frame):
     """
-    Umożliwia pionowe przewijanie zawartości.
+    Umożliwia pionowe przewijanie wstawionych do scrollable_frame widgetów.
+
+    Attributes:
+        scrollable_frame (tk.ttk.Frame): ramka będąca kontenerem na elementy;
+            ta właśnie ramka jest przewijana.
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Tworzenie subklasy tkinter.ttk.Frame umożliwiającej przewijanie
+        pionowe.
+
+        Args:
+            *args: takie same jak dla klasy bazowej.
+            **kwargs: takie same jak dla klasy bazowej.
+        """
         super().__init__(*args, **kwargs)
-        canvas = tk.Canvas(self, width=0)
+
+        # Obiekt klasy Canvas, w odróżnieniu od obiektu Frame, może być
+        # przewijany. Jednak wygodniej jest zagnieżdżać obiekty wewnątrz
+        # Frame niż wewnątrz Canvas. Dlatego tworzone są (obiekty) Frame
+        # wewnątrz Canvas wewnątrz Frame. W ten sposób z zewnątrz widać
+        # obiekty Frame, a obiekty Canvas (i ScrollBar) są ukryte w obiekcie
+        # ScrollableFrame.
+
+        # Tworzenie pustego canvas, czyli czegoś co można przewijać.
+        # Na razie canvas jest puste, bez żadnej zawartości.
+        #
+        # bd=0 oznacza że nie chcemy marginesu wokół kanwy
+        # highlightthickness=0 oznacza że nie chcemy pokazywać fokusu
+        #
+        canvas = tk.Canvas(self, bd=0, highlightthickness=0)
+        canvas.pack(side='left', fill='both', expand=True)
+
+        # Tworzenie obiektu ScrollBar, czyli kontrolera przewijania.
         sb = ttk.Scrollbar(self, orient='vertical', command=canvas.yview)
-        self.scrollable_frame = ttk.Frame(canvas)
-        self.scrollable_frame.bind(
+        sb.pack(side='right', fill='y')
+
+        # Tworzenie kontenera (obiektu klasy ttk.Frame), który użytkownik
+        # będzie mógł przewijać.
+        #
+        # Obserwator zdarzenia <Configure> jest potrzebny na wypadek gdyby
+        # trzeba było na nowo określić zakres przewijania. Ten bowiem jest
+        # ustalany na poziomie canvas i wymaga w takiej sytuacji odświeżenia.
+        #
+        self._scrollable_frame = ttk.Frame(canvas)
+        self._scrollable_frame.bind(
             '<Configure>',
             lambda event: canvas.configure(scrollregion=canvas.bbox('all'))
         )
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor='nw')
+
+        # Dodawanie do canvas zawartości - innego widgetu - wykonywane jest
+        # metodą create_window. Nazwa może kojarzyć się z jakąś fabryką lub
+        # funkcjami/metodami tworzącymi okna (CreateWindow jest np. Windows
+        # API Microsoftu), ale w tkinter ma trochę inny sens.
+        #
+        # Po wstawieniu zyskujemy identyfikator wstawionego elementu, który
+        # wkrótce nam się bardzo przyda.
+        #
+        scrollable_frame_canvas_id = canvas.create_window(
+            (0, 0), window=self._scrollable_frame, anchor='nw')
+
+        # Teraz trudniejsza część - dodajemy obserwatora pilnującego aby
+        # szerokość obiektu canvas dopasowywała się do szerokości obszaru
+        # jaki jest dostępny. Jeżeli tego nie zrobimy, to canvas będą (zwykle)
+        # miały zły rozmiar. I choć nadal elementy doń wstawione mogłyby być
+        # widoczne, to menadżer geometrii nie potrafiłby działać zgodnie
+        # z naszymi oczekiwaniami.
+        #
+        def update_scrollable_frame_width(event):
+            if self._scrollable_frame.winfo_reqwidth() != canvas.winfo_width():
+                canvas.itemconfigure(
+                    scrollable_frame_canvas_id, width=canvas.winfo_width())
+        canvas.bind('<Configure>', update_scrollable_frame_width)
+
+        # Moglibyśmy to zrobić nieco wcześniej, ale robimy to na koniec:
+        # podpinamy przewijanie kanwy z tym co ustawine jest przez belkę
+        # przewijania (czyli przez scroll bar).
+        #
         canvas.configure(yscrollcommand=sb.set)
-        canvas.pack(side='left', fill='both', expand=True)
-        sb.pack(side='right', fill='y')
+
+    @property
+    def scrollable_frame(self):
+        """
+        Okno przewijane jako read-only property.
+
+        Returns:
+            obiekt klasy tinter.ttk.Frame w którym można osadzać widgety.
+        """
+        return self._scrollable_frame
 
 
 class BorderedFrame(ttk.Frame):
@@ -76,13 +150,14 @@ class BorderedFrame(ttk.Frame):
         super().__init__(*args, relief='solid', borderwidth=5, **kwargs)
 
 
-class IntroFrame(ttk.Frame):
+class IntroFrame(BorderedFrame):
     """
     Krótki opis co program robi.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pack(side='top', fill='x', expand=True)
         label = ttk.Label(self, text=_('Program do analizy danych'))
         label.pack(fill='x', expand=True)
 
@@ -237,13 +312,13 @@ class FileFrame(BorderedFrame):
         label_tests_dot.grid(row=7, column=1, sticky='e')
         label_tests_txt.grid(row=8, column=1, sticky='e')
 
-        entry_input_csv.grid(row=1, column=2, sticky='w')
-        entry_profi_htm.grid(row=3, column=2, sticky='w')
-        entry_freqs_csv.grid(row=4, column=2, sticky='w')
-        entry_stats_csv.grid(row=5, column=2, sticky='w')
-        entry_tests_csv.grid(row=6, column=2, sticky='w')
-        entry_tests_dot.grid(row=7, column=2, sticky='w')
-        entry_tests_txt.grid(row=8, column=2, sticky='w')
+        entry_input_csv.grid(row=1, column=2, sticky='we')
+        entry_profi_htm.grid(row=3, column=2, sticky='we')
+        entry_freqs_csv.grid(row=4, column=2, sticky='we')
+        entry_stats_csv.grid(row=5, column=2, sticky='we')
+        entry_tests_csv.grid(row=6, column=2, sticky='we')
+        entry_tests_dot.grid(row=7, column=2, sticky='we')
+        entry_tests_txt.grid(row=8, column=2, sticky='we')
 
         button_input_csv.grid(row=1, column=3, sticky='ew')
         button_profi_htm.grid(row=3, column=3, sticky='ew')
@@ -252,6 +327,8 @@ class FileFrame(BorderedFrame):
         button_tests_csv.grid(row=6, column=3, sticky='ew')
         button_tests_dot.grid(row=7, column=3, sticky='ew')
         button_tests_txt.grid(row=8, column=3, sticky='ew')
+
+        self.columnconfigure(2, weight=1)
 
         for w in self.winfo_children():
             w.grid_configure(padx=5, pady=5)
@@ -361,18 +438,22 @@ def run(data_frame_provider_arg, computation_engine_arg):
 
     root = tk.Tk()
     root.title('StatQuest')
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    root_width = int(screen_width * 0.75)
+    root_height = int(screen_height * 0.75)
+    root.geometry(f'{root_width}x{root_height}')
 
     global intro, parameters_frame, file_frame, columns_frame, launcher_frame
 
     frame = ScrollableFrame(root)
+    frame.pack(fill='both', expand=True)
     intro = IntroFrame(frame.scrollable_frame)
     parameters_frame = ParametersFrame(frame.scrollable_frame)
     file_frame = FileFrame(frame.scrollable_frame)
     columns_frame = ColumnsFrame(frame.scrollable_frame)
     launcher_frame = LauncherFrame(frame.scrollable_frame)
 
-    frame.pack(fill='both', expand=True)
-    intro.pack(fill='x')
     parameters_frame.pack(fill='x')
     file_frame.pack(fill='x')
     columns_frame.pack(fill='x')
