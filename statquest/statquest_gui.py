@@ -62,8 +62,8 @@ class ScrollableFrame(ttk.Frame):
         pionowe.
 
         Args:
-            *args: takie same jak dla klasy bazowej.
-            **kwargs: takie same jak dla klasy bazowej.
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
         """
         super().__init__(*args, **kwargs)
 
@@ -147,6 +147,13 @@ class BorderedFrame(ttk.Frame):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Tworzenie ramki tkinter.ttk.Frame mającej widoczną ramkę.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
         super().__init__(*args, relief='solid', borderwidth=5, **kwargs)
 
 
