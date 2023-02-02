@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-The main module of StatQuest.
+Tkinter GUI for StatQuest.
 
 File:
     project: StatQuest
-    name: statquest.py
-    version: 0.4.0.2
-    date: 19.10.2022
+    name: statquest_gui.py
+    version: 0.4.1.0
+    date: 01.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -49,7 +49,7 @@ from statquest import statquest_locale
 
 class ScrollableFrame(ttk.Frame):
     """
-    Widget umożliwiający pionowe przewijanie zawartości.
+    Umożliwia pionowe przewijanie zawartości.
     """
 
     def __init__(self, *args, **kwargs):
@@ -324,6 +324,7 @@ class ColumnsFrame(BorderedFrame):
                 selected.append(name)
         obj.selected_columns = selected
 
+
 class LauncherFrame(ttk.Frame):
     """
     Wybór plików.
@@ -353,7 +354,6 @@ launcher_frame = None
 
 
 def run(data_frame_provider_arg, computation_engine_arg):
-
     global data_frame_provider, computation_engine
 
     data_frame_provider = data_frame_provider_arg
