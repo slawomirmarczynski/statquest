@@ -284,7 +284,8 @@ class ParametersFrame(BorderedFrame):
             computation_engine.alpha = self.alpha.get()
             computation_engine.should_compute_pandas_profile = self.profile.get()
             computation_engine.locale_code = self.locale_code.get()
-            columns_frame.parameters_frame_observer(self.locale_code.get())  # @todo
+            data_frame_provider.set_locale(self.locale_code.get())
+            columns_frame.update()
 
 
         # tkinker wymaga aby wartości początkowe dla obiektów takich jak
@@ -349,6 +350,14 @@ class FileFrame(BorderedFrame):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Inicjalizator.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
+
         super().__init__(*args, **kwargs)
 
         label_input = ttk.Label(self, text="Dane wejściowe")
@@ -377,7 +386,7 @@ class FileFrame(BorderedFrame):
             computation_engine.stats_csv_file_name = self.stats_csv.get()
             computation_engine.tests_csv_file_name = self.tests_csv.get()
             computation_engine.tests_txt_file_name = self.tests_txt.get()
-            columns_frame.file_frame_observer(self.input_csv.get())
+            columns_frame.update()
 
         def callback_input(*args):
             head, tail = os.path.split(self.input_csv.get())
@@ -389,6 +398,9 @@ class FileFrame(BorderedFrame):
             # self.tests_csv.set(os.path.join(head, name + '_tests' + '.csv'))
             # self.tests_txt.set(os.path.join(head, name + '_tests' + '.txt'))
             callback(*args)
+            data_frame_provider.set_file_name(self.input_csv.get())
+            columns_frame.update()
+
 
         def callback_output(*args):
             head, tail = os.path.split(self.tests_dot.get())
@@ -499,6 +511,14 @@ class ColumnsFrame(BorderedFrame):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Inicjalizator.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
+
         super().__init__(*args, **kwargs)
 
         def select_all(*args):
@@ -509,9 +529,9 @@ class ColumnsFrame(BorderedFrame):
             for name, variable, checkbox in self.__cbs:
                 variable.set(False)
 
-        label = ttk.Label(self, text='Wybór kolumn')
-        button_all = ttk.Button(self, text='wszystkie', command=select_all)
-        button_none = ttk.Button(self, text='żadna', command=select_none)
+        label = ttk.Label(self, text=_('Wybór kolumn'))
+        button_all = ttk.Button(self, text=_('wszystkie'), command=select_all)
+        button_none = ttk.Button(self, text=_('żadna'), command=select_none)
         label.grid(row=0, column=0, sticky='w', pady=5)
         button_all.grid(row=0, column=2, padx=20)
         button_none.grid(row=0, column=3, padx=20)
@@ -519,6 +539,15 @@ class ColumnsFrame(BorderedFrame):
         self.__cbs = []
 
     def populate(self, column_headers_list):
+
+        def callback():
+            selected = []
+            for name, variable, checkbox in self.__cbs:
+                if variable.get():
+                    print(name)
+                    selected.append(name)
+            data_frame_provider.selected_columns = selected
+
         for name, variable, checkbox in self.__cbs:
             checkbox.destroy()
             del variable
@@ -529,27 +558,14 @@ class ColumnsFrame(BorderedFrame):
             variable.set(True)
             print(name)
             checkbox = ttk.Checkbutton(self, text=name, variable=variable,
-                                       onvalue=True, offvalue=False)
+                                       onvalue=True, offvalue=False,
+                                       command=callback)
             checkbox.grid(row=i, column=1, sticky='we')
             self.__cbs.append((name, variable, checkbox))
 
-    def parameters_frame_observer(self, locale_code):
-        data_frame_provider.set_locale(locale_code)
+    def update(self):
         df = tuple(data_frame_provider.get())
         self.populate(df)
-
-    def file_frame_observer(self, file_name):
-        data_frame_provider.set_file_name(file_name)
-        df = tuple(data_frame_provider.get())
-        self.populate(df)
-
-    def export_data_to_object(self, obj):
-        selected = []
-        for name, variable, checkbox in self.__cbs:
-            if variable.get():
-                print(name)
-                selected.append(name)
-        obj.selected_columns = selected
 
 
 class LauncherFrame(ttk.Frame):
@@ -558,12 +574,17 @@ class LauncherFrame(ttk.Frame):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Inicjalizator.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
+
         super().__init__(*args, **kwargs)
 
         def callback(*args):
-            parameters_frame.export_data_to_object(computation_engine)
-            file_frame.export_data_to_object(computation_engine)
-            columns_frame.export_data_to_object(computation_engine)
             computation_engine.run()
 
         button = ttk.Button(self, text="Uruchom obliczenia", command=callback)
