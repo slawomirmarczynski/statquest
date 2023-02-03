@@ -546,26 +546,27 @@ class ColumnsFrame(BorderedFrame):
                 if variable.get():
                     print(name)
                     selected.append(name)
-            data_frame_provider.selected_columns = selected
+            computation_engine.selected_columns = selected
 
         for name, variable, checkbox in self.__cbs:
             checkbox.destroy()
             del variable
+        self.__cbs.clear()
         i = 0
         for name in column_headers_list:
             i += 1
             variable = tk.BooleanVar()
             variable.set(True)
-            print(name)
             checkbox = ttk.Checkbutton(self, text=name, variable=variable,
                                        onvalue=True, offvalue=False,
                                        command=callback)
             checkbox.grid(row=i, column=1, sticky='we')
             self.__cbs.append((name, variable, checkbox))
+        callback()
 
     def update(self):
-        df = tuple(data_frame_provider.get())
-        self.populate(df)
+        pandas_data_frame = tuple(data_frame_provider.get())
+        self.populate(pandas_data_frame)
 
 
 class LauncherFrame(ttk.Frame):
