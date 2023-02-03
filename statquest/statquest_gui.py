@@ -244,54 +244,103 @@ class ParametersFrame(BorderedFrame):
         """
         super().__init__(*args, **kwargs)
 
-        def validator(alpha_string):
+        def validator(string):
+            """
+            Sprawdza czy wartość wpisana w kontrolkę jest liczbą z przedziału
+            od 0 do 1, czyli mogącą określać prawdopodobieństwo.
+
+            Args:
+                string (str): wpisana liczba jako napis.
+
+            Returns:
+                True jeżeli walidacja zakończyła się pomyślnie, False jeżeli
+                nie powiodła się.
+            """
+
             try:
-                value = float(alpha_string)
+                value = float(string)
                 return 0 <= value <= 1
             except:
                 return False
+
+        # Rejestracja, dla potrzeb tkinker, funkcji walidującej.
+        #
         registred_validator = self.register(validator)
 
         def callback(*args):
-            if columns_frame:
-                columns_frame.locale_code_observer(self.locale_code.get())
+            """
+            Informowanie computation_engine o aktualnych wartościach
+            parametrów jakie mają być użyte w obliczeniach.
 
+            Args:
+                *args: argumenty są określane przez tkinker.tk.StrValue.
+            """
+
+            # Nawet jeżeli zmienia się tylko jeden parametr, to nie zaszkodzi
+            # aktualizacja wszystkich innych. Owszem, nie jest to potrzebne,
+            # jednak zyskujemy na prostocie. Obiekt computation_engine używa
+            # zwykłych zmiennych do przechowywania wartości parametrów.
+            #
+            computation_engine.alpha = self.alpha.get()
+            computation_engine.should_compute_pandas_profile = self.profile.get()
+            computation_engine.locale_code = self.locale_code.get()
+            columns_frame.parameters_frame_observer(self.locale_code.get())  # @todo
+
+
+        # tkinker wymaga aby wartości początkowe dla obiektów takich jak
+        # tk.StringVar itp. były jawnie określane. Sam z siebie nie gwarantuje
+        # że początkowa zawartość pól Entry będzie skopiowana do takich
+        # zmiennych.
+        #
         self.alpha = tk.DoubleVar(value=0.95)
         self.profile = tk.BooleanVar(value=False)
         self.locale_code = tk.StringVar(value='pl_PL')
         self.locale_code.trace_add('write', callback)
 
-        label = ttk.Label(self, text='Parametry')
-        label.grid(row=0, column=0, sticky='w')
+        # Ogólny opis dla tej sekcji.
+        #
+        label = ttk.Label(self, text=_('Parametry'))
+        label.grid(row=0, column=0, columnspan=4, sticky='w')
 
+        # Parametr alpha
+        #
         label_alpha = ttk.Label(
-            self, text='α jako krytyczna wartość dla p-value: ')
+            self, text=_('α jako krytyczna wartość dla p-value:'))
         label_alpha.grid(row=1, column=0, sticky='e')
         entry_alpha = ttk.Entry(self, width=20, textvariable=self.alpha,
                                 validate='all',
                                 validatecommand=(registred_validator, '%P'))
         entry_alpha.grid(row=1, column=1, sticky='w')
+        label_alpha_comment = ttk.Label(
+            self,
+            text=_('Wartość parametru α musi spełniać warunek 0 ⩽ α ⩽ 1.'))
+        label_alpha_comment.grid(row=1, column=2, sticky='w')
 
+        # Czy ma być użyte pandas_profiling (tj. ydata_profiling)?
+        #
         checkbox_profile = ttk.Checkbutton(
-            self, text='generowanie raportu Ydata Profile',
+            self, text=_('generowanie raportu Ydata Profile'),
             variable=self.profile, onvalue=True, offvalue=False)
         checkbox_profile.grid(row=2, column=0, sticky='w')
+        label_profile_comment = ttk.Label(self, text=_(
+            'Oblicza podstawowe statystyki i korelacje. Nie wpływa na testy.'))
+        label_profile_comment.grid(row=2, column=2, sticky='w')
 
-        label_locale = ttk.Label(self, text='ustawienia regionalne:')
+        label_locale = ttk.Label(self, text=_('ustawienia regionalne:'))
         label_locale.grid(row=3, column=0, sticky='e')
         combobox_locale = ttk.Combobox(self, width=8,
                                        textvariable=self.locale_code)
         combobox_locale.grid(row=3, column=1, sticky='w')
         combobox_locale['values'] = ('pl_PL', 'en_US')
         combobox_locale.current(0)
+        label_locale_comment = ttk.Label(
+            self,
+            text='Ustala szczegóły takie jak znak przecinka dziesiętnego.')
+        label_locale_comment.grid(row=3, column=2, sticky='w')
 
-        for w in self.winfo_children():
-            w.grid_configure(padx=5, pady=5)
+        for widget in self.winfo_children():
+            widget.grid_configure(padx=5, pady=5)  # todo: piksele -> punkty
 
-    def export_data_to_object(self, obj):
-        obj.alpha = self.alpha.get()
-        obj.should_compute_pandas_profile = self.profile.get()
-        obj.locale_code = self.locale_code.get()
 
 
 class FileFrame(BorderedFrame):
@@ -305,54 +354,73 @@ class FileFrame(BorderedFrame):
         label_input = ttk.Label(self, text="Dane wejściowe")
         label_output = ttk.Label(self, text="Wyniki obliczeń")
         label_input_csv = ttk.Label(self, text="Dane (CSV lub XSLX):")
+        label_tests_dot = ttk.Label(self, text="Graf zależności (DOT):")
         label_profi_htm = ttk.Label(self, text="Profil (HTML):")
         label_freqs_csv = ttk.Label(self, text="Tablica częstości (CSV):")
         label_stats_csv = ttk.Label(self, text="Statystyki (CSV):")
         label_tests_csv = ttk.Label(self, text="Wyniki testów (CSV):")
-        label_tests_dot = ttk.Label(self, text="Graf zależności (GV):")
         label_tests_txt = ttk.Label(self, text="Opis testów (TXT):")
 
         self.input_csv = tk.StringVar()
+        self.tests_dot = tk.StringVar()
         self.profi_htm = tk.StringVar()
         self.freqs_csv = tk.StringVar()
         self.stats_csv = tk.StringVar()
         self.tests_csv = tk.StringVar()
-        self.tests_dot = tk.StringVar()
         self.tests_txt = tk.StringVar()
 
         def callback(*args):
+            computation_engine.input_csv_file_name = self.input_csv.get()
+            computation_engine.tests_dot_file_name = self.tests_dot.get()
+            computation_engine.profi_htm_file_name = self.profi_htm.get()
+            computation_engine.freqs_csv_file_name = self.freqs_csv.get()
+            computation_engine.stats_csv_file_name = self.stats_csv.get()
+            computation_engine.tests_csv_file_name = self.tests_csv.get()
+            computation_engine.tests_txt_file_name = self.tests_txt.get()
+            columns_frame.file_frame_observer(self.input_csv.get())
+
+        def callback_input(*args):
             head, tail = os.path.split(self.input_csv.get())
             name, extension = os.path.splitext(tail)
-            self.profi_htm.set(
-                os.path.join(head, name + '_profi' + '.html'))
-            self.freqs_csv.set(
-                os.path.join(head, name + '_freqs' + '.csv'))
-            self.stats_csv.set(
-                os.path.join(head, name + '_stats' + '.csv'))
-            self.tests_csv.set(
-                os.path.join(head, name + '_tests' + '.csv'))
-            self.tests_dot.set(os.path.join(head, name + '_links' + '.gv'))
-            self.tests_txt.set(
-                os.path.join(head, name + '_tests' + '.txt'))
-            if columns_frame:
-                columns_frame.file_frame_observer(self.input_csv.get())
+            self.tests_dot.set(os.path.join(head, name + '_links' + '.dot'))
+            # self.profi_htm.set(os.path.join(head, name + '_profi' + '.html'))
+            # self.freqs_csv.set(os.path.join(head, name + '_freqs' + '.csv'))
+            # self.stats_csv.set(os.path.join(head, name + '_stats' + '.csv'))
+            # self.tests_csv.set(os.path.join(head, name + '_tests' + '.csv'))
+            # self.tests_txt.set(os.path.join(head, name + '_tests' + '.txt'))
+            callback(*args)
 
-        self.input_csv.trace('w', callback)
+        def callback_output(*args):
+            head, tail = os.path.split(self.tests_dot.get())
+            name, extension = os.path.splitext(tail)
+            self.profi_htm.set(os.path.join(head, name + '_profi' + '.html'))
+            self.freqs_csv.set(os.path.join(head, name + '_freqs' + '.csv'))
+            self.stats_csv.set(os.path.join(head, name + '_stats' + '.csv'))
+            self.tests_csv.set(os.path.join(head, name + '_tests' + '.csv'))
+            self.tests_txt.set(os.path.join(head, name + '_tests' + '.txt'))
+            callback(*args)
 
-        entry_input_csv = ttk.Entry(self, width=80,
-                                    textvariable=self.input_csv)
-        entry_profi_htm = ttk.Entry(self, width=80,
-                                    textvariable=self.profi_htm)
-        entry_freqs_csv = ttk.Entry(self, width=80,
-                                    textvariable=self.freqs_csv)
-        entry_stats_csv = ttk.Entry(self, width=80,
-                                    textvariable=self.stats_csv)
-        entry_tests_csv = ttk.Entry(self, width=80,
-                                    textvariable=self.tests_csv)
-        entry_tests_dot = ttk.Entry(self, width=80,
-                                    textvariable=self.tests_dot)
-        entry_tests_txt = ttk.Entry(self, width=80,
-                                    textvariable=self.tests_txt)
+        # Ponieważ śledzenie (trace) jest dodawane do wielu kontrolek, których
+        # zawartość jest generowane także przez kontrolki, to call-back'i
+        # niepotrzebnie będą się wywoływać nadmierną liczbę razy. Nie jest to
+        # jednak istotnym problemem - nawet kilkanaście wywołań nie będzie
+        # zauważalne.
+        #
+        self.input_csv.trace_add('write', callback_input)
+        self.tests_dot.trace_add('write', callback_output)
+        self.profi_htm.trace_add('write', callback)
+        self.freqs_csv.trace_add('write', callback)
+        self.stats_csv.trace_add('write', callback)
+        self.tests_csv.trace_add('write', callback)
+        self.tests_txt.trace_add('write', callback)
+
+        entry_input_csv = ttk.Entry(self, width=80, textvariable=self.input_csv)
+        entry_profi_htm = ttk.Entry(self, width=80, textvariable=self.profi_htm)
+        entry_freqs_csv = ttk.Entry(self, width=80, textvariable=self.freqs_csv)
+        entry_stats_csv = ttk.Entry(self, width=80, textvariable=self.stats_csv)
+        entry_tests_csv = ttk.Entry(self, width=80, textvariable=self.tests_csv)
+        entry_tests_dot = ttk.Entry(self, width=80, textvariable=self.tests_dot)
+        entry_tests_txt = ttk.Entry(self, width=80, textvariable=self.tests_txt)
 
         def pick_open():
             full_name = filedialog.askopenfilename(
@@ -363,72 +431,66 @@ class FileFrame(BorderedFrame):
 
         def pick_save(variable, file_type):
             known_types = {'.txt': 'text', '.csv': 'CSV', '.xlmx': 'Excel',
-                           '.html': 'HTML', '.gv': 'DOT', }
+                           '.html': 'HTML', '.dot': 'DOT', }
             ft = (known_types[file_type], '*' + file_type)
             name = filedialog.asksaveasfilename(filetypes=(ft,))
             if name:
                 name = os.path.normpath(name)
                 variable.set(name)
 
-        button_input_csv = ttk.Button(self, text='zmień wszystko',
-                                      command=lambda: pick_open())
-        button_profi_htm = ttk.Button(self, text='zmień',
-                                      command=lambda: pick_save(self.profi_htm,
-                                                                ".html"))
-        button_freqs_csv = ttk.Button(self, text='zmień',
-                                      command=lambda: pick_save(self.freqs_csv,
-                                                                ".csv"))
-        button_stats_csv = ttk.Button(self, text='zmień',
-                                      command=lambda: pick_save(self.stats_csv,
-                                                                ".csv"))
-        button_tests_csv = ttk.Button(self, text='zmień',
-                                      command=lambda: pick_save(self.tests_csv,
-                                                                ".csv"))
-        button_tests_dot = ttk.Button(self, text='zmień',
-                                      command=lambda: pick_save(self.tests_dot,
-                                                                ".gv"))
-        button_tests_txt = ttk.Button(self, text='zmień',
-                                      command=lambda: pick_save(self.tests_txt,
-                                                                ".txt"))
+        button_input_csv = ttk.Button(
+            self, text='zmień wszystko',
+            command=lambda: pick_open())
+        button_tests_dot = ttk.Button(
+            self, text='zmień pozostałe',
+            command=lambda: pick_save(self.tests_dot, ".gv"))
+        button_profi_htm = ttk.Button(
+            self, text='zmień',
+            command=lambda: pick_save(self.profi_htm, ".csv"))
+        button_freqs_csv = ttk.Button(
+            self, text='zmień',
+            command=lambda: pick_save(self.freqs_csv, ".csv"))
+        button_stats_csv = ttk.Button(
+            self, text='zmień',
+            command=lambda: pick_save(self.stats_csv, ".csv"))
+        button_tests_csv = ttk.Button(
+            self, text='zmień',
+            command=lambda: pick_save(self.tests_csv, ".csv"))
+        button_tests_txt = ttk.Button(
+            self, text='zmień',
+            command=lambda: pick_save(self.tests_txt, ".txt"))
+
         label_input.grid(row=0, column=0, sticky='w')
         label_output.grid(row=2, column=0, sticky='w')
+
         label_input_csv.grid(row=1, column=1, sticky='e')
+        label_tests_dot.grid(row=2, column=1, sticky='e')
         label_profi_htm.grid(row=3, column=1, sticky='e')
         label_freqs_csv.grid(row=4, column=1, sticky='e')
         label_stats_csv.grid(row=5, column=1, sticky='e')
         label_tests_csv.grid(row=6, column=1, sticky='e')
-        label_tests_dot.grid(row=7, column=1, sticky='e')
-        label_tests_txt.grid(row=8, column=1, sticky='e')
+        label_tests_txt.grid(row=7, column=1, sticky='e')
 
         entry_input_csv.grid(row=1, column=2, sticky='we')
+        entry_tests_dot.grid(row=2, column=2, sticky='we')
         entry_profi_htm.grid(row=3, column=2, sticky='we')
         entry_freqs_csv.grid(row=4, column=2, sticky='we')
         entry_stats_csv.grid(row=5, column=2, sticky='we')
         entry_tests_csv.grid(row=6, column=2, sticky='we')
-        entry_tests_dot.grid(row=7, column=2, sticky='we')
-        entry_tests_txt.grid(row=8, column=2, sticky='we')
+        entry_tests_txt.grid(row=7, column=2, sticky='we')
 
         button_input_csv.grid(row=1, column=3, sticky='ew')
+        button_tests_dot.grid(row=2, column=3, sticky='ew')
         button_profi_htm.grid(row=3, column=3, sticky='ew')
         button_freqs_csv.grid(row=4, column=3, sticky='ew')
         button_stats_csv.grid(row=5, column=3, sticky='ew')
         button_tests_csv.grid(row=6, column=3, sticky='ew')
-        button_tests_dot.grid(row=7, column=3, sticky='ew')
-        button_tests_txt.grid(row=8, column=3, sticky='ew')
+        button_tests_txt.grid(row=7, column=3, sticky='ew')
 
         self.columnconfigure(2, weight=1)
 
-        for w in self.winfo_children():
-            w.grid_configure(padx=5, pady=5)
-
-    def export_data_to_object(self, obj):
-        obj.input_csv_file_name = self.input_csv.get()
-        obj.profi_htm_file_name = self.profi_htm.get()
-        obj.freqs_csv_file_name = self.freqs_csv.get()
-        obj.stats_csv_file_name = self.stats_csv.get()
-        obj.tests_csv_file_name = self.tests_csv.get()
-        obj.tests_dot_file_name = self.tests_dot.get()
-        obj.tests_txt_file_name = self.tests_txt.get()
+        for widget in self.winfo_children():
+            widget.grid_configure(padx=5, pady=5)
 
 
 class ColumnsFrame(BorderedFrame):
@@ -549,9 +611,6 @@ def run(data_frame_provider_arg, computation_engine_arg):
 
     for w in frame.scrollable_frame.winfo_children():
         w.pack_configure(padx=10, pady=10)
-
-    parameters_frame.export_data_to_object(computation_engine)
-    file_frame.export_data_to_object(computation_engine)
 
     root.mainloop()
 
