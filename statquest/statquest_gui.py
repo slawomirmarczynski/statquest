@@ -14,7 +14,7 @@ Authors:
 
 Copyright (c) 2022 Sławomir Marczyński
 """
-
+import locale
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -81,8 +81,9 @@ computation_engine = None
 # tego się trzymajmy. Oczywiście wartości None są, gdy będzie uruchamiany
 # interfejs użytkownika, zastępowane konkretnymi obiektami.
 #
-# Drobna kolizja nazewnictwa: frame jest koncepcją Pandas oraz widgetem
-# biblioteki Tkinter.
+# Uwaga: jest drobna kolizja nazewnictwa: frame jest koncepcją Pandas
+# oraz widgetem biblioteki Tkinter; pandas.DataFrame jest czymś zupełnie innym
+# niż tkinker.ttk.Frame
 #
 intro = None
 parameters_frame = None
@@ -325,7 +326,6 @@ class ParametersFrame(BorderedFrame):
             data_frame_provider.set_locale(self.locale_code.get())
             columns_frame.update()
 
-
         # tkinker wymaga aby wartości początkowe dla obiektów takich jak
         # tk.StringVar itp. były jawnie określane. Sam z siebie nie gwarantuje
         # że początkowa zawartość pól Entry będzie skopiowana do takich
@@ -346,10 +346,12 @@ class ParametersFrame(BorderedFrame):
         label_alpha = ttk.Label(
             self, text=_('α jako krytyczna wartość dla p-value:'))
         label_alpha.grid(row=1, column=0, sticky='e')
-        entry_alpha = ttk.Entry(self, width=20, textvariable=self.alpha,
-                                validate='all',
-                                validatecommand=(registred_validator, '%P'))
-        entry_alpha.grid(row=1, column=1, sticky='w')
+
+        spinbox_alpha = ttk.Spinbox(
+            self, from_=0, to=1, increment=0.01, format = "%.2f", width = 10,
+            textvariable = self.alpha,
+            validate='all',  validatecommand=(registred_validator, '%P'))
+        spinbox_alpha.grid(row=1, column=1, sticky='w')
         label_alpha_comment = ttk.Label(
             self,
             text=_('Wartość parametru α musi spełniać warunek 0 ⩽ α ⩽ 1.'))

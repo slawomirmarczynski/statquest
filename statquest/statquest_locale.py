@@ -64,10 +64,15 @@ def setup_locale_translation_gettext(messages_domain='messages'):
     """
 
     # Reset all locale settings to the user's default settings.
+    # Keep LC_NUMERIC to en_US due problems with tkinter and conflicts
+    # with data created with distinct locale than actually used/installed
+    # on the user computer. For example well known the titanic3.csv data
+    # set has the comma as a decimal point separator.
     #
     global _setlocale_called
     if not _setlocale_called:
         locale.setlocale(locale.LC_ALL, '')
+        locale.setlocale(locale.LC_NUMERIC, 'en_US')
         _setlocale_called = True
 
     # Set language for default locale. It is a kind of magic on MS Windows
