@@ -49,13 +49,51 @@ from tkinter import filedialog, ttk
 from statquest import statquest_locale
 
 
+# Sposób, w jaki jest napisany ten moduł, tj. statquest_gui, nie jest wzorowy
+# w sensie teoretycznej poprawności. To kompromis pomiędzy najlepszymi
+# teoriami programowania obiektowego, a praktycznym podejściem YAGNI/KISS.
+# Tak, wiemy że zmienne globalne są złe. Jednak plątanina obserwatorów,
+# obserwowanych (wzorce projektowe) wcale nie jest wiele lepsza... przynajmniej
+# na obecnym etapie rozwoju programu StatQuest.
+
+# Zmienna globalna data_frame_provider w chwili uruchomienia interfejsu GUI,
+# a także przez cały czas jego działania musi określać obiekt mający
+# przynajmniej metody set_locale(locale_code: str), set_file_name(name: str)
+# i get(). Przy tym metoda get() ma dostarczać obiektu pandas.DataFrame
+# odpowiednio do tego jak data_frame_provider został wcześniej skonfigurowany.
+# Inne metody/atrybuty data_frame_provider nie są używane w statquest_gui.
+#
+data_frame_provider = None
+
+# Zmienna globalna computation_engine służy do konfigurowania i uruchamiania
+# obliczeń i powinna zawierać obiekt mający bezparametrową metodę run().
+# Innymi słowy, w żargonie programistów używających Javy, ma to być obiekt
+# runnable. Konfigurowanie polega na dopisywaniu/nadpisywaniu atrybutów tego
+# obiektu, tak aby metoda run odwoływała się ona wyłącznie do nich.
+# Wszystkie dane potrzebne do wykonania run powinny/muszą już wcześniej być
+# znane obiektowi computation_engine.
+#
+computation_engine = None
+
+# Interfejs użytkownika jest podzielony na sekcje. Sekcje te nie są całkiem
+# niezależne, bo (niektóre z nich) współpracują ze sobą. Wyszczególnienie
+# ich jako zmiennych globalnych nie jest najlepszym pomysłem, ale działa i
+# tego się trzymajmy. Oczywiście wartości None są, gdy będzie uruchamiany
+# interfejs użytkownika, zastępowane konkretnymi obiektami.
+#
+# Drobna kolizja nazewnictwa: frame jest koncepcją Pandas oraz widgetem
+# biblioteki Tkinter.
+#
+intro = None
+parameters_frame = None
+file_frame = None
+columns_frame = None
+launcher_frame = None
+
+
 class ScrollableFrame(ttk.Frame):
     """
     Umożliwia pionowe przewijanie wstawionych do scrollable_frame widgetów.
-
-    Attributes:
-        scrollable_frame (tk.ttk.Frame): ramka będąca kontenerem na elementy;
-            ta właśnie ramka jest przewijana.
     """
 
     def __init__(self, *args, **kwargs):
@@ -343,7 +381,6 @@ class ParametersFrame(BorderedFrame):
             widget.grid_configure(padx=5, pady=5)  # todo: piksele -> punkty
 
 
-
 class FileFrame(BorderedFrame):
     """
     Wybór plików.
@@ -427,11 +464,11 @@ class FileFrame(BorderedFrame):
         self.tests_txt.trace_add('write', callback)
 
         entry_input_csv = ttk.Entry(self, width=80, textvariable=self.input_csv)
+        entry_tests_dot = ttk.Entry(self, width=80, textvariable=self.tests_dot)
         entry_profi_htm = ttk.Entry(self, width=80, textvariable=self.profi_htm)
         entry_freqs_csv = ttk.Entry(self, width=80, textvariable=self.freqs_csv)
         entry_stats_csv = ttk.Entry(self, width=80, textvariable=self.stats_csv)
         entry_tests_csv = ttk.Entry(self, width=80, textvariable=self.tests_csv)
-        entry_tests_dot = ttk.Entry(self, width=80, textvariable=self.tests_dot)
         entry_tests_txt = ttk.Entry(self, width=80, textvariable=self.tests_txt)
 
         def pick_open():
@@ -592,14 +629,7 @@ class LauncherFrame(ttk.Frame):
         button.pack(side='left', pady=(10, 50))
 
 
-data_frame_provider = None
-computation_engine = None
 
-intro = None
-parameters_frame = None
-file_frame = None
-columns_frame = None
-launcher_frame = None
 
 
 def run(data_frame_provider_arg, computation_engine_arg):
