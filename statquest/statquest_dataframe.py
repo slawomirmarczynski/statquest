@@ -49,12 +49,12 @@ class DataFrameProvider:
         self.__empty_data_frame = pd.DataFrame()
         self.__data_frame = self.__empty_data_frame
         self.__file_name = None
-        self.__cvs_format = statquest_locale.setup_locale_csv_format()
+        self.__csv_format = statquest_locale.setup_locale_csv_format()
         self.is_csv_file = False
         self.is_excel_file = False
 
     def set_locale(self, locale_='default'):
-        self.__cvs_format = statquest_locale.setup_locale_csv_format(locale_)
+        self.__csv_format = statquest_locale.setup_locale_csv_format(locale_)
         self.reload()
 
     def set_file_name(self, file_name):
@@ -62,17 +62,23 @@ class DataFrameProvider:
         self.reload()
 
     def reload(self):
+        self.is_csv_file = False
+        self.is_excel_file = False
         try:
             if self.__file_name and os.path.exists(self.__file_name):
-                df = pd.read_csv(self.__file_name, **self.__cvs_format)
-                self.__data_frame = df
-                self.is_csv_file = True
-                print('reloaded...')
+                __, extension = os.path.splitext(self.__file_name)
+                if extension.lower() == '.xlsx':
+                    decimal = self.__csv_format['decimal']
+                    df = pd.read_excel(self.__file_name, decimal=decimal)
+                    self.__data_frame = df
+                    self.is_excel_file = True
+                else:
+                    df = pd.read_csv(self.__file_name, **self.__csv_format)
+                    self.__data_frame = df
+                    self.is_csv_file = True
         except:
             self.__data_frame = self.__empty_data_frame
-            self.is_csv_file = False
-            self.is_excel_file = False
-            print('reload failed...')
+
 
     def get(self):
         return self.__data_frame
