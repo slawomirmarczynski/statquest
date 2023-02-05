@@ -653,7 +653,14 @@ class LauncherFrame(ttk.Frame):
         super().__init__(*args, **kwargs)
 
         def enable_siblings(enable):
-            pass
+            stack = [self.master]
+            while stack:
+                widget = stack.pop(0)
+                stack.extend(widget.winfo_children())
+                try:
+                    widget['state'] = 'normal' if enable else 'disable'
+                except tk.TclError:
+                    pass
 
         def callback(*args):
             enable_siblings(False)
