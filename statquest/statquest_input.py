@@ -67,7 +67,7 @@ def input_observables(data_frame):
         series = data_frame[index]
         series = series.dropna()
         try:
-            obs = Observable(name, dict(series));
+            obs = Observable(name, dict(series))
             if len(obs) > 2:
                 observables.append(obs)
                 print(f"{name} ok")

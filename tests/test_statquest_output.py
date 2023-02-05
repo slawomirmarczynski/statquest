@@ -42,7 +42,7 @@ class TestOutput(TestCase):
     def test_write_descriptive_statistics_csv(self):
         obs = Mock()
         obs.IS_CONTINUOUS = True
-        obs.descriptive_statistics.return_value = {'A': 123.45, 'B': 777.89};
+        obs.descriptive_statistics.return_value = {'A': 123.45, 'B': 777.89}
         sink = Mock()
         write_descriptive_statistics_csv((obs,), sink)
         sink.write.assert_has_calls([

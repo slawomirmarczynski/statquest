@@ -39,8 +39,7 @@ import gettext
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
+import matplotlib
 import pandas as pd
 import pandas_profiling
 
@@ -53,10 +52,7 @@ from statquest_tests import ALL_STATISTICAL_TESTS
 import statquest_gui
 
 
-# Default importance level alpha, it is a probability as a float number.
-#
-DEFAULT_ALPHA_LEVEL = 0.99
-assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
+
 
 
 class ComputationEngine:
@@ -70,7 +66,7 @@ class ComputationEngine:
         if not data_frame.empty:
             data_frame = data_frame.copy()  # should defrag data_frame
 
-        if self.should_compute_pandas_profile:
+        if self.need_pandas_profile:
             profile_report = pandas_profiling.ProfileReport(data_frame)
             profile_report.to_file(self.profi_htm_file_name)
 
@@ -102,7 +98,6 @@ class ComputationEngine:
 
 
 if __name__ == '__main__':
-    import matplotlib
     matplotlib.use('TkAgg')
     data_frame_provider = statquest_dataframe.DataFrameProvider()
     computation_engine = ComputationEngine()

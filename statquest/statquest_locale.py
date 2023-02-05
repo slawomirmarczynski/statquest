@@ -69,6 +69,8 @@ def setup_locale_translation_gettext(messages_domain='messages'):
     # on the user computer. For example well known the titanic3.csv data
     # set has the comma as a decimal point separator.
     #
+    # @todo: remove forced en_US when tkinker bug will be fixed.
+    #
     global _setlocale_called
     if not _setlocale_called:
         locale.setlocale(locale.LC_ALL, '')
@@ -101,7 +103,7 @@ def setup_locale_csv_format(locale_code='default'):
     Get settings for reading CSV files.
 
     Args:
-        locale: locale code like 'pl_PL'; 'default' for system-default.
+        locale_code: locale code like 'pl_PL'; 'default' for system-default.
 
     Returns:
         kwargs dictionary with appropriate settings for pandas.read_csv()

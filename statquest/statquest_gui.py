@@ -48,13 +48,20 @@ from tkinter import filedialog, ttk
 
 from statquest import statquest_locale
 
-
 # Sposób, w jaki jest napisany ten moduł, tj. statquest_gui, nie jest wzorowy
 # w sensie teoretycznej poprawności. To kompromis pomiędzy najlepszymi
 # teoriami programowania obiektowego, a praktycznym podejściem YAGNI/KISS.
 # Tak, wiemy że zmienne globalne są złe. Jednak plątanina obserwatorów,
 # obserwowanych (wzorce projektowe) wcale nie jest wiele lepsza... przynajmniej
 # na obecnym etapie rozwoju programu StatQuest.
+
+# Default importance level alpha (a probability as a float number).
+#
+DEFAULT_ALPHA_LEVEL = 0.95
+
+# Locale' codes, the first code is default.
+#
+LOCALE_CODES = ('pl_PL', 'en_US')
 
 # Zmienna globalna data_frame_provider w chwili uruchomienia interfejsu GUI,
 # a także przez cały czas jego działania musi określać obiekt mający
@@ -90,6 +97,10 @@ parameters_frame = None
 file_frame = None
 columns_frame = None
 launcher_frame = None
+
+# Gettext translator.
+#
+_ = statquest_locale.setup_locale_translation_gettext()
 
 
 class ScrollableFrame(ttk.Frame):
@@ -283,7 +294,7 @@ class ParametersFrame(BorderedFrame):
         """
         super().__init__(*args, **kwargs)
 
-        def validator(string):
+        def alpha_validator(string):
             """
             Sprawdza czy wartość wpisana w kontrolkę jest liczbą z przedziału
             od 0 do 1, czyli mogącą określać prawdopodobieństwo.
@@ -304,7 +315,8 @@ class ParametersFrame(BorderedFrame):
 
         # Rejestracja, dla potrzeb tkinker, funkcji walidującej.
         #
-        registred_validator = self.register(validator)
+        #
+        registred_alpha_validator = self.register(alpha_validator)
 
         def callback(*args):
             """
@@ -321,7 +333,7 @@ class ParametersFrame(BorderedFrame):
             # zwykłych zmiennych do przechowywania wartości parametrów.
             #
             computation_engine.alpha = self.alpha.get()
-            computation_engine.should_compute_pandas_profile = self.profile.get()
+            computation_engine.need_pandas_profile = self.need_profile.get()
             computation_engine.locale_code = self.locale_code.get()
             data_frame_provider.set_locale(self.locale_code.get())
             columns_frame.update()
@@ -331,9 +343,10 @@ class ParametersFrame(BorderedFrame):
         # że początkowa zawartość pól Entry będzie skopiowana do takich
         # zmiennych.
         #
-        self.alpha = tk.DoubleVar(value=0.95)
-        self.profile = tk.BooleanVar(value=False)
-        self.locale_code = tk.StringVar(value='pl_PL')
+        assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
+        self.alpha = tk.DoubleVar(value=DEFAULT_ALPHA_LEVEL)
+        self.need_profile = tk.BooleanVar(value=False)
+        self.locale_code = tk.StringVar(value=LOCALE_CODES[0])
         self.locale_code.trace_add('write', callback)
 
         # Ogólny opis dla tej sekcji.
@@ -348,9 +361,9 @@ class ParametersFrame(BorderedFrame):
         label_alpha.grid(row=1, column=0, sticky='e')
 
         spinbox_alpha = ttk.Spinbox(
-            self, from_=0, to=1, increment=0.01, format = "%.2f", width = 10,
-            textvariable = self.alpha,
-            validate='all',  validatecommand=(registred_validator, '%P'))
+            self, from_=0, to=1, increment=0.01, format="%.2f", width=10,
+            textvariable=self.alpha,
+            validate='all',  validatecommand=(registred_alpha_validator, '%P'))
         spinbox_alpha.grid(row=1, column=1, sticky='w')
         label_alpha_comment = ttk.Label(
             self,
@@ -361,7 +374,7 @@ class ParametersFrame(BorderedFrame):
         #
         checkbox_profile = ttk.Checkbutton(
             self, text=_('generowanie raportu Ydata Profile'),
-            variable=self.profile, onvalue=True, offvalue=False)
+            variable=self.need_profile, onvalue=True, offvalue=False)
         checkbox_profile.grid(row=2, column=0, sticky='w')
         label_profile_comment = ttk.Label(self, text=_(
             'Oblicza podstawowe statystyki i korelacje. Nie wpływa na testy.'))
@@ -372,11 +385,11 @@ class ParametersFrame(BorderedFrame):
         combobox_locale = ttk.Combobox(self, width=8,
                                        textvariable=self.locale_code)
         combobox_locale.grid(row=3, column=1, sticky='w')
-        combobox_locale['values'] = ('pl_PL', 'en_US')
+        combobox_locale['values'] = LOCALE_CODES
         combobox_locale.current(0)
         label_locale_comment = ttk.Label(
             self,
-            text='Ustala szczegóły takie jak znak przecinka dziesiętnego.')
+            text=_('Ustala szczegóły takie jak znak przecinka dziesiętnego.'))
         label_locale_comment.grid(row=3, column=2, sticky='w')
 
         for widget in self.winfo_children():
@@ -385,7 +398,7 @@ class ParametersFrame(BorderedFrame):
 
 class FileFrame(BorderedFrame):
     """
-    Wybór plików.
+    Wybór nazw plików.
     """
 
     def __init__(self, *args, **kwargs):
@@ -417,6 +430,22 @@ class FileFrame(BorderedFrame):
         self.tests_csv = tk.StringVar()
         self.tests_txt = tk.StringVar()
 
+        # Przy zmianie nazwy... choćby jednej litery w nazwie... aktualizowane
+        # są wartości zapisane w computation_engine. Jest to w większości
+        # niepotrzebne, nadpisuje ponownie stare wartości takimi samymi,
+        # wystarczyłoby zmieniać tylko to co rzeczywiście uległo zmianie.
+        # Ale taki, lepszy, algorytm byłby niepotrzebnie skomplikowany,
+        # a obecna wersja tej części programu jest wystarczająco wydajna.
+        #
+        # Wyjaśnienia wymaga też dlaczego nie używać StringVar, DoubleVar
+        # itd. bezpośrednio w computation_engine? Przecież gdyby tak zrobić
+        # nie trzeba byłoby przepisywać danych do computation_engine bo one
+        # już byłyby tam same z siebie, nieprawdaż? Wyjaśnienie jest proste:
+        # chcemy odizolować computation_engine od biblioteki widgetów (jaką
+        # jest tkinter). W klasie ComputationEngine nie ma żadnych odwołań
+        # do GUI, nie jest ona od GUI zależna i dlatego łatwo można (będzie)
+        # zmienić GUI pozostawiając obliczeniową część programu bez zmian.
+
         def callback(*args):
             computation_engine.input_csv_file_name = self.input_csv.get()
             computation_engine.tests_dot_file_name = self.tests_dot.get()
@@ -439,7 +468,6 @@ class FileFrame(BorderedFrame):
             callback(*args)
             data_frame_provider.set_file_name(self.input_csv.get())
             columns_frame.update()
-
 
         def callback_output(*args):
             head, tail = os.path.split(self.tests_dot.get())
@@ -624,17 +652,30 @@ class LauncherFrame(ttk.Frame):
 
         super().__init__(*args, **kwargs)
 
+        def enable_siblings(enable):
+            pass
+
         def callback(*args):
+            enable_siblings(False)
             computation_engine.run()
+            enable_siblings(True)
 
         button = ttk.Button(self, text="Uruchom obliczenia", command=callback)
         button.pack(side='left', pady=(10, 50))
 
 
-
-
-
 def run(data_frame_provider_arg, computation_engine_arg):
+    """
+    Uruchomienie interfejsu graficznego i wejście w pętlę mainloop.
+
+    Args:
+        data_frame_provider_arg:
+        computation_engine_arg:
+
+    Returns:
+
+    """
+
     global data_frame_provider, computation_engine
 
     data_frame_provider = data_frame_provider_arg
@@ -667,10 +708,3 @@ def run(data_frame_provider_arg, computation_engine_arg):
         w.pack_configure(padx=10, pady=10)
 
     root.mainloop()
-
-
-_ = statquest_locale.setup_locale_translation_gettext()
-# directory = os.path.dirname(__file__)
-# localedir = os.path.join(directory, 'locale')
-# gettext.bindtextdomain('argparse', localedir)
-# gettext.textdomain('argparse')
