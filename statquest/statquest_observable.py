@@ -85,6 +85,7 @@ class Observable:
     CONTINUOUS_TYPES = (float, float32, float64, int, int32, int64)
     NOMINAL_TYPES = (str,)
 
+    # noinspection PyTypeChecker
     def __init__(self, name, data):
         """
         Initialize observable.
@@ -115,12 +116,11 @@ class Observable:
             >>> print(o3, o3.IS_ORDINAL, o3.IS_CONTINUOUS, o3.IS_NOMINAL)
             example3 False False True
         """
-        # pylint: disable=invalid-name  # uppercase for "final read-only"
         self.name = name
         self.data = dict(data)
-        self.IS_ORDINAL = self._check_data_kind(self.ORDINAL_TYPES)
-        self.IS_CONTINUOUS = self._check_data_kind(self.CONTINUOUS_TYPES)
-        self.IS_NOMINAL = self._check_data_kind(self.NOMINAL_TYPES)
+        self.IS_ORDINAL = self._check_data_kind(Observable.ORDINAL_TYPES)
+        self.IS_CONTINUOUS = self._check_data_kind(Observable.CONTINUOUS_TYPES)
+        self.IS_NOMINAL = self._check_data_kind(Observable.NOMINAL_TYPES)
         if not (self.IS_ORDINAL or self.IS_CONTINUOUS or self.IS_NOMINAL):
             raise TypeError
         # @todo: second chance - change all to nominal scale by casting to str.
@@ -280,6 +280,7 @@ class Observable:
             pass  # simply freq is unchanged, i.e. freq = freq
         return freq
 
+    # noinspection PyTypeChecker
     def descriptive_statistics(self):
         """
         Compute descriptive statistics.
@@ -297,6 +298,7 @@ class Observable:
         """
         if self.IS_CONTINUOUS or self.IS_ORDINAL:
             data = tuple(self.data.values())
+            # noinspection PyTypeChecker
             return {_('mean'): np.mean(data),
                     _('median'): np.median(data),
                     _('lower quartile '): np.percentile(data, 25),

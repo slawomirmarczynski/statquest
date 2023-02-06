@@ -66,6 +66,7 @@ def input_observables(data_frame):
         name = str(index)
         series = data_frame[index]
         series = series.dropna()  # drop missing values
+        # noinspection PyBroadException
         try:
             obs = Observable(name, dict(series))
             if len(obs) > 2:

@@ -105,18 +105,47 @@ _ = statquest_locale.setup_locale_translation_gettext()
 
 
 class Progress:
+    """Fasada dla tkinter.ttk.Progressbar."""
+
+    # noinspection PyShadowingNames
     def __init__(self, progress):
+        """
+        Przekazuje obiekt progress do obiektu klasy Progress.
+
+        Args:
+            progress (tkinter.tkk.Progress): obiekt toolkitu tkinter który ma
+            się kryć za fasadą klasy Progress.
+        """
         self.progress = progress
 
     def set(self, x):
+        """
+        Ustawia wartość pokazywaną przez progress bar.
+
+        Args:
+            x: wartość jaka powinna być ustawiona
+        """
         self.progress['value'] = x
 
     def step(self, delta=1):
+        """
+        Zwiększa postęp pokazywany przez progress o zadany krok.
+
+        Args:
+            delta: wartość o jaką powinien powiększyć się progress.
+        """
         self.progress['value'] += delta
         self.progress.update()
 
-    def range(self, x):
-        self.progress['maximum'] = x
+    def range(self, maximal_value):
+        """
+        Ustawia zakres dla progress-u.
+
+        Args:
+            maximal_value: ustala maksymalną wartość jaką ma pokazywać
+                progress.
+        """
+        self.progress['maximum'] = maximal_value
 
 
 class ScrollableFrame(ttk.Frame):
@@ -186,6 +215,7 @@ class ScrollableFrame(ttk.Frame):
         # widoczne, to menadżer geometrii nie potrafiłby działać zgodnie
         # z naszymi oczekiwaniami.
         #
+        # noinspection PyUnusedLocal
         def update_scrollable_frame_width(event):
             if self._scrollable_frame.winfo_reqwidth() != canvas.winfo_width():
                 canvas.itemconfigure(
@@ -198,6 +228,14 @@ class ScrollableFrame(ttk.Frame):
         # przewijania (czyli przez scroll bar).
         #
         canvas.configure(yscrollcommand=sb.set)
+
+        # Jeszcze dodajemy przewijanie kółkiem myszy.
+        #
+        canvas.bind_all(
+            "<MouseWheel>",
+            lambda event:
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        )
 
     @property
     def scrollable_frame(self):
@@ -324,6 +362,7 @@ class ParametersFrame(BorderedFrame):
                 nie powiodła się.
             """
 
+            # noinspection PyBroadException
             try:
                 value = float(string)
                 return 0 <= value <= 1
@@ -335,6 +374,7 @@ class ParametersFrame(BorderedFrame):
         #
         registred_alpha_validator = self.register(alpha_validator)
 
+        # noinspection PyUnusedLocal,PyShadowingNames
         def callback1(*args):
             """
             Informowanie computation_engine o aktualnych wartościach
@@ -356,6 +396,7 @@ class ParametersFrame(BorderedFrame):
             checkbox_profile_correlations['state'] = (
                 'normal' if self.need_profile.get() else 'disabled')
 
+        # noinspection PyUnusedLocal,PyShadowingNames
         def callback2(*args):
             """
             Informowanie computation_engine o aktualnych wartościach
@@ -506,6 +547,7 @@ class FileFrame(BorderedFrame):
         # therefore easy to (will) change the GUI leaving the computational
         # part of the program unchanged.
 
+        # noinspection PyUnusedLocal,PyShadowingNames
         def callback(*args):
             computation_engine.input_csv_file_name = self.input_csv.get()
             computation_engine.tests_dot_file_name = self.tests_dot.get()
@@ -517,6 +559,7 @@ class FileFrame(BorderedFrame):
             if columns_frame:
                 columns_frame.update()
 
+        # noinspection PyShadowingNames
         def callback_input(*args):
             head, tail = os.path.split(self.input_csv.get())
             name, extension = os.path.splitext(tail)
@@ -530,6 +573,7 @@ class FileFrame(BorderedFrame):
             data_frame_provider.set_file_name(self.input_csv.get())
             columns_frame.update()
 
+        # noinspection PyShadowingNames
         def callback_output(*args):
             head, tail = os.path.split(self.tests_dot.get())
             name, extension = os.path.splitext(tail)
@@ -658,10 +702,12 @@ class ColumnsFrame(BorderedFrame):
 
         super().__init__(*args, **kwargs)
 
+        # noinspection PyUnusedLocal,PyShadowingNames
         def select_all(*args):
             for name, variable, checkbox in self.__cbs:
                 variable.set(True)
 
+        # noinspection PyUnusedLocal,PyShadowingNames
         def select_none(*args):
             for name, variable, checkbox in self.__cbs:
                 variable.set(False)
@@ -677,6 +723,7 @@ class ColumnsFrame(BorderedFrame):
 
     def populate(self, column_headers_list):
 
+        # noinspection PyShadowingNames
         def callback():
             selected = []
             for name, variable, checkbox in self.__cbs:
@@ -732,13 +779,15 @@ class LauncherFrame(ttk.Frame):
                 except tk.TclError:
                     pass
 
+        # noinspection PyUnusedLocal,PyShadowingNames
         def callback(*args):
             enable_siblings(False)
             label['text'] = 'przeprowadzam obliczenia'
             label['state'] = 'normal'
             self.master.update()
+            # noinspection PyBroadException
             try:
-                computation_engine.run(data_frame_provider, computation_engine)
+                computation_engine.run(data_frame_provider)
             except:
                 tk.messagebox.showwarning(
                     title='StatQuest',
@@ -756,14 +805,14 @@ class LauncherFrame(ttk.Frame):
 
         progressbar = ttk.Progressbar(self)
         progressbar.grid(row=0, column=2,
-                      padx=(20, 0), pady=(10, 50),
-                      sticky='we')
+                         padx=(20, 0), pady=(10, 50),
+                         sticky='we')
         self.grid_columnconfigure(2, weight=1)
         self.grid_columnconfigure(3, weight=1)
 
         global progress
         progress = Progress(progressbar)
-        progress.set(0)
+        # progress.set(0)
 
 
 def run(data_frame_provider_arg, computation_engine_arg):

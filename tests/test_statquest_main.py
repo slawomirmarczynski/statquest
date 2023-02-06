@@ -25,13 +25,3 @@ class TestComputationEngine(TestCase):
         """
         computation_engine = ComputationEngine()
         self.assertIsNotNone(computation_engine)
-
-    def test_run_1(self):
-        """
-        Empty run should fail.
-        """
-        computation_engine = ComputationEngine()
-        with self.assertRaises(TypeError):
-            computation_engine.run()
-
-

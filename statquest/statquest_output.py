@@ -198,6 +198,7 @@ def write_relations_dot(relations, file):
         print('}', file=file)
 
 
+# noinspection PyUnusedLocal
 def write_relations_nx(relations, file):
     """
     """
@@ -212,24 +213,24 @@ def write_relations_nx(relations, file):
                 else:
                     s = f'{r.test.name_short}* p = {r.p_value:#.4}'
                 label.append(s)
-            label = '\\n'.join(label)
+            label = '\\n'.join(label)  # @todo: ???
             graph.add_node(a)
             graph.add_node(b)
             graph.add_edge(a, b)
-    options = {
-        "font_size": 8,
-        "node_size": 1500,
-        "node_color": "white",
-        "edgecolors": "black",
-        "linewidths": 1,
-        "width": 1,
-    }
-    nx.draw_networkx(graph, **options)
-    #nx.draw(graph)
-    ax = plt.gca()
-    ax.margins(0.20)
-    plt.axis("off")
-    plt.show()
+        options = {
+            "font_size": 8,
+            "node_size": 1500,
+            "node_color": "white",
+            "edgecolors": "black",
+            "linewidths": 1,
+            "width": 1,
+        }
+        nx.draw_networkx(graph, **options)
+        # nx.draw(graph)
+        ax = plt.gca()
+        ax.margins(0.20)
+        plt.axis("off")
+        plt.show()
 
 
 _ = statquest_locale.setup_locale_translation_gettext()

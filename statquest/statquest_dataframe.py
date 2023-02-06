@@ -66,6 +66,7 @@ class DataFrameProvider:
     def reload(self):
         self.is_csv_file = False
         self.is_excel_file = False
+        # noinspection PyBroadException
         try:
             if self.__file_name and os.path.exists(self.__file_name):
                 __, extension = os.path.splitext(self.__file_name)
@@ -84,6 +85,7 @@ class DataFrameProvider:
         return self.__data_frame
 
     def get_selected(self, headers):
+        # noinspection PyBroadException
         try:
             df = self.__data_frame.loc[:, headers]
         except:

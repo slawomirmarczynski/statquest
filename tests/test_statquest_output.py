@@ -15,7 +15,7 @@ Copyright (c) 2023 Sławomir Marczyński.
 
 import os
 from unittest import TestCase
-from unittest.mock import Mock, MagicMock, call, ANY
+from unittest.mock import ANY, MagicMock, Mock
 
 from statquest_output import *
 

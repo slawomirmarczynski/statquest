@@ -137,10 +137,13 @@ class Relations:
                                   file=sys.stderr)
                             continue
                         if test.can_be_carried_out(a, b):
+                            # noinspection PyBroadException
                             try:
-                                observable_relations.relations.append(test(a, b))
+                                observable_relations.relations.append(
+                                    test(a, b))
                             except:
-                                print(f'Nieudany {test} dla {a} vs. {b}', file=sys.stderr)
+                                print(f'Nieudany {test} dla {a} vs. {b}',
+                                      file=sys.stderr)
                     observables_relations[(a, b)] = observable_relations
         return observables_relations
 

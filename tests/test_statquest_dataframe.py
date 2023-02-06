@@ -4,6 +4,7 @@ import pandas
 
 from statquest_dataframe import *
 
+
 class TestDataFrameProvider(TestCase):
 
     def test___init__(self):
@@ -33,4 +34,3 @@ class TestDataFrameProvider(TestCase):
         result = data_frame_provider.get()
         self.assertIsNotNone(result)
         self.assertIsInstance(result, pandas.DataFrame)
-

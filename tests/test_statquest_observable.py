@@ -16,7 +16,6 @@ Copyright (c) 2023 Sławomir Marczyński.
 import math
 import random
 from unittest import TestCase
-from unittest.mock import Mock, MagicMock
 
 from statquest_observable import Observable
 
@@ -76,6 +75,7 @@ class TestObservable(TestCase):
         """create empty"""
         with self.assertRaises(TypeError):
             obs = Observable('O', {})
+            self.assertIsNone(obs)
 
     def test___getitem__1(self):
         """Access to observable data"""

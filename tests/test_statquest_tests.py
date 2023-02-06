@@ -21,7 +21,6 @@ from statquest_tests import *
 class TestTest(TestCase):
 
     def setUp(self):
-        n = 100
         data_int = {1: 1, 2: 2, 3: 4, 4: 5, 5: 66, 6: 34, 7: -2}
         data_float = {1: 1.5, 2.3: 2, 3: 4, 4: 5, 5: 66, 6: 34, 7: -2.5}
         data_str = {1: 'a', 2: 'b', 3: 'c', 4: 'cc', 5: 'abc'}

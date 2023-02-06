@@ -47,7 +47,7 @@ from statquest_tests import ALL_STATISTICAL_TESTS
 
 
 class ComputationEngine:
-    def run(self, data_frame_provider, computation_engine):
+    def run(self, data_frame_provider):
         tests = ALL_STATISTICAL_TESTS
         output(self.tests_txt_file_name, write_tests_doc, tests)
 
