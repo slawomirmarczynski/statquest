@@ -14,6 +14,9 @@ Copyright (c) 2022 Sławomir Marczyński.
 """
 
 from unittest import TestCase
+
+import pandas as pd
+
 from typing import Container
 
 from statquest_input import *
@@ -22,7 +25,15 @@ from statquest_input import *
 class TestInput(TestCase):
 
     def test_input_observables(self):
-        observables = input_observables()
+        df = pd.DataFrame()
+        observables = input_observables(df)
+        self.assertIsNotNone(observables)
+        # self.assertIsInstance(observables, Container)
+        # self.assertTrue(observables)
+
+    def test_input_observables1(self):
+        df = pd.DataFrame()
+        observables = input_observables(df)
         self.assertIsNotNone(observables)
         self.assertIsInstance(observables, Container)
         self.assertTrue(observables)
