@@ -4,8 +4,8 @@
 File:
     project: StatQuest
     name: test_statquest_output.py
-    version: 0.4.0.0
-    date: 19.06.2022
+    version: 4.2.0.1
+    date: 07.02.2022
 
 Authors:
     Sławomir Marczyński

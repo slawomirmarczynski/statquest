@@ -7,7 +7,7 @@ File:
     project: StatQuest
     name: statquest_input.py
     version: 0.4.0.2
-    date: 19.10.2022
+    date: 07.02.2022
 
 Authors:
     Sławomir Marczyński

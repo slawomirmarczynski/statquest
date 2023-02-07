@@ -7,7 +7,7 @@ File:
     project: StatQuest
     name: statquest_locale.py
     version: 0.4.0.1
-    date: 19.06.2022
+    date: 07.02.2022
 
 Authors:
     Sławomir Marczyński

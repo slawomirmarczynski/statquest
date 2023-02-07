@@ -7,7 +7,7 @@ File:
     project: StatQuest
     name: statquest_gui.py
     version: 0.4.1.0
-    date: 01.02.2023
+    date: 07.02.2022
 
 Authors:
     Sławomir Marczyński
