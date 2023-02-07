@@ -98,23 +98,43 @@ def setup_locale_translation_gettext(messages_domain='messages'):
     return translation.gettext
 
 
-def setup_locale_csv_format(locale_code='default'):
+def setup_locale_csv_format(locale_code=None):
     """
     Get settings for reading CSV files.
 
     Args:
-        locale_code: locale code like 'pl_PL'; 'default' for system-default.
+        locale_code: locale code like 'pl_PL'; None for system-default.
 
     Returns:
         kwargs dictionary with appropriate settings for pandas.read_csv()
     """
-    if locale_code == 'default':
-        locale_code, encoding = locale.getdefaultlocale()
-    kwargs = {}
     if locale_code is None:
-        kwargs = {}
-    elif locale_code == 'pl_PL':
+        locale_code, encoding = locale.getdefaultlocale()
+    if locale_code == 'pl_PL':
         kwargs = {'encoding': 'cp1250', 'sep': ';', 'decimal': ','}
     elif locale_code == 'en_US':
         kwargs = {'encoding': 'utf-8', 'sep': ',', 'decimal': '.'}
+    else:
+        raise ValueError
+    return kwargs
+
+
+def setup_locale_excel_format(locale_code=None):
+    """
+    Get settings for reading Excel files.
+
+    Args:
+        locale_code: locale code like 'pl_PL'; None for system-default.
+
+    Returns:
+        kwargs dictionary with appropriate settings for pandas.read_csv()
+    """
+    if locale_code is None:
+        locale_code, encoding = locale.getdefaultlocale()
+    if locale_code == 'pl_PL':
+        kwargs = {'decimal': ','}
+    elif locale_code == 'en_US':
+        kwargs = {'decimal': '.'}
+    else:
+        raise ValueError
     return kwargs

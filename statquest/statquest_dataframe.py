@@ -50,11 +50,13 @@ class DataFrameProvider:
         self.__data_frame = self.__empty_data_frame
         self.__file_name = None
         self.__csv_format = statquest_locale.setup_locale_csv_format()
+        self.__excel_format = statquest_locale.setup_locale_excel_format()
         self.is_csv_file = False
         self.is_excel_file = False
 
-    def set_locale(self, locale_='default'):
+    def set_locale(self, locale_=None):
         self.__csv_format = statquest_locale.setup_locale_csv_format(locale_)
+        self.__excel_format = statquest_locale.setup_locale_csv_format(locale_)
         self.reload()
 
     def set_file_name(self, file_name):
@@ -68,8 +70,7 @@ class DataFrameProvider:
             if self.__file_name and os.path.exists(self.__file_name):
                 __, extension = os.path.splitext(self.__file_name)
                 if extension.lower() == '.xlsx':
-                    decimal = self.__csv_format['decimal']
-                    df = pd.read_excel(self.__file_name, decimal=decimal)
+                    df = pd.read_excel(self.__file_name, **self.__excel_format)
                     self.__data_frame = df
                     self.is_excel_file = True
                 else:
