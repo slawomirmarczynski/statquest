@@ -38,19 +38,50 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import matplotlib
+import pandas_profiling
 
-from statquest_dataframe import DataFrameProvider
-from statquest_engine import ComputationEngine
-from statquest_gui import run
-
-
-def main():
-    matplotlib.use('TkAgg')
-    data_frame_provider = DataFrameProvider()
-    computation_engine = ComputationEngine()
-    run(data_frame_provider, computation_engine)
+from statquest_gui import *
+from statquest_input import input_observables
+from statquest_output import *
+from statquest_relations import Relations
+from statquest_tests import ALL_STATISTICAL_TESTS
 
 
-if __name__ == '__main__':
-    main()
+class ComputationEngine:
+    def run(self):
+        tests = ALL_STATISTICAL_TESTS
+        output(self.tests_txt_file_name, write_tests_doc, tests)
+
+        data_frame = data_frame_provider.get_selected(self.selected_columns)
+        if not data_frame.empty:
+            data_frame = data_frame.copy()  # should defrag data_frame
+
+        if self.need_pandas_profile:
+            profile_report = pandas_profiling.ProfileReport(data_frame)
+            profile_report.to_file(self.profi_htm_file_name)
+
+        # plot={"dpi": 200, "image_format": "png"} ???
+
+        print(data_frame)
+
+        observables = input_observables(data_frame)
+        output(self.stats_csv_file_name, write_descriptive_statistics_csv,
+               observables)
+        output(self.freqs_csv_file_name, write_elements_freq_csv,
+               observables)
+
+        relations = Relations.create_relations(observables, tests)
+        output(self.tests_csv_file_name, write_relations_csv,
+               relations, self.alpha)
+
+        significant_relations = Relations.credible_only(relations, self.alpha)
+        output(self.tests_dot_file_name, write_relations_nx,
+               significant_relations)
+        output(self.tests_dot_file_name, write_relations_dot,
+               significant_relations)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(optionflags=doctest.ELLIPSIS)

@@ -1,19 +1,6 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-The main module of StatQuest.
 
-File:
-    project: StatQuest
-    name: statquest.py
-    version: 4.2.0.1
-    date: 07.02.2022
-
-Authors:
-    Sławomir Marczyński
-
-Copyright (c) 2022 Sławomir Marczyński
-"""
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -38,19 +25,6 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import matplotlib
+from statquest_main import main
 
-from statquest_dataframe import DataFrameProvider
-from statquest_engine import ComputationEngine
-from statquest_gui import run
-
-
-def main():
-    matplotlib.use('TkAgg')
-    data_frame_provider = DataFrameProvider()
-    computation_engine = ComputationEngine()
-    run(data_frame_provider, computation_engine)
-
-
-if __name__ == '__main__':
-    main()
+main()
