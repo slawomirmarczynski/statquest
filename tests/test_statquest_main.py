@@ -15,7 +15,7 @@ Copyright (c) 2022 Sławomir Marczyński.
 
 from unittest import TestCase
 
-from statquest.statquest import ComputationEngine
+from statquest_engine import ComputationEngine
 
 
 class TestComputationEngine(TestCase):

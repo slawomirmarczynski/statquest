@@ -336,7 +336,8 @@ class ParametersFrame(BorderedFrame):
             computation_engine.need_pandas_profile = self.need_profile.get()
             computation_engine.locale_code = self.locale_code.get()
             data_frame_provider.set_locale(self.locale_code.get())
-            columns_frame.update()
+            if columns_frame:
+                columns_frame.update()
 
         # tkinker wymaga aby wartości początkowe dla obiektów takich jak
         # tk.StringVar itp. były jawnie określane. Sam z siebie nie gwarantuje
@@ -347,6 +348,8 @@ class ParametersFrame(BorderedFrame):
         self.alpha = tk.DoubleVar(value=DEFAULT_ALPHA_LEVEL)
         self.need_profile = tk.BooleanVar(value=False)
         self.locale_code = tk.StringVar(value=LOCALE_CODES[0])
+        self.alpha.trace_add('write', callback)
+        self.need_profile.trace_add('write', callback)
         self.locale_code.trace_add('write', callback)
 
         # Ogólny opis dla tej sekcji.
@@ -664,7 +667,7 @@ class LauncherFrame(ttk.Frame):
 
         def callback(*args):
             enable_siblings(False)
-            computation_engine.run()
+            computation_engine.run(data_frame_provider, computation_engine)
             enable_siblings(True)
 
         button = ttk.Button(self, text="Uruchom obliczenia", command=callback)

@@ -343,11 +343,12 @@ class Observable:
         # Do not replace isinstance(obj, cls) by type(obj), because isinstance
         # should work with derived classes (Liskov's substitution principle).
         #
+        # BTW, the implicite/default return type in None, thus else-False is
+        # not necessary at all.
+        #
         if self.data:
             values = self.data.values()
             return all(any(isinstance(v, t) for t in types) for v in values)
-        else:
-            False
 
 
 if __name__ == "__main__":

@@ -45,10 +45,12 @@ from statquest_engine import ComputationEngine
 from statquest_gui import run
 
 
+data_frame_provider = DataFrameProvider()
+computation_engine = ComputationEngine()
+
+
 def main():
     matplotlib.use('TkAgg')
-    data_frame_provider = DataFrameProvider()
-    computation_engine = ComputationEngine()
     run(data_frame_provider, computation_engine)
 
 
