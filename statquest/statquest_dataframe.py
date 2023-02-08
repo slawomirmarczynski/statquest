@@ -90,3 +90,9 @@ class DataFrameProvider:
         except:
             df = self.__empty_data_frame
         return df
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(optionflags=doctest.ELLIPSIS)

@@ -71,6 +71,15 @@ class TestSetupLocaleExcel(TestCase):
         result = setup_locale_excel_format()
         self.assertIsInstance(result, dict)
         self.assertTrue(result)
+        result = setup_locale_excel_format('')
+        self.assertIsInstance(result, dict)
+        self.assertTrue(result)
+        result = setup_locale_excel_format(None)
+        self.assertIsInstance(result, dict)
+        self.assertTrue(result)
+        result = setup_locale_excel_format(False)
+        self.assertIsInstance(result, dict)
+        self.assertTrue(result)
 
     def test_2(self):
         """pl_PL locale argument"""
@@ -87,7 +96,7 @@ class TestSetupLocaleExcel(TestCase):
     def test_4(self):
         """bad locale argument"""
         with self.assertRaises(ValueError):
-            setup_locale_excel_format('random_1283221634_unsuported_locale')
+            setup_locale_excel_format('random_1283221634_unsupported_locale')
 
     def test_5(self):
         """bad locale argument"""

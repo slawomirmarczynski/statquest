@@ -103,12 +103,13 @@ def setup_locale_csv_format(locale_code=None):
     Get settings for reading CSV files.
 
     Args:
-        locale_code: locale code like 'pl_PL'; None for system-default.
+        locale_code: locale code like 'pl_PL'; use none or empty or False
+            for system-default locales.
 
     Returns:
         kwargs dictionary with appropriate settings for pandas.read_csv()
     """
-    if locale_code is None:
+    if not locale_code:
         locale_code, encoding = locale.getdefaultlocale()
     if locale_code == 'pl_PL':
         kwargs = {'encoding': 'cp1250', 'sep': ';', 'decimal': ','}
@@ -124,12 +125,13 @@ def setup_locale_excel_format(locale_code=None):
     Get settings for reading Excel files.
 
     Args:
-        locale_code: locale code like 'pl_PL'; None for system-default.
+        locale_code: locale code like 'pl_PL'; use none or empty or False
+            for system-default locales.
 
     Returns:
         kwargs dictionary with appropriate settings for pandas.read_csv()
     """
-    if locale_code is None:
+    if not locale_code:
         locale_code, encoding = locale.getdefaultlocale()
     if locale_code == 'pl_PL':
         kwargs = {'decimal': ','}
@@ -138,3 +140,9 @@ def setup_locale_excel_format(locale_code=None):
     else:
         raise ValueError
     return kwargs
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(optionflags=doctest.ELLIPSIS)

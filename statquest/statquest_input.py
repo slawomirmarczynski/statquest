@@ -65,14 +65,17 @@ def input_observables(data_frame):
     for index in data_frame:
         name = str(index)
         series = data_frame[index]
-        series = series.dropna()
+        series = series.dropna()  # drop missing values
         try:
             obs = Observable(name, dict(series))
             if len(obs) > 2:
                 observables.append(obs)
-                print(f"{name} ok")
-            else:
-                print(f"{name} too short")
         except:
-            print(f"{name} fail")
+            pass
     return observables
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(optionflags=doctest.ELLIPSIS)

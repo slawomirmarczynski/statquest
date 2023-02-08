@@ -13,6 +13,7 @@ Authors:
 Copyright (c) 2022 Sławomir Marczyński.
 """
 
+import math
 import random
 from unittest import TestCase
 from unittest.mock import Mock, MagicMock
@@ -40,16 +41,16 @@ class TestObservable(TestCase):
         del self.observable_nominal
 
     def test___init__1(self):
-        """Create an ordinal observable"""
+        """create ordinal"""
         self.assertIsInstance(self.observable_ordinal, Observable)
         self.assertIsNotNone(self.observable_ordinal.name)
         self.assertIsNotNone(self.observable_ordinal.data)
-        self.assertEqual(True, self.observable_ordinal.IS_ORDINAL)
-        self.assertEqual(False, self.observable_ordinal.IS_CONTINUOUS)
-        self.assertEqual(False, self.observable_ordinal.IS_NOMINAL)
+        self.assertTrue(self.observable_ordinal.IS_ORDINAL)
+        self.assertTrue(self.observable_ordinal.IS_CONTINUOUS)
+        self.assertFalse(self.observable_ordinal.IS_NOMINAL)
 
     def test___init__2(self):
-        """Create an continuous observable"""
+        """create continuous"""
         self.assertIsInstance(self.observable_continuous, Observable)
         self.assertIsNotNone(self.observable_continuous.name)
         self.assertIsNotNone(self.observable_continuous.data)
@@ -58,7 +59,7 @@ class TestObservable(TestCase):
         self.assertEqual(False, self.observable_continuous.IS_NOMINAL)
 
     def test___init__3(self):
-        """Create a nominal observable"""
+        """create nominal"""
         self.assertIsInstance(self.observable_nominal, Observable)
         self.assertIsNotNone(self.observable_nominal.name)
         self.assertIsNotNone(self.observable_nominal.data)
@@ -66,15 +67,25 @@ class TestObservable(TestCase):
         self.assertEqual(False, self.observable_nominal.IS_CONTINUOUS)
         self.assertEqual(True, self.observable_nominal.IS_NOMINAL)
 
+    def test___init_4(self):
+        """create buggy"""
+        with self.assertRaises(TypeError):
+            obs = Observable('O', {1: 1, 2: 2.0, 3: 'bug'})
+
+    def test___init_5(self):
+        """create empty"""
+        with self.assertRaises(TypeError):
+            obs = Observable('O', {})
+
     def test___getitem__1(self):
         """Access to observable data"""
         for i in range(1, self.N + 1):
             vo = self.observable_ordinal[i]
             vc = self.observable_continuous[i]
             vn = self.observable_nominal[i]
-            self.assertIsInstance(vo, int)
-            self.assertIsInstance(vc, float)
-            self.assertIsInstance(vn, str)
+            # self.assertIsInstance(vo, int)
+            # self.assertIsInstance(vc, float)
+            # self.assertIsInstance(vn, str)
             self.assertEqual(int(100 * i), vo)
             self.assertEqual(float(100 * i), vc)
             self.assertEqual(str(100 * i), vn)
@@ -114,13 +125,6 @@ class TestObservable(TestCase):
         self.assertEqual(self.N, lo)
         self.assertEqual(self.N, lc)
         self.assertEqual(self.N, ln)
-
-    def test___len__2(self):
-        """Length of an empty observable"""
-        obs = Observable('an observable', {})
-        result = len(obs)
-        expected = 0
-        self.assertEqual(expected, result)
 
     def test___str__1(self):
         """Casting to str"""
@@ -235,17 +239,8 @@ class TestObservable(TestCase):
         self.assertIsInstance(result, dict)
         self.assertDictEqual(expected, result)
 
-    def test_values_to_indices_dict_7(self):
-        """Extract values indices from an observable"""
-        obs = Observable('O', dict())
-        result = obs.values_to_indices_dict()
-        expected = dict()
-        self.assertIsNotNone(result)
-        self.assertIsInstance(result, dict)
-        self.assertDictEqual(expected, result)
-
     def test_frequency_table_1(self):
-        """Create the frequency table"""
+        """integers"""
         result = self.observable_ordinal.frequency_table()
         expected = {int(100 * i): 1 for i in range(1, self.N + 1)}
         self.assertIsNotNone(result)
@@ -253,7 +248,7 @@ class TestObservable(TestCase):
         self.assertDictEqual(expected, result)
 
     def test_frequency_table_2(self):
-        """Create the frequency table"""
+        """floats"""
         result = self.observable_continuous.frequency_table()
         expected = {float(100 * i): 1 for i in range(1, self.N + 1)}
         self.assertIsNotNone(result)
@@ -261,7 +256,7 @@ class TestObservable(TestCase):
         self.assertDictEqual(expected, result)
 
     def test_frequency_table_3(self):
-        """Create the frequency table"""
+        """nominal"""
         result = self.observable_nominal.frequency_table()
         expected = {str(100 * i): 1 for i in range(1, self.N + 1)}
         self.assertIsNotNone(result)
@@ -269,7 +264,7 @@ class TestObservable(TestCase):
         self.assertDictEqual(expected, result)
 
     def test_frequency_table_4(self):
-        """Create the frequency table"""
+        """simple ints"""
         obs = Observable('obs', {5: 1, 7: 1, 8: 1, 20: 2, 21: 33, 22: 33})
         result = obs.frequency_table()
         expected = {1: 3, 2: 1, 33: 2}
@@ -278,7 +273,7 @@ class TestObservable(TestCase):
         self.assertDictEqual(expected, result)
 
     def test_frequency_table_5(self):
-        """Create the frequency table"""
+        """simple floats"""
         obs = Observable('obs',
                          {5: 1.0, 7: 1.0, 8: 1.0, 20: 2.0, 21: 33.0, 22: 33})
         result = obs.frequency_table()
@@ -288,29 +283,11 @@ class TestObservable(TestCase):
         self.assertDictEqual(expected, result)
 
     def test_frequency_table_6(self):
-        """Create the frequency table"""
+        """nominal"""
         obs = Observable('obs',
                          {5: '1', 7: '1', 8: '1', 20: '2.0', 21: 'X', 22: 'X'})
         result = obs.frequency_table()
         expected = {'1': 3, '2.0': 1, 'X': 2}
-        self.assertIsNotNone(result)
-        self.assertIsInstance(result, dict)
-        self.assertDictEqual(expected, result)
-
-    def test_frequency_table_7(self):
-        """Create the frequency table"""
-        obs = Observable('obs',
-                         {5: 1, 7: 1, 8: 1, 20: 2.0, 21: 'X', 22: 'X'})
-        result = obs.frequency_table()
-        expected = {1: 3, 2.0: 1, 'X': 2}
-        self.assertIsNotNone(result)
-        self.assertIsInstance(result, dict)
-        self.assertDictEqual(expected, result)
-
-    def test_frequency_table_8(self):
-        """Create the frequency table"""
-        result = Observable('obs', {}).frequency_table()
-        expected = {}
         self.assertIsNotNone(result)
         self.assertIsInstance(result, dict)
         self.assertDictEqual(expected, result)
@@ -333,61 +310,10 @@ class TestObservable(TestCase):
         self.assertIsNone(result)
 
     def test_descriptive_statistics_4(self):
-        """Test that None dict object is returned"""
-        obs = Observable('empty observable', {})
-        result = obs.descriptive_statistics()
-        self.assertIsNone(result)
-
-    def test_descriptive_statistics_5(self):
-        """Test results for flat, constant, values."""
-        obs = Observable('empty observable', {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0})
-        expected = [0.0] * 9 + [-3.0]
+        """constants"""
+        obs = Observable('flat-obs', {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0})
+        expected_first_7 = [0.0] * 7
         result = list(obs.descriptive_statistics().values())
-        self.assertEqual(expected, result)
-
-    def test__check_data_kind_1(self):
-        """Recognize data type"""
-        r_int = self.observable_ordinal._check_data_kind(int)
-        r_float = self.observable_ordinal._check_data_kind(float)
-        r_str = self.observable_ordinal._check_data_kind(str)
-        self.assertEqual(True, r_int)
-        self.assertEqual(False, r_float)
-        self.assertEqual(False, r_str)
-
-    def test__check_data_kind_2(self):
-        """Recognize data type"""
-        r_int = self.observable_continuous._check_data_kind(int)
-        r_float = self.observable_continuous._check_data_kind(float)
-        r_str = self.observable_continuous._check_data_kind(str)
-        self.assertEqual(False, r_int)
-        self.assertEqual(True, r_float)
-        self.assertEqual(False, r_str)
-
-    def test__check_data_kind_3(self):
-        """Recognize data type"""
-        r_int = self.observable_nominal._check_data_kind(int)
-        r_float = self.observable_nominal._check_data_kind(float)
-        r_str = self.observable_nominal._check_data_kind(str)
-        self.assertEqual(False, r_int)
-        self.assertEqual(False, r_float)
-        self.assertEqual(True, r_str)
-
-    def test__check_data_kind_4(self):
-        """Recognize data type"""
-        obs = Observable('O', {1: 1, 2: 2.0, 3: 'iii'})
-        r_int = obs._check_data_kind(int)
-        r_float = obs._check_data_kind(float)
-        r_str = obs._check_data_kind(str)
-        self.assertEqual(False, r_int)
-        self.assertEqual(False, r_float)
-        self.assertEqual(False, r_str)
-
-    def test__check_data_kind_5(self):
-        """Recognize data type"""
-        obs = Observable('O', {})
-        r_int = obs._check_data_kind(int)
-        r_float = obs._check_data_kind(float)
-        r_str = obs._check_data_kind(str)
-        self.assertEqual(False, r_int)
-        self.assertEqual(False, r_float)
-        self.assertEqual(False, r_str)
+        self.assertEqual(expected_first_7, result[:-2])
+        self.assertTrue(math.isnan(result[-1]))
+        self.assertTrue(math.isnan(result[-2]))

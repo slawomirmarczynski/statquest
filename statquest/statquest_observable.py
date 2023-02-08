@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 The definition of Observable class.
@@ -76,8 +76,13 @@ class Observable:
         IS_ORDINAL (bool): read-only, True for an ordinal scale
     """
 
-    ORDINAL_TYPES = (int, int32, int64,)
-    CONTINUOUS_TYPES = (float, float32, float64,)
+    # Integer types are promoted to float-point in computations,
+    # therefore CONTINUOUS_TYPES includes these types.
+    # Actually we would check if a type is cast-able to the desired
+    # type.
+    #
+    ORDINAL_TYPES = (int, int32, int64, int32, int64,)
+    CONTINUOUS_TYPES = (float, float32, float64, int, int32, int64)
     NOMINAL_TYPES = (str,)
 
     def __init__(self, name, data):
@@ -113,14 +118,12 @@ class Observable:
         # pylint: disable=invalid-name  # uppercase for "final read-only"
         self.name = name
         self.data = dict(data)
-        self.IS_ORDINAL = any(
-            self._check_data_kind(T) for T in self.ORDINAL_TYPES)
-        self.IS_CONTINUOUS = any(
-            self._check_data_kind(T) for T in self.CONTINUOUS_TYPES)
-        self.IS_NOMINAL = any(
-            self._check_data_kind(T) for T in self.NOMINAL_TYPES)
+        self.IS_ORDINAL = self._check_data_kind(self.ORDINAL_TYPES)
+        self.IS_CONTINUOUS = self._check_data_kind(self.CONTINUOUS_TYPES)
+        self.IS_NOMINAL = self._check_data_kind(self.NOMINAL_TYPES)
         if not (self.IS_ORDINAL or self.IS_CONTINUOUS or self.IS_NOMINAL):
             raise TypeError
+        # @todo: second chance - change all to nominal scale by casting to str.
 
     def __getitem__(self, key):
         """
@@ -309,35 +312,42 @@ class Observable:
                     _('kurtosis'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
 
-    def _check_data_kind(self, type_):
+    def _check_data_kind(self, types):
         """
         Check if all values in self.data are type T.
 
         Args:
-            type_ (type): int, float, str or other type
+            types (list): list of types, like [int, float, str]
 
         Returns:
-            bool: True if all values in dictionary self.data is type T,
-                False if at least one value is not type T.
+            bool: True if all values in dictionary self.data have given
+                types, False if at least one value is not type form
+                given types list.
 
         Examples:
             >>> obs1 = Observable('example', {1: 10.5, 2: 10.2, 3: -5.0})
-            >>> obs1._check_data_kind(float)
+            >>> obs1._check_data_kind([float])
             True
 
             >>> obs2 = Observable('example', {1: 10, 2: 11, 3: 12})
-            >>> obs2._check_data_kind(float)
+            >>> obs2._check_data_kind([float])
             False
 
             >>> obs3 = Observable('example', {1: 'A', 2: 'AB', 3: 'ABC'})
-            >>> obs3._check_data_kind(float)
+            >>> obs3._check_data_kind([float])
             False
         """
         # Notice that empty data (without elements) can not be checked for
         # type of all elements, because "all" in this case mean "none".
         #
-        return (len(self.data) > 0
-                and all(isinstance(v, type_) for v in self.data.values()))
+        # Do not replace isinstance(obj, cls) by type(obj), because isinstance
+        # should work with derived classes (Liskov's substitution principle).
+        #
+        if self.data:
+            values = self.data.values()
+            return all(any(isinstance(v, t) for t in types) for v in values)
+        else:
+            False
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Output routines.
@@ -232,8 +232,8 @@ def write_relations_nx(relations, file):
     plt.show()
 
 
-
 _ = statquest_locale.setup_locale_translation_gettext()
+
 if __name__ == "__main__":
     import doctest
 

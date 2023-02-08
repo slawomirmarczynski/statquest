@@ -715,3 +715,9 @@ def run(data_frame_provider_arg, computation_engine_arg):
         w.pack_configure(padx=10, pady=10)
 
     root.mainloop()
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(optionflags=doctest.ELLIPSIS)

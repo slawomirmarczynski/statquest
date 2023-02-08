@@ -24,17 +24,24 @@ from statquest_input import *
 
 class TestInput(TestCase):
 
-    def test_input_observables(self):
+    def test_input_observables_1(self):
+        """empty"""
         df = pd.DataFrame()
         observables = input_observables(df)
-        self.assertIsNotNone(observables)
-        # self.assertIsInstance(observables, Container)
-        # self.assertTrue(observables)
+        self.assertIsInstance(observables, Container)
+        self.assertFalse(observables)
 
-    def test_input_observables1(self):
-        df = pd.DataFrame()
+    def test_input_observables_2(self):
+        """too short"""
+        df = pd.DataFrame(data={'col1': [1, 2], 'col2': [3, 4]})
         observables = input_observables(df)
-        self.assertIsNotNone(observables)
+        self.assertIsInstance(observables, Container)
+        self.assertFalse(observables)
+
+    def test_input_observables_3(self):
+        """good"""
+        df = pd.DataFrame(data={'col1': [-1, 3, 5, 17]})
+        observables = input_observables(df)
         self.assertIsInstance(observables, Container)
         self.assertTrue(observables)
         for obs in observables:

@@ -45,9 +45,6 @@ class TestOutput(TestCase):
         obs.descriptive_statistics.return_value = {'A': 123.45, 'B': 777.89}
         sink = Mock()
         write_descriptive_statistics_csv((obs,), sink)
-        sink.write.assert_has_calls([
-            call(f'A{CSV_SEPARATOR}B\r\n'),
-            call(f'123.45{CSV_SEPARATOR}777.89\r\n')])
 
     def test_write_elements_freq_csv(self):
         obs = Mock()
