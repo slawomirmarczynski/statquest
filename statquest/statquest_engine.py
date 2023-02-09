@@ -38,7 +38,7 @@ Copyright (c) 2022 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pandas_profiling
+import ydata_profiling as pandas_profiling
 
 from statquest_gui import *
 from statquest_input import input_observables
