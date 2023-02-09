@@ -57,12 +57,23 @@ class ComputationEngine:
             data_frame = data_frame.copy()  # should defrag data_frame
 
         if self.need_pandas_profile:
-            profile_report = pandas_profiling.ProfileReport(data_frame)
-            profile_report.to_file(self.profi_htm_file_name)
+            progress_bar = False
+            plot_parameters = {"dpi": 300, "image_format": "png"}
+            if self.need_pandas_profile_correlations:
+                profile_report = pandas_profiling.ProfileReport(
+                    data_frame,
+                    plot=plot_parameters,
+                    progress_bar=progress_bar)
+                profile_report.to_file(self.profi_htm_file_name)
+            else:
+                profile_report = pandas_profiling.ProfileReport(
+                    data_frame,
+                    correlations=None,
+                    plot=plot_parameters,
+                    progress_bar=progress_bar)
+                profile_report.to_file(self.profi_htm_file_name)
 
-        # plot={"dpi": 200, "image_format": "png"} ???
-
-        print(data_frame)
+        # print(data_frame)
 
         observables = input_observables(data_frame)
         output(self.stats_csv_file_name, write_descriptive_statistics_csv,

@@ -12,6 +12,7 @@ File:
 Authors:
     Sławomir Marczyński
 """
+import sys
 
 #  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
@@ -127,11 +128,14 @@ class Relations:
                     known_pairs.add((b, a))
                     observable_relations = Relations()
                     for test in tests:
+                        if len(set(a.data.keys()) & set(b.data.keys())) < 2:
+                            print(f'{a} nie może być testowane z {b}.', file=sys.stderr)
+                            continue
                         if test.can_be_carried_out(a, b):
                             try:
                                 observable_relations.relations.append(test(a, b))
                             except:
-                                print('ups... something goes wrong')
+                                print(f'Nieudany {test} dla {a} vs. {b}', file=sys.stderr)
                     observables_relations[(a, b)] = observable_relations
         return observables_relations
 

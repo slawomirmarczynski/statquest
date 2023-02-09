@@ -31,7 +31,7 @@ class TestComputationEngine(TestCase):
         Empty run should fail.
         """
         computation_engine = ComputationEngine()
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             computation_engine.run()
 
 

@@ -318,7 +318,7 @@ class ParametersFrame(BorderedFrame):
         #
         registred_alpha_validator = self.register(alpha_validator)
 
-        def callback(*args):
+        def callback1(*args):
             """
             Informowanie computation_engine o aktualnych wartościach
             parametrów jakie mają być użyte w obliczeniach.
@@ -334,6 +334,25 @@ class ParametersFrame(BorderedFrame):
             #
             computation_engine.alpha = self.alpha.get()
             computation_engine.need_pandas_profile = self.need_profile.get()
+            computation_engine.need_pandas_profile_correlations = (
+                self.need_profile_correlations.get())
+            checkbox_profile_correlations['state'] = (
+                'normal' if self.need_profile.get() else 'disabled')
+
+        def callback2(*args):
+            """
+            Informowanie computation_engine o aktualnych wartościach
+            parametrów jakie mają być użyte w obliczeniach.
+
+            Args:
+                *args: argumenty są określane przez tkinker.tk.StrValue.
+            """
+
+            # Nawet jeżeli zmienia się tylko jeden parametr, to nie zaszkodzi
+            # aktualizacja wszystkich innych. Owszem, nie jest to potrzebne,
+            # jednak zyskujemy na prostocie. Obiekt computation_engine używa
+            # zwykłych zmiennych do przechowywania wartości parametrów.
+            #
             computation_engine.locale_code = self.locale_code.get()
             data_frame_provider.set_locale(self.locale_code.get())
             if columns_frame:
@@ -347,10 +366,12 @@ class ParametersFrame(BorderedFrame):
         assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
         self.alpha = tk.DoubleVar(value=DEFAULT_ALPHA_LEVEL)
         self.need_profile = tk.BooleanVar(value=False)
+        self.need_profile_correlations = tk.BooleanVar(value=False)
         self.locale_code = tk.StringVar(value=LOCALE_CODES[0])
-        self.alpha.trace_add('write', callback)
-        self.need_profile.trace_add('write', callback)
-        self.locale_code.trace_add('write', callback)
+        self.alpha.trace_add('write', callback1)
+        self.need_profile.trace_add('write', callback1)
+        self.need_profile_correlations.trace_add('write', callback1)
+        self.locale_code.trace_add('write', callback2)
 
         # Ogólny opis dla tej sekcji.
         #
@@ -373,27 +394,38 @@ class ParametersFrame(BorderedFrame):
             text=_('Wartość parametru α musi spełniać warunek 0 ⩽ α ⩽ 1.'))
         label_alpha_comment.grid(row=1, column=2, sticky='w')
 
-        # Czy ma być użyte pandas_profiling (tj. ydata_profiling)?
+        # Czy i jak ma być użyte pandas_profiling (tj. ydata_profiling)?
         #
         checkbox_profile = ttk.Checkbutton(
             self, text=_('generowanie raportu Ydata Profile'),
             variable=self.need_profile, onvalue=True, offvalue=False)
         checkbox_profile.grid(row=2, column=0, sticky='w')
         label_profile_comment = ttk.Label(self, text=_(
-            'Oblicza podstawowe statystyki i korelacje. Nie wpływa na testy.'))
+            'Oblicza statystyki. Nie wpływa na testy.'))
         label_profile_comment.grid(row=2, column=2, sticky='w')
+        checkbox_profile_correlations = ttk.Checkbutton(
+            self, text=_('korelacje w raporcie Ydata Profile '),
+            variable=self.need_profile_correlations,
+            onvalue=True, offvalue=False)
+        checkbox_profile_correlations.grid(row=3, column=0, sticky='w')
+        label_profile_comment_correlations = ttk.Label(self, text=_(
+            'Włącza obliczanie korelacji w raporcie Ydata Profile.'
+            ' Nie wpływa na testy.'))
+        label_profile_comment_correlations.grid(row=3, column=2, sticky='w')
 
+        # Ustawienia regionalne/locale
+        #
         label_locale = ttk.Label(self, text=_('ustawienia regionalne:'))
-        label_locale.grid(row=3, column=0, sticky='e')
+        label_locale.grid(row=4, column=0, sticky='e')
         combobox_locale = ttk.Combobox(self, width=8,
                                        textvariable=self.locale_code)
-        combobox_locale.grid(row=3, column=1, sticky='w')
+        combobox_locale.grid(row=4, column=1, sticky='w')
         combobox_locale['values'] = LOCALE_CODES
         combobox_locale.current(0)
         label_locale_comment = ttk.Label(
             self,
             text=_('Ustala szczegóły takie jak znak przecinka dziesiętnego.'))
-        label_locale_comment.grid(row=3, column=2, sticky='w')
+        label_locale_comment.grid(row=4, column=2, sticky='w')
 
         for widget in self.winfo_children():
             widget.grid_configure(padx=5, pady=5)  # todo: piksele -> punkty
@@ -614,7 +646,6 @@ class ColumnsFrame(BorderedFrame):
             selected = []
             for name, variable, checkbox in self.__cbs:
                 if variable.get():
-                    print(name)
                     selected.append(name)
             computation_engine.selected_columns = selected
 
@@ -667,6 +698,7 @@ class LauncherFrame(ttk.Frame):
 
         def callback(*args):
             enable_siblings(False)
+            self.master.update()
             computation_engine.run(data_frame_provider, computation_engine)
             enable_siblings(True)
 
