@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.2.1
+
+### Changes
+
+- Tkinter GUI.
+- Use ydata_profiling (formerly pandas_profiling).
+- Fixed bug in the data categorisation. Columns (observables) with mixed
+  int and float values were rejected as bad columns. It was a bug.
+- Fixed bug related to missing data values.
+  Tests were preformed for pairs well-defined values and missing values.
+  Now test are preformed only when are at least two rows with well-defined
+  values for given columns.
+- *Can* be frozen by pyinstaller. With a little help of a copy-paste magic.
+  Not as a single file.
+
 ## 0.4.0.0
 
 ### Changes
