@@ -11,13 +11,13 @@ File:
     project: StatQuest
     name: statquest_tests.py
     version: 0.4.2.1
-    date: 07.02.2022
+    date: 07.02.2023
 
 Authors:
     Sławomir Marczyński
 """
 
-#  Copyright (c) 2022 Sławomir Marczyński. All rights reserved.
+#  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
 #  are met: 1. Redistributions of source code must retain the above

@@ -5,12 +5,12 @@ File:
     project: StatQuest
     name: test_statquest_input.py
     version: 0.4.2.1
-    date: 07.02.2022
+    date: 07.02.2023
 
 Authors:
     Sławomir Marczyński
 
-Copyright (c) 2022 Sławomir Marczyński.
+Copyright (c) 2023 Sławomir Marczyński.
 """
 
 from unittest import TestCase

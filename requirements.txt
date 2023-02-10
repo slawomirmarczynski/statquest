@@ -1,0 +1,7 @@
+future
+numpy
+matplotlib
+scipy
+networkx
+pandas
+setuptools
