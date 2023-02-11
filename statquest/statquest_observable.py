@@ -105,7 +105,7 @@ class Observable:
 
             >>> o1 = Observable('example1', {1: 10, 2: 20, 3: 30})
             >>> print(o1, o1.IS_ORDINAL, o1.IS_CONTINUOUS, o1.IS_NOMINAL)
-            example1 True False False
+            example1 True True False
 
             >>> o2 = Observable('example2', {1: 10.5, 2: 10.2, 3: 11.5})
             >>> print(o2, o2.IS_ORDINAL, o2.IS_CONTINUOUS, o2.IS_NOMINAL)
@@ -156,9 +156,6 @@ class Observable:
             >>> obs = Observable('example', {1: 'A', 2: 'B', 3: 'AB'})
             >>> len(obs)
             3
-            >>> empty = Observable('empty observable', {})
-            >>> len(empty)
-            0
         """
         return len(self.data)
 

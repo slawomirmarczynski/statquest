@@ -97,9 +97,26 @@ file_frame = None
 columns_frame = None
 launcher_frame = None
 
+progress = None
+
 # Gettext translator.
 #
 _ = statquest_locale.setup_locale_translation_gettext()
+
+
+class Progress:
+    def __init__(self, progress):
+        self.progress = progress
+
+    def set(self, x):
+        self.progress['value'] = x
+
+    def step(self, delta=1):
+        self.progress['value'] += delta
+        self.progress.update()
+
+    def range(self, x):
+        self.progress['maximum'] = x
 
 
 class ScrollableFrame(ttk.Frame):
@@ -246,14 +263,15 @@ class IntroFrame(BorderedFrame):
             '''
             StatQuest, aplikacja metod statystycznych do analizy danych.
             
-            Program StatQuest służy do analizy danych wskaźnikowych, porządkowych
-            i kategorycznych. Nie obsługiwane są w nim dane przedziałowe.
+            Program StatQuest służy do analizy danych wskaźnikowych,
+            porządkowych i kategorycznych. Nie obsługiwane są w nim dane
+            przedziałowe.
     
-            Przykładem danych wskaźnikowych może być wartości napięcia ogniw AAA 
-            mierzone w woltach. Będą to wartości wyrażone liczbami 
-            zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52. W takim przypadku
-            mamy wartości dla których sens ma obliczanie średniej arytmetycznej,
-            odchylenia standardowego itp.
+            Przykładem danych wskaźnikowych może być wartości napięcia ogniw
+            AAA mierzone w woltach. Będą to wartości wyrażone liczbami 
+            zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52. 
+            W takim przypadku mamy wartości dla których sens ma obliczanie
+            średniej arytmetycznej, odchylenia standardowego itp.
             
             Dane porządkowe są w programie StatQuest rozumiane jako takie które
             można opisać liczbami całkowitymi. Czy ma sens obliczanie średniej
@@ -261,12 +279,12 @@ class IntroFrame(BorderedFrame):
             osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
             dla danej populacji średnia coś mówi o tym jaki procent ludzi jest
             wysokich w tej populacji. Jeżeli dodamy jeszcze kod 2 dla rudych
-            oraz kod 3 dla mieszkańców małych miasteczek... to obliczona technikami
-            statystycznymi średnia nie ma sensu. Choć same obliczenia są/byłyby
-            dość proste.
+            oraz kod 3 dla mieszkańców małych miasteczek... to obliczona
+            technikami statystycznymi średnia nie ma sensu. 
+            Choć same obliczenia są/byłyby dość proste.
             
             Dane kategoryczne to takie dane które nie są wyrażalne liczbami.
-            Dobrym przykładem może być kolor oczu: niebieskie, brązowe, zielone...
+            Dobrym przykładem może być kolor oczu: niebieskie, zielone, ...
             Każda wartość jest wyrażona nie-liczbowo, nie da się obliczyć
             średniej czy odchylenia standardowego.
             '''
@@ -593,28 +611,28 @@ class FileFrame(BorderedFrame):
         label_output.grid(row=2, column=0, sticky='w')
 
         label_input_csv.grid(row=1, column=1, sticky='e')
-        label_tests_dot.grid(row=2, column=1, sticky='e')
-        label_profi_htm.grid(row=3, column=1, sticky='e')
-        label_freqs_csv.grid(row=4, column=1, sticky='e')
-        label_stats_csv.grid(row=5, column=1, sticky='e')
-        label_tests_csv.grid(row=6, column=1, sticky='e')
-        label_tests_txt.grid(row=7, column=1, sticky='e')
+        label_tests_dot.grid(row=3, column=1, sticky='e')
+        label_profi_htm.grid(row=4, column=1, sticky='e')
+        label_freqs_csv.grid(row=5, column=1, sticky='e')
+        label_stats_csv.grid(row=6, column=1, sticky='e')
+        label_tests_csv.grid(row=7, column=1, sticky='e')
+        label_tests_txt.grid(row=8, column=1, sticky='e')
 
         entry_input_csv.grid(row=1, column=2, sticky='we')
-        entry_tests_dot.grid(row=2, column=2, sticky='we')
-        entry_profi_htm.grid(row=3, column=2, sticky='we')
-        entry_freqs_csv.grid(row=4, column=2, sticky='we')
-        entry_stats_csv.grid(row=5, column=2, sticky='we')
-        entry_tests_csv.grid(row=6, column=2, sticky='we')
-        entry_tests_txt.grid(row=7, column=2, sticky='we')
+        entry_tests_dot.grid(row=3, column=2, sticky='we')
+        entry_profi_htm.grid(row=4, column=2, sticky='we')
+        entry_freqs_csv.grid(row=5, column=2, sticky='we')
+        entry_stats_csv.grid(row=6, column=2, sticky='we')
+        entry_tests_csv.grid(row=7, column=2, sticky='we')
+        entry_tests_txt.grid(row=8, column=2, sticky='we')
 
         button_input_csv.grid(row=1, column=3, sticky='ew')
-        button_tests_dot.grid(row=2, column=3, sticky='ew')
-        button_profi_htm.grid(row=3, column=3, sticky='ew')
-        button_freqs_csv.grid(row=4, column=3, sticky='ew')
-        button_stats_csv.grid(row=5, column=3, sticky='ew')
-        button_tests_csv.grid(row=6, column=3, sticky='ew')
-        button_tests_txt.grid(row=7, column=3, sticky='ew')
+        button_tests_dot.grid(row=3, column=3, sticky='ew')
+        button_profi_htm.grid(row=4, column=3, sticky='ew')
+        button_freqs_csv.grid(row=5, column=3, sticky='ew')
+        button_stats_csv.grid(row=6, column=3, sticky='ew')
+        button_tests_csv.grid(row=7, column=3, sticky='ew')
+        button_tests_txt.grid(row=8, column=3, sticky='ew')
 
         self.columnconfigure(2, weight=1)
 
@@ -728,6 +746,7 @@ class LauncherFrame(ttk.Frame):
                             'danych?\nSprawdź i spróbuj ponownie')
             label['text'] = ''
             enable_siblings(True)
+            progress.set(0)
 
         button = ttk.Button(self, text="Uruchom obliczenia", command=callback)
         button.grid(row=0, column=0, padx=20, pady=(10, 50))
@@ -735,13 +754,16 @@ class LauncherFrame(ttk.Frame):
         label = ttk.Label(self, width=30)
         label.grid(row=0, column=1, padx=20, pady=(10, 50))
 
-        progress = ttk.Progressbar(self)
-        progress.grid(row=0, column=2,
+        progressbar = ttk.Progressbar(self)
+        progressbar.grid(row=0, column=2,
                       padx=(20, 0), pady=(10, 50),
                       sticky='we')
-        progress['value'] = 50
         self.grid_columnconfigure(2, weight=1)
         self.grid_columnconfigure(3, weight=1)
+
+        global progress
+        progress = Progress(progressbar)
+        progress.set(0)
 
 
 def run(data_frame_provider_arg, computation_engine_arg):

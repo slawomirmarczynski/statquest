@@ -12,8 +12,6 @@ File:
 Authors:
     Sławomir Marczyński
 """
-import sys
-
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -38,7 +36,10 @@ import sys
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
+
 import statquest_locale
+import statquest_gui
 
 _ = statquest_locale.setup_locale_translation_gettext()
 
@@ -121,7 +122,10 @@ class Relations:
         # pylint: disable=invalid-name  # short names a, b are ok
         observables_relations = {}
         known_pairs = set((a, a) for a in observables)
+        progress = statquest_gui.progress
+        progress.range(len(observables))
         for a in observables:
+            progress.step()
             for b in observables:
                 if (a, b) not in known_pairs and (b, a) not in known_pairs:
                     known_pairs.add((a, b))
@@ -129,7 +133,8 @@ class Relations:
                     observable_relations = Relations()
                     for test in tests:
                         if len(set(a.data.keys()) & set(b.data.keys())) < 2:
-                            print(f'{a} nie może być testowane z {b}.', file=sys.stderr)
+                            print(f'{a} nie może być testowane z {b}.',
+                                  file=sys.stderr)
                             continue
                         if test.can_be_carried_out(a, b):
                             try:

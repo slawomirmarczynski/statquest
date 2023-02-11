@@ -40,7 +40,6 @@ Copyright (c) 2023 Sławomir Marczyński
 
 import ydata_profiling as pandas_profiling
 
-from statquest_gui import *
 from statquest_input import input_observables
 from statquest_output import *
 from statquest_relations import Relations

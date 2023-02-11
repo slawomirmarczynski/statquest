@@ -80,7 +80,6 @@ class DataFrameProvider:
         except:
             self.__data_frame = self.__empty_data_frame
 
-
     def get(self):
         return self.__data_frame
 
