@@ -430,6 +430,13 @@ class ParametersFrame(BorderedFrame):
         for widget in self.winfo_children():
             widget.grid_configure(padx=5, pady=5)  # todo: piksele -> punkty
 
+        # Ekstra wywołanie aby ustawić domyślne wartości (na wypadek gdyby
+        # nie było ruszane w czasie pracy, czyli gdyby gdzie indziej nie było
+        # wywołań).
+        #
+        callback1()
+        callback2()
+
 
 class FileFrame(BorderedFrame):
     """
@@ -489,7 +496,8 @@ class FileFrame(BorderedFrame):
             computation_engine.stats_csv_file_name = self.stats_csv.get()
             computation_engine.tests_csv_file_name = self.tests_csv.get()
             computation_engine.tests_txt_file_name = self.tests_txt.get()
-            columns_frame.update()
+            if columns_frame:
+                columns_frame.update()
 
         def callback_input(*args):
             head, tail = os.path.split(self.input_csv.get())
@@ -606,6 +614,8 @@ class FileFrame(BorderedFrame):
         for widget in self.winfo_children():
             widget.grid_configure(padx=5, pady=5)
 
+        callback()
+
 
 class ColumnsFrame(BorderedFrame):
     """
@@ -663,6 +673,7 @@ class ColumnsFrame(BorderedFrame):
                                        command=callback)
             checkbox.grid(row=i, column=1, sticky='we')
             self.__cbs.append((name, variable, checkbox))
+
         callback()
 
     def update(self):
@@ -698,12 +709,18 @@ class LauncherFrame(ttk.Frame):
 
         def callback(*args):
             enable_siblings(False)
+            label['text'] = 'przeprowadzam obliczenia'
+            label['state'] = 'normal'
             self.master.update()
             computation_engine.run(data_frame_provider, computation_engine)
+            label['text'] = ''
             enable_siblings(True)
 
         button = ttk.Button(self, text="Uruchom obliczenia", command=callback)
-        button.pack(side='left', pady=(10, 50))
+        button.grid(row=0, column=0, padx=20, pady=(10, 50))
+
+        label = ttk.Label(self, width=40)
+        label.grid(row=0, column=1, padx=20, pady=(10, 50))
 
 
 def run(data_frame_provider_arg, computation_engine_arg):
