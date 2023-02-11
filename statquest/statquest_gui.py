@@ -14,7 +14,6 @@ Authors:
 
 Copyright (c) 2023 Sławomir Marczyński
 """
-import locale
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -244,33 +243,33 @@ class IntroFrame(BorderedFrame):
         self.pack(side='top', fill='x', expand=True)
 
         text = dedentln(
-        '''
-        StatQuest, aplikacja metod statystycznych do analizy danych.
-        
-        Program StatQuest służy do analizy danych wskaźnikowych, porządkowych
-        i kategorycznych. Nie obsługiwane są w nim dane przedziałowe.
-
-        Przykładem danych wskaźnikowych może być wartości napięcia ogniw AAA 
-        mierzone w woltach. Będą to wartości wyrażone liczbami 
-        zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52. W takim przypadku
-        mamy wartości dla których sens ma obliczanie średniej arytmetycznej,
-        odchylenia standardowego itp.
-        
-        Dane porządkowe są w programie StatQuest rozumiane jako takie które
-        można opisać liczbami całkowitymi. Czy ma sens obliczanie średniej
-        dla takich danych? Może mieć, może nie mieć. Przykładowo jeżeli 
-        osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
-        dla danej populacji średnia coś mówi o tym jaki procent ludzi jest
-        wysokich w tej populacji. Jeżeli dodamy jeszcze kod 2 dla rudych
-        oraz kod 3 dla mieszkańców małych miasteczek... to obliczona technikami
-        statystycznymi średnia nie ma sensu. Choć same obliczenia są/byłyby
-        dość proste.
-        
-        Dane kategoryczne to takie dane które nie są wyrażalne liczbami.
-        Dobrym przykładem może być kolor oczu: niebieskie, brązowe, zielone...
-        Każda wartość jest wyrażona nie-liczbowo, nie da się obliczyć
-        średniej czy odchylenia standardowego.
-        '''
+            '''
+            StatQuest, aplikacja metod statystycznych do analizy danych.
+            
+            Program StatQuest służy do analizy danych wskaźnikowych, porządkowych
+            i kategorycznych. Nie obsługiwane są w nim dane przedziałowe.
+    
+            Przykładem danych wskaźnikowych może być wartości napięcia ogniw AAA 
+            mierzone w woltach. Będą to wartości wyrażone liczbami 
+            zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52. W takim przypadku
+            mamy wartości dla których sens ma obliczanie średniej arytmetycznej,
+            odchylenia standardowego itp.
+            
+            Dane porządkowe są w programie StatQuest rozumiane jako takie które
+            można opisać liczbami całkowitymi. Czy ma sens obliczanie średniej
+            dla takich danych? Może mieć, może nie mieć. Przykładowo jeżeli 
+            osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
+            dla danej populacji średnia coś mówi o tym jaki procent ludzi jest
+            wysokich w tej populacji. Jeżeli dodamy jeszcze kod 2 dla rudych
+            oraz kod 3 dla mieszkańców małych miasteczek... to obliczona technikami
+            statystycznymi średnia nie ma sensu. Choć same obliczenia są/byłyby
+            dość proste.
+            
+            Dane kategoryczne to takie dane które nie są wyrażalne liczbami.
+            Dobrym przykładem może być kolor oczu: niebieskie, brązowe, zielone...
+            Każda wartość jest wyrażona nie-liczbowo, nie da się obliczyć
+            średniej czy odchylenia standardowego.
+            '''
         )
 
         label = ttk.Label(self, text=text)
@@ -387,7 +386,7 @@ class ParametersFrame(BorderedFrame):
         spinbox_alpha = ttk.Spinbox(
             self, from_=0, to=1, increment=0.01, format="%.2f", width=10,
             textvariable=self.alpha,
-            validate='all',  validatecommand=(registred_alpha_validator, '%P'))
+            validate='all', validatecommand=(registred_alpha_validator, '%P'))
         spinbox_alpha.grid(row=1, column=1, sticky='w')
         label_alpha_comment = ttk.Label(
             self,
@@ -472,21 +471,22 @@ class FileFrame(BorderedFrame):
         self.tests_csv = tk.StringVar()
         self.tests_txt = tk.StringVar()
 
-        # Przy zmianie nazwy... choćby jednej litery w nazwie... aktualizowane
-        # są wartości zapisane w computation_engine. Jest to w większości
-        # niepotrzebne, nadpisuje ponownie stare wartości takimi samymi,
-        # wystarczyłoby zmieniać tylko to co rzeczywiście uległo zmianie.
-        # Ale taki, lepszy, algorytm byłby niepotrzebnie skomplikowany,
-        # a obecna wersja tej części programu jest wystarczająco wydajna.
+        # When renamed... even one letter in the name... updated are the values
+        # stored in computation_engine. It is mostly unnecessary, overwrites
+        # old values again with the same ones, it would be enough to change
+        # only what has actually changed. But such a better algorithm would
+        # be unnecessarily complicated, and the current version of this part
+        # of the program is efficient enough.
         #
-        # Wyjaśnienia wymaga też dlaczego nie używać StringVar, DoubleVar
-        # itd. bezpośrednio w computation_engine? Przecież gdyby tak zrobić
-        # nie trzeba byłoby przepisywać danych do computation_engine bo one
-        # już byłyby tam same z siebie, nieprawdaż? Wyjaśnienie jest proste:
-        # chcemy odizolować computation_engine od biblioteki widgetów (jaką
-        # jest tkinter). W klasie ComputationEngine nie ma żadnych odwołań
-        # do GUI, nie jest ona od GUI zależna i dlatego łatwo można (będzie)
-        # zmienić GUI pozostawiając obliczeniową część programu bez zmian.
+        # Also requires explanation why not to use StringVar, DoubleVar etc
+        # directly in computation_engine? Well, if you did there would be
+        # no need to rewrite data to computation_engine because they would
+        # already be there by itself, wouldn't it? The explanation is
+        # simple: we want to isolate the computation_engine from the widget
+        # library (like  is tkinter). There are no references in the
+        # ComputationEngine class to the GUI, it is not GUI dependent and
+        # therefore easy to (will) change the GUI leaving the computational
+        # part of the program unchanged.
 
         def callback(*args):
             computation_engine.input_csv_file_name = self.input_csv.get()
@@ -536,13 +536,20 @@ class FileFrame(BorderedFrame):
         self.tests_csv.trace_add('write', callback)
         self.tests_txt.trace_add('write', callback)
 
-        entry_input_csv = ttk.Entry(self, width=80, textvariable=self.input_csv)
-        entry_tests_dot = ttk.Entry(self, width=80, textvariable=self.tests_dot)
-        entry_profi_htm = ttk.Entry(self, width=80, textvariable=self.profi_htm)
-        entry_freqs_csv = ttk.Entry(self, width=80, textvariable=self.freqs_csv)
-        entry_stats_csv = ttk.Entry(self, width=80, textvariable=self.stats_csv)
-        entry_tests_csv = ttk.Entry(self, width=80, textvariable=self.tests_csv)
-        entry_tests_txt = ttk.Entry(self, width=80, textvariable=self.tests_txt)
+        entry_input_csv = ttk.Entry(self, width=80,
+                                    textvariable=self.input_csv)
+        entry_tests_dot = ttk.Entry(self, width=80,
+                                    textvariable=self.tests_dot)
+        entry_profi_htm = ttk.Entry(self, width=80,
+                                    textvariable=self.profi_htm)
+        entry_freqs_csv = ttk.Entry(self, width=80,
+                                    textvariable=self.freqs_csv)
+        entry_stats_csv = ttk.Entry(self, width=80,
+                                    textvariable=self.stats_csv)
+        entry_tests_csv = ttk.Entry(self, width=80,
+                                    textvariable=self.tests_csv)
+        entry_tests_txt = ttk.Entry(self, width=80,
+                                    textvariable=self.tests_txt)
 
         def pick_open():
             full_name = filedialog.askopenfilename(
@@ -712,15 +719,29 @@ class LauncherFrame(ttk.Frame):
             label['text'] = 'przeprowadzam obliczenia'
             label['state'] = 'normal'
             self.master.update()
-            computation_engine.run(data_frame_provider, computation_engine)
+            try:
+                computation_engine.run(data_frame_provider, computation_engine)
+            except:
+                tk.messagebox.showwarning(
+                    title='StatQuest',
+                    message='Coś nie tak, może po prostu brak '
+                            'danych?\nSprawdź i spróbuj ponownie')
             label['text'] = ''
             enable_siblings(True)
 
         button = ttk.Button(self, text="Uruchom obliczenia", command=callback)
         button.grid(row=0, column=0, padx=20, pady=(10, 50))
 
-        label = ttk.Label(self, width=40)
+        label = ttk.Label(self, width=30)
         label.grid(row=0, column=1, padx=20, pady=(10, 50))
+
+        progress = ttk.Progressbar(self)
+        progress.grid(row=0, column=2,
+                      padx=(20, 0), pady=(10, 50),
+                      sticky='we')
+        progress['value'] = 50
+        self.grid_columnconfigure(2, weight=1)
+        self.grid_columnconfigure(3, weight=1)
 
 
 def run(data_frame_provider_arg, computation_engine_arg):
