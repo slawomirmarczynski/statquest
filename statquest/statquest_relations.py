@@ -201,7 +201,6 @@ class Relations:
                 result[key] = [r for r in relations if r.credible(alpha)]
         return result
 
-
 if __name__ == "__main__":
     import doctest
 

@@ -92,6 +92,7 @@ computation_engine = None
 #
 intro = None
 parameters_frame = None
+tests_frame = None
 file_frame = None
 columns_frame = None
 launcher_frame = None
@@ -496,6 +497,44 @@ class ParametersFrame(BorderedFrame):
         callback2()
 
 
+class TestsFrame(BorderedFrame):
+    def __init__(self, *args, **kwargs):
+        """
+        Inicjalizator.
+
+        Args:
+            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+        """
+
+        super().__init__(*args, **kwargs)
+
+        label = ttk.Label(self, text='Uruchamiane testy')
+        label.grid(row=0, column=0, pady=(5, 20), sticky='w')
+
+        # @todo: Nie da się importować globalnie, bo GUI jest importowane przez
+        #        Relations (pośrednio) - ale Relations samo importuje GUI.
+        #
+        from statquest_tests import ALL_STATISTICAL_TESTS
+
+        def callback(*args):
+            computation_engine.tests_to_proceed = []
+            for t in self.switches:
+                v, cb = self.switches[t]
+                if v.get():
+                    computation_engine.tests_to_proceed.append(t)
+
+        self.switches = {}
+        for i, t in enumerate(ALL_STATISTICAL_TESTS):
+            v = tk.BooleanVar(value=True)
+            cb = ttk.Checkbutton(self, text=str(t), variable=v,
+                                 onvalue=True, offvalue=False)
+            cb.grid(row=i + 1, column=0, sticky='w')
+            v.trace_add('write', callback=callback)
+            self.switches[t] = v, cb
+        callback()
+
+
 class FileFrame(BorderedFrame):
     """
     Wybór nazw plików.
@@ -834,24 +873,27 @@ def run(data_frame_provider_arg, computation_engine_arg):
     computation_engine = computation_engine_arg
 
     root = tk.Tk()
-    root.title('StatQuest')
+    root.title('StatQuest version 0.4.2.1')
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     root_width = int(screen_width * 0.75)
     root_height = int(screen_height * 0.75)
     root.geometry(f'{root_width}x{root_height}')
 
-    global intro, parameters_frame, file_frame, columns_frame, launcher_frame
+    global intro, parameters_frame, tests_frame
+    global file_frame, columns_frame, launcher_frame
 
     frame = ScrollableFrame(root)
     frame.pack(fill='both', expand=True)
     intro = IntroFrame(frame.scrollable_frame)
     parameters_frame = ParametersFrame(frame.scrollable_frame)
+    tests_frame = TestsFrame(frame.scrollable_frame)
     file_frame = FileFrame(frame.scrollable_frame)
     columns_frame = ColumnsFrame(frame.scrollable_frame)
     launcher_frame = LauncherFrame(frame.scrollable_frame)
 
     parameters_frame.pack(fill='x')
+    tests_frame.pack(fill='x')
     file_frame.pack(fill='x')
     columns_frame.pack(fill='x')
     launcher_frame.pack(fill='x')

@@ -48,7 +48,7 @@ from statquest_tests import ALL_STATISTICAL_TESTS
 
 class ComputationEngine:
     def run(self, data_frame_provider):
-        tests = ALL_STATISTICAL_TESTS
+        tests = self.tests_to_proceed
         output(self.tests_txt_file_name, write_tests_doc, tests)
 
         data_frame = data_frame_provider.get_selected(self.selected_columns)
