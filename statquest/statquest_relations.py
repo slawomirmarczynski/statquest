@@ -93,7 +93,7 @@ class Relation:
         """
         if self.test.prove_relationship:
             return self.p_value >= alpha
-        return self.p_value < alpha
+        return self.p_value < 1.0 - alpha
 
 
 class Relations:

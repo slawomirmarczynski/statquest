@@ -69,7 +69,11 @@ def setup_locale_translation_gettext(messages_domain='messages'):
     # on the user computer. For example well known the titanic3.csv data
     # set has the comma as a decimal point separator.
     #
-    # @todo: remove forced en_US when tkinker bug will be fixed.
+    # @todo: remove forced en_US when the bug inside tkinkter (spinners do not
+    #        works with localized
+    #  will
+    #  be
+    #  fixed.
     #
     global _setlocale_called
     if not _setlocale_called:

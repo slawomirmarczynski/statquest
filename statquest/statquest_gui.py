@@ -47,12 +47,12 @@ from tkinter import filedialog, ttk
 
 from statquest import statquest_locale
 
-# Sposób, w jaki jest napisany ten moduł, tj. statquest_gui, nie jest wzorowy
-# w sensie teoretycznej poprawności. To kompromis pomiędzy najlepszymi
-# teoriami programowania obiektowego, a praktycznym podejściem YAGNI/KISS.
-# Tak, wiemy że zmienne globalne są złe. Jednak plątanina obserwatorów,
-# obserwowanych (wzorce projektowe) wcale nie jest wiele lepsza... przynajmniej
-# na obecnym etapie rozwoju programu StatQuest.
+# The way this module, i.e. statquest_gui, is written is not exemplary in
+# terms of theoretical correctness. It's a compromise between the best
+# object-oriented programming theories and the practical YAGNI/KISS
+# approach. Yes, we know that global variables are bad. But the tangle of
+# observers, observed (design patterns) isn't much better...at least at the
+# current stage of development of the StatQuest program.
 
 # Default importance level alpha (a probability as a float number).
 #
@@ -62,12 +62,11 @@ DEFAULT_ALPHA_LEVEL = 0.95
 #
 LOCALE_CODES = ('pl_PL', 'en_US')
 
-# Zmienna globalna data_frame_provider w chwili uruchomienia interfejsu GUI,
-# a także przez cały czas jego działania musi określać obiekt mający
-# przynajmniej metody set_locale(locale_code: str), set_file_name(name: str)
-# i get(). Przy tym metoda get() ma dostarczać obiektu pandas.DataFrame
-# odpowiednio do tego jak data_frame_provider został wcześniej skonfigurowany.
-# Inne metody/atrybuty data_frame_provider nie są używane w statquest_gui.
+# The data_frame_provider global variable must specify an object with at
+# least set_locale(locale_code: str), set_file_name(name: str) and get().
+# The get() method is supposed to provide the pandas. DataFrame object
+# according to how the data_frame_provider was previously configured.
+# No other data_frame_provider methods/attributes are used in statquest_gui.
 #
 data_frame_provider = None
 
@@ -334,6 +333,7 @@ class IntroFrame(BorderedFrame):
         label.pack(fill='x', expand=True)
 
 
+# noinspection PyUnresolvedReferences
 class ParametersFrame(BorderedFrame):
     """
     Konfigurowanie parametrów pracy programu.
@@ -396,7 +396,7 @@ class ParametersFrame(BorderedFrame):
             checkbox_profile_correlations['state'] = (
                 'normal' if self.need_profile.get() else 'disabled')
 
-        # noinspection PyUnusedLocal,PyShadowingNames
+        # noinspection PyUnusedLocal
         def callback2(*args):
             """
             Informowanie computation_engine o aktualnych wartościach
@@ -686,6 +686,7 @@ class FileFrame(BorderedFrame):
         callback()
 
 
+# noinspection PyUnresolvedReferences
 class ColumnsFrame(BorderedFrame):
     """
     Wybór plików.
