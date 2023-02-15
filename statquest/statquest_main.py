@@ -38,19 +38,55 @@ Copyright (c) 2023 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import matplotlib
+import tkinter as tk
 
-from statquest_dataframe import DataFrameProvider
-from statquest_engine import ComputationEngine
-from statquest_gui import run
+import matplotlib  # todo: move to gui?
 
+from scrollableframe import ScrollableFrame
+from statquest_intro import Intro
+from statquest_parameters import Parameters
+from statquest_suite import Suite
+from statquest_filesnames import FilesNames
+from statquest_input import Input
+from statquest_launcher import Launcher
+from statquest_outtro import Outtro
+from statquest_output import Output
 
-def main():
-    matplotlib.use('TkAgg')
-    data_frame_provider = DataFrameProvider()
-    computation_engine = ComputationEngine()
-    run(data_frame_provider, computation_engine)
+class Program:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title('StatQuest version 0.5.0.0')
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        root_width = int(screen_width * 0.75)
+        root_height = int(screen_height * 0.75)
+        self.root.geometry(f'{root_width}x{root_height}')
+
+        self.frame = ScrollableFrame(self.root)
+        self.frame.pack(fill='both', expand=True)
+
+        def create_component(ComponentClass, border=True):
+            parent = self
+            component = ComponentClass(parent, self.frame.scrollable_frame,
+                                       border)
+            return component
+
+        self.intro = create_component(Intro, border=False)
+        self.parameters = create_component(Parameters)
+        self.suite = create_component(Suite)
+        self.files_names = create_component(FilesNames)
+        self.input = create_component(Input)
+        self.output = Output(self)
+        self.launcher = create_component(Launcher, border=False)
+        self.outtro = create_component(Outtro, border=False)
+        self.parameters.add_listener(self.input)
+        self.files_names.add_listener(self.input)
+
+    def run(self):
+        self.root.mainloop()
 
 
 if __name__ == '__main__':
-    main()
+    matplotlib.use('TkAgg')  # todo: move to gui?
+    program = Program()
+    program.run()

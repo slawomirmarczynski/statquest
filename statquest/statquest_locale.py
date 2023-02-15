@@ -46,6 +46,22 @@ import os
 _setlocale_called = False
 
 
+def get_supported_locales():
+    return 'en_US', 'pl_PL'
+
+
+def get_default_locale_code():
+    # Set language for default locale. It is a kind of magic on MS Windows
+    # because locale.getdefaultlocale() CAN obtain this information without
+    # environmental variables (see below).
+    #
+    lang, __ = locale.getdefaultlocale()
+    supported = get_supported_locales()
+    if lang not in supported:
+        lang = supported[0]
+    return lang
+
+
 def setup_locale_translation_gettext(messages_domain='messages'):
     """
     Setup locale according to the system configuration.

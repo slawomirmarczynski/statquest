@@ -46,194 +46,198 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 import statquest_locale
+from statquest_component import Component
+
+_ = statquest_locale.setup_locale_translation_gettext()
+
 
 CSV_SEPARATOR = ';'
 
 
-def output(file_name, writer, content, *args, **kwargs):
-    """
-    Use a writer to output a content to a text file.
+class Output:
+    def __init__(self, parent_component):
+        pass
 
-    Args:
-        file_name (str): file name.
-        writer (function): a function like fun(content, file).
-        content: a content to write.
-        args: extra arguments to pass to writer
-        kwargs: extra arguments to pass to writer
-    """
-    with open(file_name, "wt", encoding='utf-8', newline='') as file:
-        # writer(content, sys.stdout)  # uncomment to echo on sys.stdout
-        writer(content, file, *args, **kwargs)
+    def run(self):
+        pass
 
+    @staticmethod
+    def _output_content_to_file(file_name, writer, content, *args, **kwargs):
+        """
+        Use a writer to _output_content_to_file a content to a text file.
 
-def write_tests_doc(tests, file):
-    """
-    Print the descriptions of the tests to a file/console.
+        Args:
+            file_name (str): file name.
+            writer (function): a function like fun(content, file).
+            content: a content to write.
+            args: extra arguments to pass to writer
+            kwargs: extra arguments to pass to writer
+        """
+        with open(file_name, "wt", encoding='utf-8', newline='') as file:
+            # writer(content, sys.stdout)  # uncomment to echo on sys.stdout
+            writer(content, file, *args, **kwargs)
 
-    Args:
-        tests (iterable): a collection of test objects.
-        file (file): a text file; None redirects to a console.
-    """
-    if tests:
-        for test in tests:
+    @staticmethod
+    def _write_tests_doc(tests, file):
+        """
+        Print the descriptions of the tests to a file/console.
+
+        Args:
+            tests (iterable): a collection of test objects.
+            file (file): a text file; None redirects to a console.
+        """
+        if tests:
+            for test in tests:
+                print('=' * 80, file=file)
+                print(test.__doc__, file=file)
             print('=' * 80, file=file)
-            print(test.__doc__, file=file)
-        print('=' * 80, file=file)
 
+    def _write_descriptive_statistics_csv(observables, file):
+        """
+        Print descriptive statistics.
 
-def write_descriptive_statistics_csv(observables, file):
-    """
-    Print descriptive statistics.
+        Prints descriptive statistics of given observables collection
+        in CSV format.
 
-    Prints descriptive statistics of given observables collection
-    in CSV format.
-
-    Args:
-        observables (iterable): a collection of observables whose
-            statistics should be printed/exported to file.
-        file: file for exported data or None for console output.
-    """
-
-    for obs in observables:
-        if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            keys = obs.descriptive_statistics().keys()
-            break
-    else:
-        return  # there is no key, nothing to print
-    data_title = _('data')
-    entitled_keys = [data_title] + list(keys)
-    csv_writer = csv.DictWriter(file, entitled_keys, delimiter=CSV_SEPARATOR)
-    csv_writer.writeheader()
-    for obs in observables:
-        if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-            descriptive_statistics = obs.descriptive_statistics()
-            descriptive_statistics[data_title] = str(obs)  # the name of obs
-            csv_writer.writerow(descriptive_statistics)
-
-
-def write_elements_freq_csv(observables, file):
-    """
-    Write how many times the specified values have appeared in the data.
-
-    Args:
-        observables (iterable): a collection of observables
-        file (file): output file.
-    """
-    csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
-    for obs in sorted(observables, key=lambda observable: str(observable)):
-        if obs.IS_ORDINAL or obs.IS_NOMINAL:
-            csv_writer.writerow((obs,))
-            csv_writer.writerows(obs.frequency_table().items())
-            print(file=file)
-
-
-def write_relations_csv(relations, file, alpha):
-    """
-    Write all given relations in CSV format.
-
-    Note:
-        We assume that relation names have no sep character inside.
-
-    Args:
-        relations (iterable): a collection of relations.
-        file (file): file or null for console write.
-        alpha (float): the alpha level
-    """
-    csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
-    csv_writer.writerow((
-        _('data1'), _('data2'),
-        _('related?'),
-        _('test'), _('stat'),
-        _('value'), _('p_value'), _('thesis')))
-    relations_list = list(chain.from_iterable(relations.values()))
-    for relation in relations_list:
-        if relation.p_value < alpha:
-            thesis = relation.test.h1_thesis
+        Args:
+            observables (iterable): a collection of observables whose
+                statistics should be printed/exported to file.
+            file: file for exported data or None for console _output_content_to_file.
+        """
+        for obs in observables:
+            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+                keys = obs.descriptive_statistics().keys()
+                break
         else:
-            thesis = relation.test.h0_thesis
+            return  # there is no key, nothing to print
+        data_title = _('data')
+        entitled_keys = [data_title] + list(keys)
+        csv_writer = csv.DictWriter(file, entitled_keys, delimiter=CSV_SEPARATOR)
+        csv_writer.writeheader()
+        for obs in observables:
+            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+                descriptive_statistics = obs.descriptive_statistics()
+                descriptive_statistics[data_title] = str(obs)  # the name of obs
+                csv_writer.writerow(descriptive_statistics)
+    @staticmethod
+    def _write_elements_freq_csv(observables, file):
+        """
+        Write how many times the specified values have appeared in the data.
+
+        Args:
+            observables (iterable): a collection of observables
+            file (file): _output_content_to_file file.
+        """
+        csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
+        for obs in sorted(observables, key=lambda observable: str(observable)):
+            if obs.IS_ORDINAL or obs.IS_NOMINAL:
+                csv_writer.writerow((obs,))
+                csv_writer.writerows(obs.frequency_table().items())
+                print(file=file)
+    @staticmethod
+    def _write_relations_csv(relations, file, alpha):
+        """
+        Write all given relations in CSV format.
+
+        Note:
+            We assume that relation names have no sep character inside.
+
+        Args:
+            relations (iterable): a collection of relations.
+            file (file): file or null for console write.
+            alpha (float): the alpha level
+        """
+        csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
         csv_writer.writerow((
-            relation.observable1, relation.observable2,
-            relation.credible(alpha),
-            relation.test.name, relation.test.stat_name,
-            relation.value, relation.p_value, thesis))
+            _('data1'), _('data2'),
+            _('related?'),
+            _('test'), _('stat'),
+            _('value'), _('p_value'), _('thesis')))
+        relations_list = list(chain.from_iterable(relations.values()))
+        for relation in relations_list:
+            if relation.p_value < alpha:
+                thesis = relation.test.h1_thesis
+            else:
+                thesis = relation.test.h0_thesis
+            csv_writer.writerow((
+                relation.observable1, relation.observable2,
+                relation.credible(alpha),
+                relation.test.name, relation.test.stat_name,
+                relation.value, relation.p_value, thesis))
 
+    def _write_relations_dot(relations, file):
+        """
+        Write graph of relations.
 
-def write_relations_dot(relations, file):
-    """
-    Write graph of relations.
+        Relations are written as graph data described in DOT language::
 
-    Relations are written as graph data described in DOT language::
+            graph {
+                    "obs1" -- "obs2" [ label= "Student (p = 0.0754)" ]
+                    ...
+            }
 
-        graph {
-                "obs1" -- "obs2" [ label= "Student (p = 0.0754)" ]
-                ...
-        }
+        Note:
+            Function _write_relations_dot writes all relations given as
+            a parameter. However, it can be applied selectively to a subset
+            of relations. We can segregate relationships according to
+            established criteria before call write_dot and then use
+            write_dot to show only specifically selected relations.
 
-    Note:
-        Function write_relations_dot writes all relations given as
-        a parameter. However, it can be applied selectively to a subset
-        of relations. We can segregate relationships according to
-        established criteria before call write_dot and then use
-        write_dot to show only specifically selected relations.
+        Args:
+            relations (dict(Relations)): an dictionary where keys are
+                pairs of relations (a, b) and values are Relations.
+                Notice that Relations are containers for Relation objects.
+            file (file):  _output_content_to_file file.
+        """
+        # pylint: disable=invalid-name  # (a, b) are ok
+        if relations:
+            print('graph {', file=file)
+            for (a, b), rlist in relations.items():
+                label = []
+                for r in rlist:
+                    if r.test.prove_relationship:
+                        s = f'{r.test.name_short}  p = {r.p_value:#.4}'
+                    else:
+                        s = f'{r.test.name_short}* p = {r.p_value:#.4}'
+                    label.append(s)
+                label = '\\n'.join(label)
+                print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
+            print('}', file=file)
 
-    Args:
-        relations (dict(Relations)): an dictionary where keys are
-            pairs of relations (a, b) and values are Relations.
-            Notice that Relations are containers for Relation objects.
-        file (file):  output file.
-    """
-    # pylint: disable=invalid-name  # (a, b) are ok
-    if relations:
-        print('graph {', file=file)
-        for (a, b), rlist in relations.items():
-            label = []
-            for r in rlist:
-                if r.test.prove_relationship:
-                    s = f'{r.test.name_short}  p = {r.p_value:#.4}'
-                else:
-                    s = f'{r.test.name_short}* p = {r.p_value:#.4}'
-                label.append(s)
-            label = '\\n'.join(label)
-            print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
-        print('}', file=file)
+    @staticmethod
+    def write_relations_nx(relations, file):
+        """
+        """
+        # pylint: disable=invalid-name  # (a, b) are ok
+        if relations:
+            graph = nx.Graph()  # todo: DiGraph?
+            for (a, b), rlist in relations.items():
+                label = []
+                for r in rlist:
+                    if r.test.prove_relationship:
+                        s = f'{r.test.name_short}  p = {r.p_value:#.4}'
+                    else:
+                        s = f'{r.test.name_short}* p = {r.p_value:#.4}'
+                    label.append(s)
+                label = '\\n'.join(label)  # @todo: ???
+                graph.add_node(a)
+                graph.add_node(b)
+                graph.add_edge(a, b)
+            options = {
+                "font_size": 8,
+                "node_size": 1500,
+                "node_color": "white",
+                "edgecolors": "black",
+                "linewidths": 1,
+                "width": 1,
+            }
+            nx.draw_networkx(graph, **options)
+            # nx.draw(graph)
+            ax = plt.gca()
+            ax.margins(0.20)
+            plt.axis("off")
+            plt.show()
 
-
-# noinspection PyUnusedLocal
-def write_relations_nx(relations, file):
-    """
-    """
-    # pylint: disable=invalid-name  # (a, b) are ok
-    if relations:
-        graph = nx.Graph()  # todo: DiGraph?
-        for (a, b), rlist in relations.items():
-            label = []
-            for r in rlist:
-                if r.test.prove_relationship:
-                    s = f'{r.test.name_short}  p = {r.p_value:#.4}'
-                else:
-                    s = f'{r.test.name_short}* p = {r.p_value:#.4}'
-                label.append(s)
-            label = '\\n'.join(label)  # @todo: ???
-            graph.add_node(a)
-            graph.add_node(b)
-            graph.add_edge(a, b)
-        options = {
-            "font_size": 8,
-            "node_size": 1500,
-            "node_color": "white",
-            "edgecolors": "black",
-            "linewidths": 1,
-            "width": 1,
-        }
-        nx.draw_networkx(graph, **options)
-        # nx.draw(graph)
-        ax = plt.gca()
-        ax.margins(0.20)
-        plt.axis("off")
-        plt.show()
-
-
-_ = statquest_locale.setup_locale_translation_gettext()
 
 if __name__ == "__main__":
     import doctest

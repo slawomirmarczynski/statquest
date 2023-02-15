@@ -39,7 +39,6 @@ Authors:
 import sys
 
 import statquest_locale
-import statquest_gui
 
 _ = statquest_locale.setup_locale_translation_gettext()
 
@@ -108,7 +107,7 @@ class Relations:
         self.relations = []
 
     @staticmethod
-    def create_relations(observables, tests):
+    def create_relations(observables, tests, progress=None):
         """
         Relationship factory. All possible relationships are created.
 
@@ -122,10 +121,11 @@ class Relations:
         # pylint: disable=invalid-name  # short names a, b are ok
         observables_relations = {}
         known_pairs = set((a, a) for a in observables)
-        progress = statquest_gui.progress
-        progress.range(len(observables))
+        if progress:
+            progress.range(len(observables))
         for a in observables:
-            progress.step()
+            if progress:
+                progress.step()
             for b in observables:
                 if (a, b) not in known_pairs and (b, a) not in known_pairs:
                     known_pairs.add((a, b))
