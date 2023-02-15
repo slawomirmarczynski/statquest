@@ -52,6 +52,7 @@ from statquest_launcher import Launcher
 from statquest_outtro import Outtro
 from statquest_output import Output
 
+
 class Program:
     def __init__(self):
         self.root = tk.Tk()
@@ -85,8 +86,11 @@ class Program:
     def run(self):
         self.root.mainloop()
 
-
-if __name__ == '__main__':
+def main():
     matplotlib.use('TkAgg')  # todo: move to gui?
     program = Program()
     program.run()
+
+
+if __name__ == '__main__':
+    main()

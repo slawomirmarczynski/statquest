@@ -96,7 +96,7 @@ class Launcher(Component):
             parent_component.output.tests_txt(tests)
             parent_component.output.stats_csv(observables)
             parent_component.output.freqs_csv(observables)
-            parent_component.output.tests_csv(relations)
+            parent_component.output.tests_csv(relations, alpha)
             parent_component.output.tests_dot(significant_relations)
             parent_component.output.tests_nx(significant_relations)
 
@@ -105,9 +105,8 @@ class Launcher(Component):
             label['text'] = 'przeprowadzam obliczenia'
             label['state'] = 'normal'
             self._frame.master.update()
-            engine()
             try:
-                pass
+                engine()
             except Exception as ex:
                 print(ex)
                 tk.messagebox.showwarning(

@@ -65,7 +65,7 @@ class FilesNames(Component):
         def callback_input(*args):
             head, tail = os.path.split(self.input_csv.get())
             name, extension = os.path.splitext(tail)
-            self.tests_dot.set(os.path.join(head, name + '_links' + '.dot'))
+            self.tests_dot.set(os.path.join(head, name + '.dot'))
             self.callback(*args)
 
         def callback_output(*args):

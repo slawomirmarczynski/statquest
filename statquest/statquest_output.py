@@ -42,6 +42,7 @@ Copyright (c) 2023 Sławomir Marczyński.
 import csv
 from itertools import chain
 
+import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -56,43 +57,17 @@ CSV_SEPARATOR = ';'
 
 class Output:
     def __init__(self, parent_component):
-        pass
+        self.parent_component = parent_component
 
-    def run(self):
-        pass
-
-    @staticmethod
-    def _output_content_to_file(file_name, writer, content, *args, **kwargs):
-        """
-        Use a writer to _output_content_to_file a content to a text file.
-
-        Args:
-            file_name (str): file name.
-            writer (function): a function like fun(content, file).
-            content: a content to write.
-            args: extra arguments to pass to writer
-            kwargs: extra arguments to pass to writer
-        """
+    def tests_txt(self, tests):
+        file_name = self.parent_component.files_names.tests_txt.get()
         with open(file_name, "wt", encoding='utf-8', newline='') as file:
-            # writer(content, sys.stdout)  # uncomment to echo on sys.stdout
-            writer(content, file, *args, **kwargs)
-
-    @staticmethod
-    def _write_tests_doc(tests, file):
-        """
-        Print the descriptions of the tests to a file/console.
-
-        Args:
-            tests (iterable): a collection of test objects.
-            file (file): a text file; None redirects to a console.
-        """
-        if tests:
             for test in tests:
                 print('=' * 80, file=file)
                 print(test.__doc__, file=file)
             print('=' * 80, file=file)
 
-    def _write_descriptive_statistics_csv(observables, file):
+    def stats_csv(self, observables):
         """
         Print descriptive statistics.
 
@@ -104,23 +79,26 @@ class Output:
                 statistics should be printed/exported to file.
             file: file for exported data or None for console _output_content_to_file.
         """
-        for obs in observables:
-            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-                keys = obs.descriptive_statistics().keys()
-                break
-        else:
-            return  # there is no key, nothing to print
-        data_title = _('data')
-        entitled_keys = [data_title] + list(keys)
-        csv_writer = csv.DictWriter(file, entitled_keys, delimiter=CSV_SEPARATOR)
-        csv_writer.writeheader()
-        for obs in observables:
-            if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-                descriptive_statistics = obs.descriptive_statistics()
-                descriptive_statistics[data_title] = str(obs)  # the name of obs
-                csv_writer.writerow(descriptive_statistics)
-    @staticmethod
-    def _write_elements_freq_csv(observables, file):
+        file_name = self.parent_component.files_names.stats_csv.get()
+        with open(file_name, "wt", encoding='utf-8', newline='') as file:
+            for obs in observables:
+                if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+                    keys = obs.descriptive_statistics().keys()
+                    break
+            else:
+                return  # there is no key, nothing to print
+            data_title = _('data')
+            entitled_keys = [data_title] + list(keys)
+            csv_writer = csv.DictWriter(file, entitled_keys,
+                                        delimiter=CSV_SEPARATOR)
+            csv_writer.writeheader()
+            for obs in observables:
+                if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
+                    descriptive_statistics = obs.descriptive_statistics()
+                    descriptive_statistics[data_title] = str(obs)
+                    csv_writer.writerow(descriptive_statistics)
+
+    def freqs_csv(self, observables):
         """
         Write how many times the specified values have appeared in the data.
 
@@ -128,14 +106,16 @@ class Output:
             observables (iterable): a collection of observables
             file (file): _output_content_to_file file.
         """
-        csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
-        for obs in sorted(observables, key=lambda observable: str(observable)):
-            if obs.IS_ORDINAL or obs.IS_NOMINAL:
-                csv_writer.writerow((obs,))
-                csv_writer.writerows(obs.frequency_table().items())
-                print(file=file)
-    @staticmethod
-    def _write_relations_csv(relations, file, alpha):
+        file_name = self.parent_component.files_names.freqs_csv.get()
+        with open(file_name, "wt", encoding='utf-8', newline='') as file:
+            csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
+            for obs in sorted(observables, key=lambda item: str(item)):
+                if obs.IS_ORDINAL or obs.IS_NOMINAL:
+                    csv_writer.writerow((obs,))
+                    csv_writer.writerows(obs.frequency_table().items())
+                    print(file=file)
+
+    def tests_csv(self, relations, alpha):
         """
         Write all given relations in CSV format.
 
@@ -147,25 +127,23 @@ class Output:
             file (file): file or null for console write.
             alpha (float): the alpha level
         """
-        csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
-        csv_writer.writerow((
-            _('data1'), _('data2'),
-            _('related?'),
-            _('test'), _('stat'),
-            _('value'), _('p_value'), _('thesis')))
-        relations_list = list(chain.from_iterable(relations.values()))
-        for relation in relations_list:
-            if relation.p_value < alpha:
-                thesis = relation.test.h1_thesis
-            else:
-                thesis = relation.test.h0_thesis
+        file_name = self.parent_component.files_names.tests_csv.get()
+        with open(file_name, "wt", encoding='utf-8', newline='') as file:
+            csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
             csv_writer.writerow((
-                relation.observable1, relation.observable2,
-                relation.credible(alpha),
-                relation.test.name, relation.test.stat_name,
-                relation.value, relation.p_value, thesis))
+                _('data1'), _('data2'),
+                _('related?'),
+                _('test'), _('stat'),
+                _('value'), _('p_value')))
+            relations_list = list(chain.from_iterable(relations.values()))
+            for relation in relations_list:
+                csv_writer.writerow((
+                    relation.observable1, relation.observable2,
+                    relation.credible(alpha),
+                    relation.test.name, relation.test.stat_name,
+                    relation.value, relation.p_value))
 
-    def _write_relations_dot(relations, file):
+    def tests_dot(self, relations):
         """
         Write graph of relations.
 
@@ -189,26 +167,25 @@ class Output:
                 Notice that Relations are containers for Relation objects.
             file (file):  _output_content_to_file file.
         """
-        # pylint: disable=invalid-name  # (a, b) are ok
-        if relations:
-            print('graph {', file=file)
-            for (a, b), rlist in relations.items():
-                label = []
-                for r in rlist:
-                    if r.test.prove_relationship:
-                        s = f'{r.test.name_short}  p = {r.p_value:#.4}'
-                    else:
-                        s = f'{r.test.name_short}* p = {r.p_value:#.4}'
-                    label.append(s)
-                label = '\\n'.join(label)
-                print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
-            print('}', file=file)
+        file_name = self.parent_component.files_names.tests_dot.get()
+        with open(file_name, "wt", encoding='utf-8', newline='') as file:
+            if relations:
+                print('graph {', file=file)
+                for (a, b), rlist in relations.items():
+                    label = []
+                    for r in rlist:
+                        if r.test.prove_relationship:
+                            s = f'{r.test.name_short}  p = {r.p_value:#.4}'
+                        else:
+                            s = f'{r.test.name_short}* p = {r.p_value:#.4}'
+                        label.append(s)
+                    label = '\\n'.join(label)
+                    print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
+                print('}', file=file)
 
-    @staticmethod
-    def write_relations_nx(relations, file):
+    def tests_nx(self, relations):
         """
         """
-        # pylint: disable=invalid-name  # (a, b) are ok
         if relations:
             graph = nx.Graph()  # todo: DiGraph?
             for (a, b), rlist in relations.items():

@@ -147,8 +147,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
 
     We formulate the null hypothesis and the alternative hypothesis:
 
-        H0: There is no relationship between the categorical variables
-        H1: Categorical variables are not independent
+        H0: There is no relationship between the categorical variables.
+        H1: Categorical variables are not independent.
 
     We calculate the chi-square statistic for the corresponding crosstab,
     then we compare the p-value with the alpha significance level.
