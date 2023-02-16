@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-The main module of StatQuest.
+The definition of Component class.
 
 File:
     project: StatQuest
-    name: statquest_filenames.py
-    version: 0.4.2.1
-    date: 07.02.2023
+    name: statquest_component.py
+    version: 0.5.0.0
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński
 
 Copyright (c) 2023 Sławomir Marczyński
 """
-import abc
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -43,8 +42,26 @@ from tkinter import ttk
 
 
 class Component:
+    """
+    The base class for creating program components.
+    """
 
     def __init__(self, parent_component, parent_frame=None, border=True):
+        """
+        A program component is an object that can have a window/widget
+        embedded in the parent window/widget. However, it is not an element
+        in itself GUI interface. And there is no need for such an object to
+        have a  window/widget GUI, because it might as well not have.
+
+        Args:
+            parent_component: any object, not necessarily a component itself
+                (you can embed components inside objects of any class);
+                theoretically, it can even be None, but it's hard to say
+                what it would be used for.
+            parent_frame: any tkinter widget or None.
+            border (bool): if True (default) and if there is a frame then
+                the frame has a drawn border.
+        """
         self._parent_component = parent_component
         self._parent_frame = parent_frame
         self._observers = []
@@ -57,17 +74,29 @@ class Component:
             self._frame.pack_configure(padx=10, pady=10)
 
     def update(self, observed):
+        """The default call handling as an observer/listener."""
         pass
 
     def add_listener(self, observer):
+        """
+        Observer pattern - adding an observer to the list of recipients of
+        subscribed information.
+        """
         if observer not in self._observers:
             self._observers.append(observer)
 
     def remove_listener(self, observer):
+        """
+        Observer pattern - removing an observer from the list of recipients
+        of subscribed information.
+        """
         if observer in self._observers:
             self._observers.remove(observer)
 
     def callback(self, *args):
+        """
+        Observer pattern - broadcast to recipients of subscribed information.
+        """
         if self._observers:
             for observer in self._observers:
                 observer.update(self)

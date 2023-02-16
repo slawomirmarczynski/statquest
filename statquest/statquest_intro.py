@@ -6,8 +6,8 @@ Tkinter GUI for StatQuest.
 File:
     project: StatQuest
     name: statquest_intro.py
-    version: 0.4.1.0
-    date: 07.02.2023
+    version: 0.5.0.0
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -39,15 +39,9 @@ Copyright (c) 2023 Sławomir Marczyński
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import os
 import re
 import textwrap
-import tkinter as tk
-from tkinter import filedialog, ttk
-
-from statquest import statquest_locale
-
-from scrollableframe import ScrollableFrame
+from tkinter import ttk
 
 from statquest_component import Component
 

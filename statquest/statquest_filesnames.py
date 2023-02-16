@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-The main module of StatQuest.
+FileNames class as a Component subclass.
 
 File:
     project: StatQuest
     name: statquest_filenames.py
-    version: 0.4.2.1
-    date: 07.02.2023
+    version: 0.5.0.0
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -38,8 +38,8 @@ Copyright (c) 2023 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import os
+import re
 import tkinter as tk
 from tkinter import filedialog, ttk
 
@@ -48,12 +48,21 @@ from statquest_component import Component
 
 class FilesNames(Component):
     """
-    Wybór nazw plików.
+    The choice of files names.
     """
 
     def __init__(self, parent_component, parent_frame, *args, **kwargs):
         super().__init__(parent_component, parent_frame, *args, **kwargs)
 
+        # A better, theoretically, approach would be to abstract from the
+        # specific GUI solution (ie from the tkinter library). However,
+        # then the whole program becomes longer and more complicated.
+        # Therefore, perhaps it is better to use objects like StringVar
+        # instead of ordinary variables - the program is shorter,
+        # you don't have to rewrite data from widgets to ordinary variables,
+        # the number of necessary callbacks/observers is significantly
+        # reduced.
+        #
         self.input_csv = tk.StringVar()
         self.tests_dot = tk.StringVar()
         self.profi_htm = tk.StringVar()
@@ -63,14 +72,29 @@ class FilesNames(Component):
         self.tests_txt = tk.StringVar()
 
         def callback_input(*args):
+            """
+            Reaction to changing the name of the input file - the name of
+            the main output file is automatically changed accordingly.
+
+            Args:
+                *args: needed for tkinker callback
+            """
             head, tail = os.path.split(self.input_csv.get())
             name, extension = os.path.splitext(tail)
-            self.tests_dot.set(os.path.join(head, name + '.dot'))
+            self.tests_dot.set(os.path.join(head, name + '_links.dot'))
             self.callback(*args)
 
         def callback_output(*args):
+            """
+            Reaction to changing the name of the main output file -
+            other output files are automatically changed accordingly.
+
+            Args:
+                *args: needed for tkinker callback
+            """
             head, tail = os.path.split(self.tests_dot.get())
             name, extension = os.path.splitext(tail)
+            name = re.sub(r'_links$', '', name)
             self.profi_htm.set(os.path.join(head, name + '_profi' + '.html'))
             self.freqs_csv.set(os.path.join(head, name + '_freqs' + '.csv'))
             self.stats_csv.set(os.path.join(head, name + '_stats' + '.csv'))
@@ -79,17 +103,31 @@ class FilesNames(Component):
             self.callback(*args)
 
         def pick_open():
+            """
+            Reaction to pressing the input file selection button.
+            """
             full_name = filedialog.askopenfilename(
                 filetypes=(('CSV', '*.csv'), ("Excel", "*.xlsx")))
             if full_name:
                 full_name = os.path.normpath(full_name)
                 self.input_csv.set(full_name)
 
-        def pick_save(variable, file_type):
-            known_types = {'.txt': 'text', '.csv': 'CSV', '.xlmx': 'Excel',
-                           '.html': 'HTML', '.dot': 'DOT', }
-            ft = (known_types[file_type], '*' + file_type)
-            name = filedialog.asksaveasfilename(filetypes=(ft,))
+        def pick_save(variable, req_ext):
+            """
+            Reaction to pressing the output file selection button.
+
+            Args:
+                variable (tkinter.StringVar): file name as StringVar
+                req_ext: an extension of the required file name.
+            """
+            known_types = {
+                '.txt': 'text',
+                '.csv': 'CSV',
+                '.xlmx': 'Excel',
+                '.html': 'HTML',
+                '.dot': 'DOT', }
+            filetypes = (known_types[req_ext], '*' + req_ext)
+            name = filedialog.asksaveasfilename(filetypes=(filetypes,))
             if name:
                 name = os.path.normpath(name)
                 variable.set(name)
@@ -121,25 +159,32 @@ class FilesNames(Component):
         entry_tests_txt = ttk.Entry(self._frame, textvariable=self.tests_txt)
 
         button_input_csv = ttk.Button(
-            self._frame, text='zmień wszystko',
+            self._frame,
+            text='zmień wszystko',
             command=lambda: pick_open())
         button_tests_dot = ttk.Button(
-            self._frame, text='zmień pozostałe',
+            self._frame,
+            text='zmień pozostałe',
             command=lambda: pick_save(self.tests_dot, ".dot"))
         button_profi_htm = ttk.Button(
-            self._frame, text='zmień',
+            self._frame,
+            text='zmień',
             command=lambda: pick_save(self.profi_htm, ".csv"))
         button_freqs_csv = ttk.Button(
-            self._frame, text='zmień',
+            self._frame,
+            text='zmień',
             command=lambda: pick_save(self.freqs_csv, ".csv"))
         button_stats_csv = ttk.Button(
-            self._frame, text='zmień',
+            self._frame,
+            text='zmień',
             command=lambda: pick_save(self.stats_csv, ".csv"))
         button_tests_csv = ttk.Button(
-            self._frame, text='zmień',
+            self._frame,
+            text='zmień',
             command=lambda: pick_save(self.tests_csv, ".csv"))
         button_tests_txt = ttk.Button(
-            self._frame, text='zmień',
+            self._frame,
+            text='zmień',
             command=lambda: pick_save(self.tests_txt, ".txt"))
 
         label_input.grid(row=0, column=0, sticky='w')
@@ -172,5 +217,3 @@ class FilesNames(Component):
 
         for widget in self._frame.winfo_children():
             widget.grid_configure(padx=5, pady=5)
-
-        self.callback()

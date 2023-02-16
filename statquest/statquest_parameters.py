@@ -7,7 +7,7 @@ File:
     project: StatQuest
     name: statquest_parameters.py
     version: 0.5.0.0
-    date: 07.02.2023
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński

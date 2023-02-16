@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-An example/template for statquest_input() function.
+Input Component.
 
 File:
     project: StatQuest
     name: statquest_input.py
-    version: 0.4.0.2
-    date: 07.02.2023
+    version: 0.5.0.0
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -53,41 +53,33 @@ from statquest_observable import Observable
 _ = setup_locale_translation_gettext()
 
 
-def input_observables(data_frame):
-    """
-
-    Args:
-        data_frame (pandas.DataFrame): input data as a Pandas Dataframe.
-
-    Returns:
-        observables (list): the list of observables.
-    """
-    # Observables can be created with calls Observable initializer with
-    # name and dictionary, see example below:
-    #
-    #   obs1 = Observable('Observable1', {1: 1, 2: 3, 3: 1, 4: 2, 5: 6})
-    #   obs2 = Observable('Observable2', {1: 1.0, 2: 3.2, 4: 2.1, 5: 6.1})
-    #   obs3 = Observable('Observable3', {1: 'red', 2: 'blue', 3: 'pink'})
-    #   return obs1, obs2, obs3
-    #
-    # but the implementation below construct them from pandas dataframe.
-
-    observables = []
-    for index in data_frame:
-        name = str(index)
-        series = data_frame[index]
-        series = series.dropna()  # drop missing values
-        # noinspection PyBroadException
-        try:
-            obs = Observable(name, dict(series))
-            if len(obs) > 2:
-                observables.append(obs)
-        except:
-            pass
-    return observables
-
-
 class Input(Component):
+
+    @staticmethod
+    def _input_observables(data_frame):
+        """
+        Converts a data frame into the list of observables.
+
+        Args:
+            data_frame (pandas.DataFrame): input data as a Pandas Dataframe.
+
+        Returns:
+            observables (list): the list of observables as Obsevable objects.
+        """
+
+        observables = []
+        for index in data_frame:
+            name = str(index)
+            series = data_frame[index]
+            series = series.dropna()  # drop missing values
+            try:
+                obs = Observable(name, dict(series))
+                if len(obs) > 2:
+                    observables.append(obs)
+            except:
+                pass
+        return observables
+
     def __init__(self, parent_component, parent_frame, *args, **kwargs):
         super().__init__(parent_component, parent_frame, *args, **kwargs)
 
@@ -185,7 +177,7 @@ class Input(Component):
 
     def get_observables(self):
         df = self.get_data_frame()
-        observables = input_observables(df)
+        observables = self._input_observables(df)
         return observables
 
 

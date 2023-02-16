@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Tkinter GUI for StatQuest.
+A facade for tkinter.ttk.Progressbar.
 
 File:
     project: StatQuest
-    name: statquest_gui.py
-    version: 0.4.1.0
-    date: 07.02.2023
+    name: progress.py
+    version: 0.5.0.0
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -40,44 +40,44 @@ Copyright (c) 2023 Sławomir Marczyński
 
 import tkinter.ttk as ttk
 
+
 class Progress:
     """Facade for tkinter.ttk.Progressbar."""
 
     def __init__(self, parent_frame):
         """
-        Przekazuje obiekt progress do obiektu klasy Progress.
+        Creates an facade object (proxy) for the tkinter.ttk progress bar.
 
         Args:
-            progress (tkinter.tkk.Progress): obiekt toolkitu tkinter który ma
-            się kryć za fasadą klasy Progress.
+            parent_frame (tkinter.tkk.Frame): the host for the progress bar.
         """
         self.progress = ttk.Progressbar(parent_frame)
 
     def set(self, x):
         """
-        Ustawia wartość pokazywaną przez progress bar.
+        Set the current value displayed by progress bar.
 
         Args:
-            x: wartość jaka powinna być ustawiona
+            x (float): value to set.
         """
         self.progress['value'] = x
 
     def step(self, delta=1):
         """
-        Zwiększa postęp pokazywany przez progress o zadany krok.
+        Increases the progress shown by the progress bar.
 
         Args:
-            delta: wartość o jaką powinien powiększyć się progress.
+            delta (float): increment by which the displayed value is to be
+                increased.
         """
         self.progress['value'] += delta
         self.progress.update()
 
     def range(self, maximal_value):
         """
-        Ustawia zakres dla progress-u.
+        Set up the end of the scale.
 
         Args:
-            maximal_value: ustala maksymalną wartość jaką ma pokazywać
-                progress.
+            maximal_value (float): the end of the scale.
         """
         self.progress['maximum'] = maximal_value

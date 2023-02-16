@@ -7,7 +7,7 @@ File:
     project: StatQuest
     name: scrollableframe.py
     version: 0.5.0.0
-    date: 07.02.2023
+    date: 16.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -38,14 +38,13 @@ Copyright (c) 2023 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import tkinter as tk
 from tkinter import ttk
 
 
 class ScrollableFrame(ttk.Frame):
     """
-    Umożliwia pionowe przewijanie wstawionych do scrollable_frame widgetów.
+    Enables vertical scrolling of widgets inserted into the scrollable frame.
     """
 
     def __init__(self, *args, **kwargs):
@@ -59,32 +58,31 @@ class ScrollableFrame(ttk.Frame):
         """
         super().__init__(*args, **kwargs)
 
-        # Obiekt klasy Canvas, w odróżnieniu od obiektu Frame, może być
-        # przewijany. Jednak wygodniej jest zagnieżdżać obiekty wewnątrz
-        # Frame niż wewnątrz Canvas. Dlatego tworzone są (obiekty) Frame
-        # wewnątrz Canvas wewnątrz Frame. W ten sposób z zewnątrz widać
-        # obiekty Frame, a obiekty Canvas (i ScrollBar) są ukryte w obiekcie
-        # ScrollableFrame.
-
-        # Tworzenie pustego canvas, czyli czegoś co można przewijać.
-        # Na razie canvas jest puste, bez żadnej zawartości.
+        # A Canvas object, unlike a Frame object, can be scrolling. However,
+        # it is more convenient to nest objects inside Frame than inside
+        # Canvas. That's why Frame (objects) are created inside Canvas
+        # inside Frame. This is how it looks from the outside Frame objects,
+        # and Canvas (and ScrollBar) objects are hidden in the object
+        # ScrollableFrame. Tworzenie pustego canvas, czyli czegoś co można
+        # przewijać. Na razie canvas jest puste, bez żadnej zawartości.
         #
-        # bd=0 oznacza że nie chcemy marginesu wokół kanwy
-        # highlightthickness=0 oznacza że nie chcemy pokazywać fokusu
+        # bd=0 means we don't want a margin around the canvas.
+        # highlightthickness=0 means we don't want to show focus.
         #
         canvas = tk.Canvas(self, bd=0, highlightthickness=0)
         canvas.pack(side='left', fill='both', expand=True)
 
-        # Tworzenie obiektu ScrollBar, czyli kontrolera przewijania.
+        # Created is a ScrollBar object as a scroll controller.
+        #
         sb = ttk.Scrollbar(self, orient='vertical', command=canvas.yview)
         sb.pack(side='right', fill='y')
 
-        # Tworzenie kontenera (obiektu klasy ttk.Frame), który użytkownik
-        # będzie mógł przewijać.
+        # Create a container (ttk.Frame class object) that user will be able
+        # to scroll.
         #
-        # Obserwator zdarzenia <Configure> jest potrzebny na wypadek gdyby
-        # trzeba było na nowo określić zakres przewijania. Ten bowiem jest
-        # ustalany na poziomie canvas i wymaga w takiej sytuacji odświeżenia.
+        # The <Configure> event watcher is needed in case had to redefine
+        # the scroll range. for he is set at the canvas level and needs to
+        # be refreshed in this situation.
         #
         self._scrollable_frame = ttk.Frame(canvas)
         self._scrollable_frame.bind(
@@ -92,25 +90,24 @@ class ScrollableFrame(ttk.Frame):
             lambda event: canvas.configure(scrollregion=canvas.bbox('all'))
         )
 
-        # Dodawanie do canvas zawartości - innego widgetu - wykonywane jest
-        # metodą create_window. Nazwa może kojarzyć się z jakąś fabryką lub
-        # funkcjami/metodami tworzącymi okna (CreateWindow jest np. Windows
-        # API Microsoftu), ale w tkinter ma trochę inny sens.
+        # Adding content - another widget - to the canvas is done method
+        # create_window. The name may be associated with some factory or
+        # functions/methods that create windows (CreateWindow is e.g. Windows
+        # Microsoft's API), but in tkinter it makes a little different sense.
         #
-        # Po wstawieniu zyskujemy identyfikator wstawionego elementu, który
-        # wkrótce nam się bardzo przyda.
+        # After inserting, we get the ID of the inserted element, which will
+        # be very useful to us soon.
         #
         scrollable_frame_canvas_id = canvas.create_window(
             (0, 0), window=self._scrollable_frame, anchor='nw')
 
-        # Teraz trudniejsza część - dodajemy obserwatora pilnującego aby
-        # szerokość obiektu canvas dopasowywała się do szerokości obszaru
-        # jaki jest dostępny. Jeżeli tego nie zrobimy, to canvas będą (zwykle)
-        # miały zły rozmiar. I choć nadal elementy doń wstawione mogłyby być
-        # widoczne, to menadżer geometrii nie potrafiłby działać zgodnie
-        # z naszymi oczekiwaniami.
+        # Now the hard part - we add an observer to watch over the width of
+        # the canvas matched the width of the area what is available. If we
+        # don't, the canvas will (usually) were the wrong size. And although
+        # there could still be elements inserted into it visible, then the
+        # geometry manager would not be able to act accordingly with our
+        # expectations.
         #
-        # noinspection PyUnusedLocal
         def update_scrollable_frame_width(event):
             if self._scrollable_frame.winfo_reqwidth() != canvas.winfo_width():
                 canvas.itemconfigure(
@@ -118,13 +115,13 @@ class ScrollableFrame(ttk.Frame):
 
         canvas.bind('<Configure>', update_scrollable_frame_width)
 
-        # Moglibyśmy to zrobić nieco wcześniej, ale robimy to na koniec:
-        # podpinamy przewijanie kanwy z tym co ustawine jest przez belkę
-        # przewijania (czyli przez scroll bar).
+        # We could do it a bit earlier, but we do it last: connect the
+        # canvas scroll with what is set by the beam scrolling (i.e. via
+        # scroll bar).
         #
         canvas.configure(yscrollcommand=sb.set)
 
-        # Jeszcze dodajemy przewijanie kółkiem myszy.
+        # We're also adding mouse wheel scrolling.
         #
         canvas.bind_all(
             "<MouseWheel>",
@@ -135,10 +132,9 @@ class ScrollableFrame(ttk.Frame):
     @property
     def scrollable_frame(self):
         """
-        Okno przewijane jako read-only property.
+        Scrollable window as read-only property.
 
         Returns:
-            obiekt klasy tinter.ttk.Frame w którym można osadzać widgety.
+            tkinter.ttk.Frame class object where widgets can be embedded.
         """
         return self._scrollable_frame
-
