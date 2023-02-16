@@ -45,7 +45,6 @@ import textwrap
 import tkinter as tk
 from tkinter import filedialog, ttk
 
-from borderedframe import BorderedFrame
 from statquest import statquest_locale
 
 from scrollableframe import ScrollableFrame

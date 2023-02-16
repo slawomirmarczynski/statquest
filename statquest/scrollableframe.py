@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-The main module of StatQuest.
+A scrollable frame container for tkinter.
 
 File:
     project: StatQuest
     name: scrollableframe.py
-    version: 0.4.2.1
+    version: 0.5.0.0
     date: 07.02.2023
 
 Authors:

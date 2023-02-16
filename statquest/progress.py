@@ -41,7 +41,7 @@ Copyright (c) 2023 Sławomir Marczyński
 import tkinter.ttk as ttk
 
 class Progress:
-    """Fasada dla tkinter.ttk.Progressbar."""
+    """Facade for tkinter.ttk.Progressbar."""
 
     def __init__(self, parent_frame):
         """

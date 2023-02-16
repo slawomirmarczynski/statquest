@@ -39,16 +39,7 @@ Copyright (c) 2023 Sławomir Marczyński
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import os
-import re
-import textwrap
-import tkinter as tk
-from tkinter import filedialog, ttk
-
-from borderedframe import BorderedFrame
-from statquest import statquest_locale
-
-from scrollableframe import ScrollableFrame
+from tkinter import ttk
 
 from statquest_component import Component
 
