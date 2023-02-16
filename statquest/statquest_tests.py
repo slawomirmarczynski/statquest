@@ -219,7 +219,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
 
         da = a.values_to_indices_dict()
         db = b.values_to_indices_dict()
-        observed = np.zeros((len(da), len(db)))
+        observed = np.zeros((len(da), len(db)), dtype=np.int32)
 
         # In fact, key sets for observables a and b should be identical,
         # i.e.the features described by the observables should correspond
@@ -231,13 +231,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         for k in keys:
             observed[da[a[k]], db[b[k]]] += 1
 
-        try:
-            # pylint: disable=unused-variable
-            chisq, p_value, dof, expected = stats.chi2_contingency(observed)
-        except:  # pylint: disable=bare-except # noqa
-            p_value = 1.0
-            chisq = float('inf')
-
+        chisq, p_value, dof, expected = stats.chi2_contingency(observed)
         return Relation(a, b, self, chisq, p_value)
 
     def can_be_carried_out(self, a, b):
@@ -260,8 +254,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
                 NOMINAL variables, but data is CONTINUOUS type).
         """
         if a and b:
-            good_a = a.IS_CONTINUOUS or a.IS_ORDINAL
-            good_b = b.IS_CONTINUOUS or b.IS_ORDINAL
+            good_a = a.IS_NOMINAL or a.IS_ORDINAL
+            good_b = b.IS_NOMINAL or b.IS_ORDINAL
             if good_a and good_b:
                 return True
         return False
@@ -336,7 +330,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
                 stat_value (float): the value of the statistic
         """
         if not self.can_be_carried_out(a, b):
-            raise TypeError
+            raise ValueError
 
         # We have two observables, namely a and b. One of them should be
         # nominal or ordinal, one of them should be continuous. 
@@ -347,8 +341,24 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         # We don't check all details here, because the check was already
         # provided by self.can_be_carried_out(a, b).
         #
-        if a.IS_CONTINUOUS:
+        if a.IS_NOMINAL and b.IS_NOMINAL:
+            raise ValueError
+        elif a.IS_NOMINAL and b.IS_ORDINAL:
+            pass
+        elif a.IS_NOMINAL and b.IS_CONTINUOUS:
+            pass
+        elif a.IS_ORDINAL and b.IS_NOMINAL:
             a, b = b, a
+        elif a.IS_ORDINAL and b.IS_ORDINAL:
+            pass
+        elif a.IS_ORDINAL and b.IS_CONTINUOUS:
+            pass
+        elif a.IS_CONTINUOUS and b.IS_NOMINAL:
+            a, b = a, b
+        elif a.IS_CONTINUOUS and b.IS_ORDINAL:
+            a, b = a, b
+        elif a.IS_CONTINUOUS and b.IS_CONTINUOUS:
+            raise ValueError
 
         # We collect all keys common for both observables.
         # And construct a mapping (dictionary) from a-values to b-values.
@@ -358,12 +368,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         for k in keys:
             observed[a[k]].append(b[k])
 
-        try:
-            h, p_value = stats.mstats.kruskalwallis(*list(observed.values()))
-        except Exception:  # pylint: disable=W0703 # noqa
-            h = float('inf')
-            p_value = 1.0
-
+        h, p_value = stats.kruskal(*list(observed.values()))
         return Relation(a, b, self, h, p_value)
 
     def can_be_carried_out(self, a, b):

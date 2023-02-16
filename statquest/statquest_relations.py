@@ -137,7 +137,6 @@ class Relations:
                                   file=sys.stderr)
                             continue
                         if test.can_be_carried_out(a, b):
-                            # noinspection PyBroadException
                             try:
                                 observable_relations.relations.append(
                                     test(a, b))
@@ -200,6 +199,7 @@ class Relations:
             if relations.credible(alpha):
                 result[key] = [r for r in relations if r.credible(alpha)]
         return result
+
 
 if __name__ == "__main__":
     import doctest
