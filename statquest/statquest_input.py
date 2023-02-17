@@ -157,10 +157,14 @@ class Input(Component):
                         self._cbs.append((name, variable, checkbox))
 
                         try:
+                            print('-'*40)
+                            print(name)
+                            print(self._data_frame[name])
                             obs = Observable(name, self._data_frame[name])
-                            tn = 'nominal' if obs.IS_NOMINAL else ''
-                            to = 'ordinal' if obs.IS_ORDINAL else ''
-                            tc = 'continuous' if obs.IS_CONTINUOUS else ''
+                            print(obs.IS_NOMINAL, obs.IS_ORDINAL, obs.IS_CONTINUOUS)
+                            tn = 'nominal' if obs.IS_NOMINAL else '??'
+                            to = 'ordinal' if obs.IS_ORDINAL else '??'
+                            tc = 'continuous' if obs.IS_CONTINUOUS else '??'
                             ln = ttk.Label(self._frame, text=tn, width=10)
                             lo = ttk.Label(self._frame, text=to, width=10)
                             lc = ttk.Label(self._frame, text=tc, width=10)
