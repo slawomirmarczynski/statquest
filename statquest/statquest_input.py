@@ -109,10 +109,12 @@ class Input(Component):
         button_none = ttk.Button(
             self._frame, text=_('żadna'),
             command=select_none)
+        label_spacer = ttk.Label(self._frame)
 
         label.grid(row=0, column=0, sticky='w', pady=5)
-        button_all.grid(row=0, column=2, padx=20)
-        button_none.grid(row=0, column=3, padx=20)
+        button_all.grid(row=0, column=5, padx=20)
+        button_none.grid(row=0, column=6, padx=20)
+        label_spacer.grid(row=1, column=0)
 
     def update(self, *args):
         try:
@@ -140,7 +142,7 @@ class Input(Component):
                         df = pd.read_csv(self._file_name, **fmt)
                         self._data_frame = df
                         self.is_csv_file = True
-                    i = 0
+                    i = 1
                     for name in self._data_frame:
                         i += 1
                         variable = tk.BooleanVar()
@@ -153,6 +155,20 @@ class Input(Component):
                             offvalue=False)
                         checkbox.grid(row=i, column=1, sticky='we')
                         self._cbs.append((name, variable, checkbox))
+
+                        try:
+                            obs = Observable(name, self._data_frame[name])
+                            tn = 'nominal' if obs.IS_NOMINAL else ''
+                            to = 'ordinal' if obs.IS_ORDINAL else ''
+                            tc = 'continuous' if obs.IS_CONTINUOUS else ''
+                            ln = ttk.Label(self._frame, text=tn, width=10)
+                            lo = ttk.Label(self._frame, text=to, width=10)
+                            lc = ttk.Label(self._frame, text=tc, width=10)
+                            ln.grid(row=i, column=2, sticky='w', padx=10)
+                            lo.grid(row=i, column=3, sticky='w', padx=10)
+                            lc.grid(row=i, column=4, sticky='w', padx=10)
+                        except:
+                            pass
         except:
             pass
 
