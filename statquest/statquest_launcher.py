@@ -108,7 +108,6 @@ class Launcher(Component):
             try:
                 engine()
             except Exception as ex:
-                print(ex)
                 tk.messagebox.showwarning(
                     title='StatQuest',
                     message='Coś nie tak, może po prostu brak danych?\n'

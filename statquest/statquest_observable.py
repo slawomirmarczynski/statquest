@@ -83,9 +83,9 @@ class Observable:
     #
     ORDINAL_TYPES = (int, int32, int64, int32, int64,)
     CONTINUOUS_TYPES = (float, float32, float64, int, int32, int64)
-    NOMINAL_TYPES = (str,)
+    NOMINAL_TYPES = (str, object)
 
-    # noinspection PyTypeChecker
+
     def __init__(self, name, data):
         """
         Initialize observable.
@@ -336,18 +336,15 @@ class Observable:
             >>> obs3._check_data_kind([float])
             False
         """
-        # Notice that empty data (without elements) can not be checked for
-        # type of all elements, because "all" in this case mean "none".
-        #
-        # Do not replace isinstance(obj, cls) by type(obj), because isinstance
-        # should work with derived classes (Liskov's substitution principle).
-        #
-        # BTW, the implicite/default return type in None, thus else-False is
-        # not necessary at all.
-        #
-        if self.data:
-            values = self.data.values()
-            return all(any(isinstance(v, t) for t in types) for v in values)
+        try:
+            v = list(self.data.values())[0]  # @todo: faster/better?
+            for t in types:
+                # Don't use isinstance - we must turn-off inheritance here.
+                if type(v) == type(t()):
+                    return True
+        except:
+            pass
+        return False
 
 
 if __name__ == "__main__":
