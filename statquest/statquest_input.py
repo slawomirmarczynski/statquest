@@ -160,17 +160,25 @@ class Input(Component):
                             print('-'*40)
                             print(name)
                             print(self._data_frame[name])
-                            obs = Observable(name, self._data_frame[name])
-                            print(obs.IS_NOMINAL, obs.IS_ORDINAL, obs.IS_CONTINUOUS)
-                            tn = 'nominal' if obs.IS_NOMINAL else '??'
-                            to = 'ordinal' if obs.IS_ORDINAL else '??'
-                            tc = 'continuous' if obs.IS_CONTINUOUS else '??'
-                            ln = ttk.Label(self._frame, text=tn, width=10)
-                            lo = ttk.Label(self._frame, text=to, width=10)
-                            lc = ttk.Label(self._frame, text=tc, width=10)
-                            ln.grid(row=i, column=2, sticky='w', padx=10)
-                            lo.grid(row=i, column=3, sticky='w', padx=10)
-                            lc.grid(row=i, column=4, sticky='w', padx=10)
+                            if name == 'cabin':
+                                txt = '???!!!'
+                            try:
+                                obs = Observable(name, self._data_frame[name])
+                                print(obs.IS_NOMINAL, obs.IS_ORDINAL, obs.IS_CONTINUOUS)
+                                tn = 'nominal' if obs.IS_NOMINAL else '??'
+                                to = 'ordinal' if obs.IS_ORDINAL else '??'
+                                tc = 'continuous' if obs.IS_CONTINUOUS else '??'
+                                ln = ttk.Label(self._frame, text=tn, width=10)
+                                lo = ttk.Label(self._frame, text=to, width=10)
+                                lc = ttk.Label(self._frame, text=tc, width=10)
+                                ln.grid(row=i, column=2, sticky='w', padx=10)
+                                lo.grid(row=i, column=3, sticky='w', padx=10)
+                                lc.grid(row=i, column=4, sticky='w', padx=10)
+                                txt = str(type(self._data_frame[name][0]))
+                            except:
+                                pass
+                            lx = ttk.Label(self._frame, text=txt)
+                            lx.grid(row=i, column=5)
                         except:
                             pass
         except:
