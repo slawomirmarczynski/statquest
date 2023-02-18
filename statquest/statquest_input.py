@@ -73,8 +73,9 @@ class Input(Component):
             series = data_frame[index]
             series = series.dropna()  # drop missing values
             try:
-                obs = Observable(name, dict(series))
-                if len(obs) > 2:
+                obs = Observable(name, dict(series),
+                                 type_hint=type(series.to_list()[0]))
+                if len(obs) >= 2:
                     observables.append(obs)
             except:
                 pass
@@ -158,23 +159,30 @@ class Input(Component):
 
                         try:
                             try:
-                                obs = Observable(
-                                    name, self._data_frame[name].dropna())
-                                tn = 'nominal' if obs.IS_NOMINAL else '??'
-                                to = 'ordinal' if obs.IS_ORDINAL else '??'
-                                tc = 'continuous' if obs.IS_CONTINUOUS else '??'
+                                dv = self._data_frame[name].dropna()
+
+                                # @todo: workaround - should be written in
+                                #        a more elegant way
+                                #
+                                obs = Observable(name, dv,
+                                                 type_hint=type(
+                                                     dv.to_list()[0]))
+                                tn = 'nominal' if obs.IS_NOMINAL else '--'
+                                to = 'ordinal' if obs.IS_ORDINAL else '--'
+                                tc = 'continuous' if obs.IS_CONTINUOUS else \
+                                    '--'
                                 ln = ttk.Label(self._frame, text=tn, width=10)
                                 lo = ttk.Label(self._frame, text=to, width=10)
                                 lc = ttk.Label(self._frame, text=tc, width=10)
                                 ln.grid(row=i, column=2, sticky='w', padx=10)
                                 lo.grid(row=i, column=3, sticky='w', padx=10)
                                 lc.grid(row=i, column=4, sticky='w', padx=10)
-                                txt = str(type(self._data_frame[
-                                                   name].dropna()[0]))
+                                # txt = str(type(self._data_frame[
+                                #                    name].dropna()[0]))
                             except:
                                 pass
-                            lx = ttk.Label(self._frame, text=txt)
-                            lx.grid(row=i, column=5)
+                            # lx = ttk.Label(self._frame, text=txt)
+                            # lx.grid(row=i, column=5)
                         except:
                             pass
         except:

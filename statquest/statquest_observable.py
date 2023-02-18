@@ -86,7 +86,7 @@ class Observable:
     NOMINAL_TYPES = (str, object)
 
 
-    def __init__(self, name, data):
+    def __init__(self, name, data, type_hint=None):
         """
         Initialize observable.
 
@@ -116,11 +116,24 @@ class Observable:
             >>> print(o3, o3.IS_ORDINAL, o3.IS_CONTINUOUS, o3.IS_NOMINAL)
             example3 False False True
         """
+        if name == 'body':
+            print(13)
         self.name = name
         self.data = dict(data)
-        self.IS_ORDINAL = self._check_data_kind(Observable.ORDINAL_TYPES)
-        self.IS_CONTINUOUS = self._check_data_kind(Observable.CONTINUOUS_TYPES)
-        self.IS_NOMINAL = self._check_data_kind(Observable.NOMINAL_TYPES)
+        self.IS_ORDINAL = False
+        self.IS_CONTINUOUS = False
+        self.IS_NOMINAL = False
+        if type_hint:
+            self.IS_ORDINAL = self._check_hint(
+                type_hint, Observable.ORDINAL_TYPES)
+            self.IS_CONTINUOUS = self._check_hint(
+                type_hint, Observable.CONTINUOUS_TYPES)
+            self.IS_NOMINAL = self._check_hint(
+                type_hint, Observable.NOMINAL_TYPES)
+        else:
+            self.IS_ORDINAL = self._check_data_kind(Observable.ORDINAL_TYPES)
+            self.IS_CONTINUOUS = self._check_data_kind(Observable.CONTINUOUS_TYPES)
+            self.IS_NOMINAL = self._check_data_kind(Observable.NOMINAL_TYPES)
         if not (self.IS_ORDINAL or self.IS_CONTINUOUS or self.IS_NOMINAL):
             raise TypeError
         # @todo: second chance - change all to nominal scale by casting to str.
@@ -310,6 +323,40 @@ class Observable:
                     _('skewness'): stats.skew(data),
                     _('kurtosis'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
+
+    def _check_hint(self, hint, types):
+        """
+        Check if all values in self.data are type T.
+
+        Args:
+            types (list): list of types, like [int, float, str]
+
+        Returns:
+            bool: True if all values in dictionary self.data have given
+                types, False if at least one value is not type form
+                given types list.
+
+        Examples:
+            >>> obs1 = Observable('example', {1: 10.5, 2: 10.2, 3: -5.0})
+            >>> obs1._check_data_kind([float])
+            True
+
+            >>> obs2 = Observable('example', {1: 10, 2: 11, 3: 12})
+            >>> obs2._check_data_kind([float])
+            False
+
+            >>> obs3 = Observable('example', {1: 'A', 2: 'AB', 3: 'ABC'})
+            >>> obs3._check_data_kind([float])
+            False
+        """
+        try:
+            for t in types:
+                # Don't use isinstance - we must turn-off inheritance here.
+                if hint == type(t()):
+                    return True
+        except:
+            pass
+        return False
 
     def _check_data_kind(self, types):
         """
