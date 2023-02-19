@@ -87,12 +87,21 @@ class Progress:
         self.progress['maximum'] = maximal_value
 
     def auto(self):
+        """
+        Turn on automatic indeterminate progress animation.
+        """
         self.progress['mode'] = 'indeterminate'
         self.progress['maximum'] = 100
         self.progress.start()
 
     def stop(self):
+        """
+        Stop animations, but don't change the mode to determinate.
+        """
         self.progress.stop()
 
     def update(self):
+        """
+        Force update of the progress bar.
+        """
         self.progress.update()

@@ -56,7 +56,7 @@ from statquest_output import Output
 class Program:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title('StatQuest version 0.5.0.0')
+        self.root.title('StatQuest version 0.5.0.5')
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         root_width = int(screen_width * 0.75)

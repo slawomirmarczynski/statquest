@@ -14,6 +14,7 @@ Authors:
 
 Copyright (c) 2023 Sławomir Marczyński
 """
+import threading
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -69,24 +70,29 @@ class Launcher(Component):
                     pass
 
         def engine():
+            def worker_proc(*args, **kwargs):
+                plot_parameters = {"dpi": 300, "image_format": "png"}
+                if parent_component.parameters.need_correlations.get():
+                    profile_report = pandas_profiling.ProfileReport(
+                        data_frame,
+                        plot=plot_parameters)
+                else:
+                    profile_report = pandas_profiling.ProfileReport(
+                        data_frame,
+                        correlations=None,
+                        plot=plot_parameters)
+                file_name = parent_component.files_names.profi_htm.get()
+                profile_report.to_file(file_name)
+
             if parent_component.parameters.need_profile.get():
                 data_frame = parent_component.input.get_data_frame()
                 if not data_frame.empty:
                     self.progress.auto()
-                    self.progress.progress.update()
                     data_frame = data_frame.copy()  # should defrag data_frame
-                    plot_parameters = {"dpi": 300, "image_format": "png"}
-                    if parent_component.parameters.need_correlations.get():
-                        profile_report = pandas_profiling.ProfileReport(
-                            data_frame,
-                            plot=plot_parameters)
-                    else:
-                        profile_report = pandas_profiling.ProfileReport(
-                            data_frame,
-                            correlations=None,
-                            plot=plot_parameters)
-                    file_name = parent_component.files_names.profi_htm.get()
-                    profile_report.to_file(file_name)
+                    worker = threading.Thread(target=worker_proc)
+                    worker.start()
+                    while worker.is_alive():
+                        self.progress.update()
                     self.progress.stop()
 
             alpha = parent_component.parameters.alpha.get()

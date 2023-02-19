@@ -44,6 +44,9 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 
 from statquest_component import Component
+from statquest_locale import setup_locale_translation_gettext
+
+_ = setup_locale_translation_gettext()
 
 
 class FilesNames(Component):
@@ -81,7 +84,7 @@ class FilesNames(Component):
             """
             head, tail = os.path.split(self.input_csv.get())
             name, extension = os.path.splitext(tail)
-            self.tests_dot.set(os.path.join(head, name + '_links.dot'))
+            self.tests_dot.set(os.path.join(head, name + '_links.txt'))
             self.callback(*args)
 
         def callback_output(*args):
@@ -95,7 +98,7 @@ class FilesNames(Component):
             head, tail = os.path.split(self.tests_dot.get())
             name, extension = os.path.splitext(tail)
             name = re.sub(r'_links$', '', name)
-            self.profi_htm.set(os.path.join(head, name + '_profi' + '.html'))
+            self.profi_htm.set(os.path.join(head, name + '_profile' + '.html'))
             self.freqs_csv.set(os.path.join(head, name + '_freqs' + '.csv'))
             self.stats_csv.set(os.path.join(head, name + '_stats' + '.csv'))
             self.tests_csv.set(os.path.join(head, name + '_tests' + '.csv'))
@@ -124,14 +127,15 @@ class FilesNames(Component):
                 '.txt': 'text',
                 '.csv': 'CSV',
                 '.xlmx': 'Excel',
-                '.html': 'HTML',
-                '.dot': 'DOT', }
+                '.html': 'HTML', }
             filetypes = (known_types[req_ext], '*' + req_ext)
             name = filedialog.asksaveasfilename(filetypes=(filetypes,))
             if name:
                 name = os.path.normpath(name)
                 variable.set(name)
 
+        # Add observers/listeners to handle changes in entry fields models.
+        #
         self.input_csv.trace_add('write', callback_input)
         self.tests_dot.trace_add('write', callback_output)
         self.profi_htm.trace_add('write', self.callback)
@@ -140,52 +144,65 @@ class FilesNames(Component):
         self.tests_csv.trace_add('write', self.callback)
         self.tests_txt.trace_add('write', self.callback)
 
-        label_input = ttk.Label(self._frame, text='Dane wejściowe')
-        label_output = ttk.Label(self._frame, text='Wyniki obliczeń')
-        label_input_csv = ttk.Label(self._frame, text='Dane (CSV lub XSLX):')
-        label_tests_dot = ttk.Label(self._frame, text='Graf zależności:')
-        label_profi_htm = ttk.Label(self._frame, text='Profil:')
-        label_freqs_csv = ttk.Label(self._frame, text='Tablica częstości:')
-        label_stats_csv = ttk.Label(self._frame, text='Statystyki:')
-        label_tests_csv = ttk.Label(self._frame, text='Wyniki testów:')
-        label_tests_txt = ttk.Label(self._frame, text='Opis testów:')
+        # An abbreviation of self._frame.
+        #
+        frame = self._frame
 
-        entry_input_csv = ttk.Entry(self._frame, textvariable=self.input_csv)
-        entry_tests_dot = ttk.Entry(self._frame, textvariable=self.tests_dot)
-        entry_profi_htm = ttk.Entry(self._frame, textvariable=self.profi_htm)
-        entry_freqs_csv = ttk.Entry(self._frame, textvariable=self.freqs_csv)
-        entry_stats_csv = ttk.Entry(self._frame, textvariable=self.stats_csv)
-        entry_tests_csv = ttk.Entry(self._frame, textvariable=self.tests_csv)
-        entry_tests_txt = ttk.Entry(self._frame, textvariable=self.tests_txt)
+        # Create widgets: labels.
+        #
+        label_input = ttk.Label(frame, text=_('Dane wejściowe'))
+        label_output = ttk.Label(frame, text=_('Wyniki obliczeń'))
+        label_input_csv = ttk.Label(frame, text=_('Dane (CSV lub XSLX):'))
+        label_tests_dot = ttk.Label(frame, text=_('Graf zależności:'))
+        label_profi_htm = ttk.Label(frame, text=_('Profil:'))
+        label_freqs_csv = ttk.Label(frame, text=_('Tablica częstości:'))
+        label_stats_csv = ttk.Label(frame, text=_('Statystyki:'))
+        label_tests_csv = ttk.Label(frame, text=_('Wyniki testów:'))
+        label_tests_txt = ttk.Label(frame, text=_('Opis testów:'))
 
+        # Create widgets: entry fields with models (i.e. traced variables).
+        #
+        entry_input_csv = ttk.Entry(frame, textvariable=self.input_csv)
+        entry_tests_dot = ttk.Entry(frame, textvariable=self.tests_dot)
+        entry_profi_htm = ttk.Entry(frame, textvariable=self.profi_htm)
+        entry_freqs_csv = ttk.Entry(frame, textvariable=self.freqs_csv)
+        entry_stats_csv = ttk.Entry(frame, textvariable=self.stats_csv)
+        entry_tests_csv = ttk.Entry(frame, textvariable=self.tests_csv)
+        entry_tests_txt = ttk.Entry(frame, textvariable=self.tests_txt)
+
+        # Create widgets: buttons.
+        #
         button_input_csv = ttk.Button(
-            self._frame,
-            text='zmień wszystko',
+            frame,
+            text=_('zmień wszystko'),
             command=lambda: pick_open())
         button_tests_dot = ttk.Button(
-            self._frame,
-            text='zmień pozostałe',
-            command=lambda: pick_save(self.tests_dot, ".dot"))
+            frame,
+            text=_('zmień pozostałe'),
+            command=lambda: pick_save(self.tests_dot, ".txt"))
         button_profi_htm = ttk.Button(
-            self._frame,
-            text='zmień',
+            frame,
+            text=_('zmień'),
             command=lambda: pick_save(self.profi_htm, ".csv"))
         button_freqs_csv = ttk.Button(
-            self._frame,
-            text='zmień',
+            frame,
+            text=_('zmień'),
             command=lambda: pick_save(self.freqs_csv, ".csv"))
         button_stats_csv = ttk.Button(
-            self._frame,
-            text='zmień',
+            frame,
+            text=_('zmień'),
             command=lambda: pick_save(self.stats_csv, ".csv"))
         button_tests_csv = ttk.Button(
-            self._frame,
-            text='zmień',
+            frame,
+            text=_('zmień'),
             command=lambda: pick_save(self.tests_csv, ".csv"))
         button_tests_txt = ttk.Button(
-            self._frame,
-            text='zmień',
+            frame,
+            text=_('zmień'),
             command=lambda: pick_save(self.tests_txt, ".txt"))
+
+        # TL;DR - all elements are placed by the grid manager
+        # - entry fields are resizable - may expand horizontally.
 
         label_input.grid(row=0, column=0, sticky='w')
         label_output.grid(row=2, column=0, sticky='w')
@@ -213,7 +230,9 @@ class FilesNames(Component):
         button_tests_csv.grid(row=7, column=3, sticky='ew')
         button_tests_txt.grid(row=8, column=3, sticky='ew')
 
-        self._frame.columnconfigure(2, weight=1)
+        frame.columnconfigure(2, weight=1)
 
-        for widget in self._frame.winfo_children():
+        # Set uniform/standard padding for all widgets in the frame.
+        #
+        for widget in frame.winfo_children():
             widget.grid_configure(padx=5, pady=5)

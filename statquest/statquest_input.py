@@ -136,7 +136,7 @@ class Input(Component):
                             obs = Observable(name, serie)
                             tn = 'nominal' if obs.IS_NOMINAL else '--'
                             to = 'ordinal' if obs.IS_ORDINAL else '--'
-                            tc = 'continuous' if obs.IS_CONTINUOUS else  '--'
+                            tc = 'continuous' if obs.IS_CONTINUOUS else '--'
                             ln = ttk.Label(self._frame, text=tn, width=10)
                             lo = ttk.Label(self._frame, text=to, width=10)
                             lc = ttk.Label(self._frame, text=tc, width=10)
