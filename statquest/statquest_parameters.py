@@ -6,8 +6,8 @@ The main module of StatQuest.
 File:
     project: StatQuest
     name: statquest_parameters.py
-    version: 0.5.0.0
-    date: 16.02.2023
+    version: 0.5.0.5
+    date: 19.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -65,6 +65,7 @@ class Parameters(Component):
         self.need_profile = tk.BooleanVar(value=False)
         self.need_correlations = tk.BooleanVar(value=False)
         self.locale_code = tk.StringVar(value=get_default_locale_code())
+        self.drop_too_short = tk.IntVar(value=2)
 
         def alpha_validator(string):
             """
@@ -83,8 +84,16 @@ class Parameters(Component):
                 return 0 <= value <= 1
             except:
                 return False
-
         registred_alpha_validator = self._frame.register(alpha_validator)
+
+        def drop_too_short_validator(string):
+            try:
+                value = int(string)
+                return value > 1
+            except:
+                return False
+        registred_drop_to_short= self._frame.register(drop_too_short_validator)
+
 
         def callback_correlations(*args):
             checkbox_correlations['state'] = (
@@ -142,6 +151,21 @@ class Parameters(Component):
             self._frame,
             text=_('Ustala szczegóły takie jak znak przecinka dziesiętnego.'))
         label_locale_comment.grid(row=4, column=2, sticky='w')
+
+        label_drop = ttk.Label(self._frame, text='progowa liczba danych:')
+        label_drop.grid(row=5, column=0, sticky='e')
+        spinbox_drop = ttk.Spinbox(
+            self._frame, from_=2, to=1000000, increment=1,
+            width=10,
+            textvariable=self.drop_too_short,
+            validate='all', validatecommand=(registred_drop_to_short, '%P'))
+        spinbox_drop.grid(row=5, column=1, sticky='w')
+        leabel_drop_comment = ttk.Label(
+            self._frame,
+            text='Jeżeli ilość danych w kolumnie będzie mniejsza, to cała '
+                 'kolumna zostanie odrzucona jako niereprezentatywna dla '
+                 'danych.')
+        leabel_drop_comment.grid(row=5, column=2, sticky='w')
 
         for widget in self._frame.winfo_children():
             widget.grid_configure(padx=5, pady=5)

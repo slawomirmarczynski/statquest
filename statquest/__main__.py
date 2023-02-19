@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+File:
+    project: StatQuest
+    name: __main__.py
+    version: 0.5.0.5
+    date: 19.02.2023
 
+Authors:
+    Sławomir Marczyński
+
+Copyright (c) 2023 Sławomir Marczyński
+"""
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions

@@ -4,8 +4,8 @@
 File:
     project: StatQuest
     name: test_statquest_relations.py
-    version: 0.5.0.0
-    date: 16.02.2023
+    version: 0.5.0.5
+    date: 19.02.2023
 
 Authors:
     Sławomir Marczyński

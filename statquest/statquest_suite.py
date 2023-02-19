@@ -6,8 +6,8 @@ The main module of StatQuest.
 File:
     project: StatQuest
     name: statquest_filenames.py
-    version: 0.5.0.0
-    date: 16.02.2023
+    version: 0.5.0.5
+    date: 19.02.2023
 
 Authors:
     Sławomir Marczyński

@@ -6,8 +6,8 @@ Input Component.
 File:
     project: StatQuest
     name: statquest_input.py
-    version: 0.5.0.0
-    date: 16.02.2023
+    version: 0.5.0.5
+    date: 19.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -170,13 +170,14 @@ class Input(Component):
     def get_observables(self):
         data_frame = self.get_data_frame()
         observables = []
+        drop_threshold = self._parent_component.parameters.drop_too_short.get()
         for index in data_frame:
             name = str(index)
             series = data_frame[index]
             series = series.dropna()  # drop missing values
             try:
                 obs = Observable(name, series)
-                if len(obs) >= 2:
+                if len(obs) >= drop_threshold:
                     observables.append(obs)
             except:
                 pass
