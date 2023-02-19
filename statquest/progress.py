@@ -60,6 +60,8 @@ class Progress:
         Args:
             x (float): value to set.
         """
+        self.progress.stop()
+        self.progress['mode'] = 'determinate'
         self.progress['value'] = x
 
     def step(self, delta=1):
@@ -80,4 +82,14 @@ class Progress:
         Args:
             maximal_value (float): the end of the scale.
         """
+        self.progress.stop()
+        self.progress['mode'] = 'determinate'
         self.progress['maximum'] = maximal_value
+
+    def auto(self):
+        self.progress['mode'] = 'indeterminate'
+        self.progress['maximum'] = 100
+        self.progress.start()
+
+    def stop(self):
+        self.progress.stop()

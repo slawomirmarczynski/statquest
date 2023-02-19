@@ -72,6 +72,8 @@ class Launcher(Component):
             if parent_component.parameters.need_profile.get():
                 data_frame = parent_component.input.get_data_frame()
                 if not data_frame.empty:
+                    self.progress.auto()
+                    self.progress.progress.update()
                     data_frame = data_frame.copy()  # should defrag data_frame
                     plot_parameters = {"dpi": 300, "image_format": "png"}
                     if parent_component.parameters.need_correlations.get():
@@ -85,6 +87,7 @@ class Launcher(Component):
                             plot=plot_parameters)
                     file_name = parent_component.files_names.profi_htm.get()
                     profile_report.to_file(file_name)
+                    self.progress.stop()
 
             alpha = parent_component.parameters.alpha.get()
             tests = parent_component.suite.get_selected()
