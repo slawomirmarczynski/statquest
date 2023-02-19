@@ -93,3 +93,6 @@ class Progress:
 
     def stop(self):
         self.progress.stop()
+
+    def update(self):
+        self.progress.update()
