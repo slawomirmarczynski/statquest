@@ -55,31 +55,6 @@ _ = setup_locale_translation_gettext()
 
 class Input(Component):
 
-    @staticmethod
-    def _input_observables(data_frame):
-        """
-        Converts a data frame into the list of observables.
-
-        Args:
-            data_frame (pandas.DataFrame): input data as a Pandas Dataframe.
-
-        Returns:
-            observables (list): the list of observables as Obsevable objects.
-        """
-
-        observables = []
-        for index in data_frame:
-            name = str(index)
-            series = data_frame[index]
-            series = series.dropna()  # drop missing values
-            try:
-                obs = Observable(name, series)
-                if len(obs) >= 2:
-                    observables.append(obs)
-            except:
-                pass
-        return observables
-
     def __init__(self, parent_component, parent_frame, *args, **kwargs):
         super().__init__(parent_component, parent_frame, *args, **kwargs)
 
@@ -157,29 +132,17 @@ class Input(Component):
                         self._cbs.append((name, variable, checkbox))
 
                         try:
-                            try:
-                                dv = self._data_frame[name].dropna()
-
-                                # @todo: workaround - should be written in
-                                #        a more elegant way
-                                #
-                                obs = Observable(name, dv)
-                                tn = 'nominal' if obs.IS_NOMINAL else '--'
-                                to = 'ordinal' if obs.IS_ORDINAL else '--'
-                                tc = 'continuous' if obs.IS_CONTINUOUS else \
-                                    '--'
-                                ln = ttk.Label(self._frame, text=tn, width=10)
-                                lo = ttk.Label(self._frame, text=to, width=10)
-                                lc = ttk.Label(self._frame, text=tc, width=10)
-                                ln.grid(row=i, column=2, sticky='w', padx=10)
-                                lo.grid(row=i, column=3, sticky='w', padx=10)
-                                lc.grid(row=i, column=4, sticky='w', padx=10)
-                                # txt = str(type(self._data_frame[
-                                #                    name].dropna()[0]))
-                            except:
-                                pass
-                            # lx = ttk.Label(self._frame, text=txt)
-                            # lx.grid(row=i, column=5)
+                            serie = self._data_frame[name].dropna()
+                            obs = Observable(name, serie)
+                            tn = 'nominal' if obs.IS_NOMINAL else '--'
+                            to = 'ordinal' if obs.IS_ORDINAL else '--'
+                            tc = 'continuous' if obs.IS_CONTINUOUS else  '--'
+                            ln = ttk.Label(self._frame, text=tn, width=10)
+                            lo = ttk.Label(self._frame, text=to, width=10)
+                            lc = ttk.Label(self._frame, text=tc, width=10)
+                            ln.grid(row=i, column=2, sticky='w', padx=10)
+                            lo.grid(row=i, column=3, sticky='w', padx=10)
+                            lc.grid(row=i, column=4, sticky='w', padx=10)
                         except:
                             pass
         except:
@@ -205,8 +168,18 @@ class Input(Component):
         return df
 
     def get_observables(self):
-        df = self.get_data_frame()
-        observables = self._input_observables(df)
+        data_frame = self.get_data_frame()
+        observables = []
+        for index in data_frame:
+            name = str(index)
+            series = data_frame[index]
+            series = series.dropna()  # drop missing values
+            try:
+                obs = Observable(name, series)
+                if len(obs) >= 2:
+                    observables.append(obs)
+            except:
+                pass
         return observables
 
 

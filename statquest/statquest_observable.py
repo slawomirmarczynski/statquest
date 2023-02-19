@@ -119,31 +119,14 @@ class Observable:
             example3 False False True
         """
         self.name = name
+        data = data.dropna()
         self.data = dict(data)
         self.IS_ORDINAL = False
         self.IS_CONTINUOUS = False
         self.IS_NOMINAL = False
-
-        if isinstance(data, pd.DataFrame):
-            data = data.dropna()
-            self._classify_type_pandas(data)
-        else:
-            self._classify_type_dict(self.data)
-
-        if type_hint:
-            self.IS_ORDINAL = self._check_hint(
-                type_hint, Observable.ORDINAL_TYPES)
-            self.IS_CONTINUOUS = self._check_hint(
-                type_hint, Observable.CONTINUOUS_TYPES)
-            self.IS_NOMINAL = self._check_hint(
-                type_hint, Observable.NOMINAL_TYPES)
-        else:
-            self.IS_ORDINAL = self._check_data_kind(Observable.ORDINAL_TYPES)
-            self.IS_CONTINUOUS = self._check_data_kind(Observable.CONTINUOUS_TYPES)
-            self.IS_NOMINAL = self._check_data_kind(Observable.NOMINAL_TYPES)
+        self.__classify_data_kind(data)
         if not (self.IS_ORDINAL or self.IS_CONTINUOUS or self.IS_NOMINAL):
             raise TypeError
-        # @todo: second chance - change all to nominal scale by casting to str.
 
     def __getitem__(self, key):
         """
@@ -331,103 +314,39 @@ class Observable:
                     _('kurtosis'): stats.kurtosis(data)}
         return None  # @todo - może lepiej raise TypeError lub coś takiego?!
 
-    def _check_hint(self, hint, types):
-        """
-        Check if all values in self.data are type T.
-
-        Args:
-            types (list): list of types, like [int, float, str]
-
-        Returns:
-            bool: True if all values in dictionary self.data have given
-                types, False if at least one value is not type form
-                given types list.
-
-        Examples:
-            >>> obs1 = Observable('example', {1: 10.5, 2: 10.2, 3: -5.0})
-            >>> obs1._check_data_kind([float])
-            True
-
-            >>> obs2 = Observable('example', {1: 10, 2: 11, 3: 12})
-            >>> obs2._check_data_kind([float])
-            False
-
-            >>> obs3 = Observable('example', {1: 'A', 2: 'AB', 3: 'ABC'})
-            >>> obs3._check_data_kind([float])
-            False
-        """
-        try:
-            for t in types:
-                # Don't use isinstance - we must turn-off inheritance here.
-                if hint == type(t()):
-                    return True
-        except:
-            pass
-        return False
-
-    def _classify_type_pandas(self, serie):
-
-        # Założenie - nie mamy brakujących wartości (NaN), te bowiem zostały
-        # już usunięte wcześniej metodą serie = serie.dropna().
-
-        types = (Observable.ORDINAL_TYPES,
-                 Observable.CONTINUOUS_TYPES,
-                 Observable.NOMINAL_TYPES)
-        scores = [0] * len(types)
+    def __classify_data_kind(self, serie):
+        # Kacze badanie typu. Założenie - nie mamy brakujących wartości (NaN),
+        # te bowiem zostały już usunięte wcześniej: serie = serie.dropna().
+        #
+        score_ordinal = 0
+        score_continuous = 0
+        score_nominal = 0
         values = serie.to_list()
-        for i, ts in enumerate(types):
-            s = {type(t()) for t in ts}
-            for v in values:
-                if type(v) in s:
-                    scores[i] += 1
-        nz = 0
-        for sc in scores:
-            if sc > 0:
-                nz += 1
-        if nz != 1:
-            raise TypeError('unable classify type of series')
-        for i, ts in enumerate(types):
-            if ts == Observable.ORDINAL_TYPES and scores[i] > 0:
-                self.IS_ORDINAL = True
-            elif ts == Observable.CONTINUOUS_TYPES and scores[i] > 0:
-                self.IS_CONTINUOUS = True
-            elif ts == Observable.NOMINAL_TYPES and scores[i] > 0:
-                self.IS_NOMINAL = True
-
-    def _check_data_kind(self, types):
-        """
-        Check if all values in self.data are type T.
-
-        Args:
-            types (list): list of types, like [int, float, str]
-
-        Returns:
-            bool: True if all values in dictionary self.data have given
-                types, False if at least one value is not type form
-                given types list.
-
-        Examples:
-            >>> obs1 = Observable('example', {1: 10.5, 2: 10.2, 3: -5.0})
-            >>> obs1._check_data_kind([float])
-            True
-
-            >>> obs2 = Observable('example', {1: 10, 2: 11, 3: 12})
-            >>> obs2._check_data_kind([float])
-            False
-
-            >>> obs3 = Observable('example', {1: 'A', 2: 'AB', 3: 'ABC'})
-            >>> obs3._check_data_kind([float])
-            False
-        """
-        try:
-            v = list(self.data.values())[0]  # @todo: faster/better?
-            for t in types:
-                # Don't use isinstance - we must turn-off inheritance here.
-                if type(v) == type(t()):
-                    return True
-        except:
-            pass
-        return False
+        for v in values:
+            try:
+                i = int(v)
+                if i == v:
+                    score_ordinal += 1
+            except:
+                pass
+            try:
+                f = float(v)
+                if f == v:
+                    score_continuous += 1
+            except:
+                pass
+            try:
+                s = str(v)
+                if s == v:
+                    score_nominal += 1
+            except:
+                pass
+        length = len(values)
+        self.IS_ORDINAL = (score_ordinal == length)
+        self.IS_CONTINUOUS = (score_continuous == length)
+        self.IS_NOMINAL = (score_nominal == length)
+        if self.IS_ORDINAL or self.IS_CONTINUOUS:
+            self.IS_NOMINAL = False
 
 
 if __name__ == "__main__":
