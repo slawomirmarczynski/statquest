@@ -73,8 +73,7 @@ class Input(Component):
             series = data_frame[index]
             series = series.dropna()  # drop missing values
             try:
-                obs = Observable(name, dict(series),
-                                 type_hint=type(series.to_list()[0]))
+                obs = Observable(name, series)
                 if len(obs) >= 2:
                     observables.append(obs)
             except:
@@ -164,9 +163,7 @@ class Input(Component):
                                 # @todo: workaround - should be written in
                                 #        a more elegant way
                                 #
-                                obs = Observable(name, dv,
-                                                 type_hint=type(
-                                                     dv.to_list()[0]))
+                                obs = Observable(name, dv)
                                 tn = 'nominal' if obs.IS_NOMINAL else '--'
                                 to = 'ordinal' if obs.IS_ORDINAL else '--'
                                 tc = 'continuous' if obs.IS_CONTINUOUS else \

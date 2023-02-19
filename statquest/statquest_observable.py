@@ -45,6 +45,8 @@ import numpy as np
 from numpy import float32, float64, int32, int64
 from scipy import stats
 
+import pandas as pd
+
 import statquest_locale
 
 _ = statquest_locale.setup_locale_translation_gettext()
@@ -86,7 +88,7 @@ class Observable:
     NOMINAL_TYPES = (str, object)
 
 
-    def __init__(self, name, data, type_hint=None):
+    def __init__(self, name, data):
         """
         Initialize observable.
 
@@ -116,13 +118,18 @@ class Observable:
             >>> print(o3, o3.IS_ORDINAL, o3.IS_CONTINUOUS, o3.IS_NOMINAL)
             example3 False False True
         """
-        if name == 'body':
-            print(13)
         self.name = name
         self.data = dict(data)
         self.IS_ORDINAL = False
         self.IS_CONTINUOUS = False
         self.IS_NOMINAL = False
+
+        if isinstance(data, pd.DataFrame):
+            data = data.dropna()
+            self._classify_type_pandas(data)
+        else:
+            self._classify_type_dict(self.data)
+
         if type_hint:
             self.IS_ORDINAL = self._check_hint(
                 type_hint, Observable.ORDINAL_TYPES)
@@ -357,6 +364,35 @@ class Observable:
         except:
             pass
         return False
+
+    def _classify_type_pandas(self, serie):
+
+        # Założenie - nie mamy brakujących wartości (NaN), te bowiem zostały
+        # już usunięte wcześniej metodą serie = serie.dropna().
+
+        types = (Observable.ORDINAL_TYPES,
+                 Observable.CONTINUOUS_TYPES,
+                 Observable.NOMINAL_TYPES)
+        scores = [0] * len(types)
+        values = serie.to_list()
+        for i, ts in enumerate(types):
+            s = {type(t()) for t in ts}
+            for v in values:
+                if type(v) in s:
+                    scores[i] += 1
+        nz = 0
+        for sc in scores:
+            if sc > 0:
+                nz += 1
+        if nz != 1:
+            raise TypeError('unable classify type of series')
+        for i, ts in enumerate(types):
+            if ts == Observable.ORDINAL_TYPES and scores[i] > 0:
+                self.IS_ORDINAL = True
+            elif ts == Observable.CONTINUOUS_TYPES and scores[i] > 0:
+                self.IS_CONTINUOUS = True
+            elif ts == Observable.NOMINAL_TYPES and scores[i] > 0:
+                self.IS_NOMINAL = True
 
     def _check_data_kind(self, types):
         """
