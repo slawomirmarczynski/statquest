@@ -84,15 +84,15 @@ class Relation:
             alpha (float) : significance level.
 
         Returns:
-            bool: True if H0 is true and H0 states that the relation is
-                credible; True if H0 is false and H0 states that the relation
-                is not credible; False if H0 is False and H0 states that the
-                relation is credible; False if H0 is True and H0 states that
-                the relation is not credible;
+            bool: True if H0 is rejected and H0 states that the relation is
+                not credible; False if H0 is rejected and H0 states that the
+                relation is not credible; True if H0 is accepted and H0 states
+                that the relation is credible; False if H0 is accepted and H0
+                states that the relation is not credible.
         """
         if self.test.prove_relationship:
-            return self.p_value >= alpha
-        return self.p_value < 1.0 - alpha
+            return self.p_value <= alpha
+        return self.p_value > 1.0 - alpha
 
 
 class Relations:

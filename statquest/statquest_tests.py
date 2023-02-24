@@ -189,7 +189,7 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         self.stat_name = 'chi-square'
         self.h0_thesis = _('H0: variables are independent')
         self.h1_thesis = _('H1: variables are not independent')
-        self.prove_relationship = False
+        self.prove_relationship = True
 
     def __call__(self, a, b):
         """
@@ -310,7 +310,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         self.stat_name = 'H'
         self.h0_thesis = _('H0: distributions are equal')
         self.h1_thesis = _('H1: distributions are not equal')
-        self.prove_relationship = True
+        self.prove_relationship = False
 
     def __call__(self, a, b):
         """
@@ -447,7 +447,7 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         self.stat_name = _('r')
         self.h0_thesis = _('H0: data are not correlated')
         self.h1_thesis = _('H1: data are correlated')
-        self.prove_relationship = False
+        self.prove_relationship = True
 
     def can_be_carried_out(self, a, b):
         """

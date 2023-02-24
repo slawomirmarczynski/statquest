@@ -58,7 +58,7 @@ class Parameters(Component):
     def __init__(self, parent_component, parent_frame, *args, **kwargs):
         super().__init__(parent_component, parent_frame, *args, **kwargs)
 
-        DEFAULT_ALPHA_LEVEL = 0.95
+        DEFAULT_ALPHA_LEVEL = 0.05
         assert 0 <= DEFAULT_ALPHA_LEVEL <= 1.0
 
         self.alpha = tk.DoubleVar(value=DEFAULT_ALPHA_LEVEL)

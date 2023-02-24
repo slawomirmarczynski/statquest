@@ -175,10 +175,10 @@ class Output:
                     label = []
                     for r in rlist:
                         if r.test.prove_relationship:
-                            s = f'{r.test.name_short} p = {r.p_value:#.4}'
-                        else:
                             s = f'{r.test.name_short} 1-p = ' \
                                 f'{1 - r.p_value:#.4}'
+                        else:
+                            s = f'{r.test.name_short} p = {r.p_value:#.4}'
                         label.append(s)
                     label = '\\n'.join(label)
                     print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
@@ -193,9 +193,9 @@ class Output:
                 label = []
                 for r in rlist:
                     if r.test.prove_relationship:
-                        s = f'{r.test.name_short}  p = {r.p_value:#.4}'
+                        s = f'{r.test.name_short}(+) p = {r.p_value:#.4}'
                     else:
-                        s = f'{r.test.name_short}* p = {r.p_value:#.4}'
+                        s = f'{r.test.name_short}(-) p = {r.p_value:#.4}'
                     label.append(s)
                 label = '\\n'.join(label)  # @todo: ???
                 graph.add_node(a)
