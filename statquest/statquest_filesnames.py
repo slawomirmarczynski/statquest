@@ -6,8 +6,8 @@ FileNames class as a Component subclass.
 File:
     project: StatQuest
     name: statquest_filenames.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -155,20 +155,14 @@ class FilesNames(Component):
         label_input_csv = ttk.Label(frame, text=_('Dane (CSV lub XSLX):'))
         label_tests_dot = ttk.Label(frame, text=_('Graf zależności:'))
         label_profi_htm = ttk.Label(frame, text=_('Profil:'))
-        label_freqs_csv = ttk.Label(frame, text=_('Tablica częstości:'))
-        label_stats_csv = ttk.Label(frame, text=_('Statystyki:'))
         label_tests_csv = ttk.Label(frame, text=_('Wyniki testów:'))
-        label_tests_txt = ttk.Label(frame, text=_('Opis testów:'))
 
         # Create widgets: entry fields with models (i.e. traced variables).
         #
         entry_input_csv = ttk.Entry(frame, textvariable=self.input_csv)
         entry_tests_dot = ttk.Entry(frame, textvariable=self.tests_dot)
         entry_profi_htm = ttk.Entry(frame, textvariable=self.profi_htm)
-        entry_freqs_csv = ttk.Entry(frame, textvariable=self.freqs_csv)
-        entry_stats_csv = ttk.Entry(frame, textvariable=self.stats_csv)
         entry_tests_csv = ttk.Entry(frame, textvariable=self.tests_csv)
-        entry_tests_txt = ttk.Entry(frame, textvariable=self.tests_txt)
 
         # Create widgets: buttons.
         #
@@ -184,22 +178,10 @@ class FilesNames(Component):
             frame,
             text=_('zmień'),
             command=lambda: pick_save(self.profi_htm, ".csv"))
-        button_freqs_csv = ttk.Button(
-            frame,
-            text=_('zmień'),
-            command=lambda: pick_save(self.freqs_csv, ".csv"))
-        button_stats_csv = ttk.Button(
-            frame,
-            text=_('zmień'),
-            command=lambda: pick_save(self.stats_csv, ".csv"))
         button_tests_csv = ttk.Button(
             frame,
             text=_('zmień'),
             command=lambda: pick_save(self.tests_csv, ".csv"))
-        button_tests_txt = ttk.Button(
-            frame,
-            text=_('zmień'),
-            command=lambda: pick_save(self.tests_txt, ".txt"))
 
         # TL;DR - all elements are placed by the grid manager
         # - entry fields are resizable - may expand horizontally.
@@ -209,26 +191,17 @@ class FilesNames(Component):
         label_input_csv.grid(row=1, column=1, sticky='e')
         label_tests_dot.grid(row=3, column=1, sticky='e')
         label_profi_htm.grid(row=4, column=1, sticky='e')
-        label_freqs_csv.grid(row=5, column=1, sticky='e')
-        label_stats_csv.grid(row=6, column=1, sticky='e')
-        label_tests_csv.grid(row=7, column=1, sticky='e')
-        label_tests_txt.grid(row=8, column=1, sticky='e')
+        label_tests_csv.grid(row=5, column=1, sticky='e')
 
         entry_input_csv.grid(row=1, column=2, sticky='we')
         entry_tests_dot.grid(row=3, column=2, sticky='we')
         entry_profi_htm.grid(row=4, column=2, sticky='we')
-        entry_freqs_csv.grid(row=5, column=2, sticky='we')
-        entry_stats_csv.grid(row=6, column=2, sticky='we')
-        entry_tests_csv.grid(row=7, column=2, sticky='we')
-        entry_tests_txt.grid(row=8, column=2, sticky='we')
+        entry_tests_csv.grid(row=5, column=2, sticky='we')
 
         button_input_csv.grid(row=1, column=3, sticky='ew')
         button_tests_dot.grid(row=3, column=3, sticky='ew')
         button_profi_htm.grid(row=4, column=3, sticky='ew')
-        button_freqs_csv.grid(row=5, column=3, sticky='ew')
-        button_stats_csv.grid(row=6, column=3, sticky='ew')
-        button_tests_csv.grid(row=7, column=3, sticky='ew')
-        button_tests_txt.grid(row=8, column=3, sticky='ew')
+        button_tests_csv.grid(row=5, column=3, sticky='ew')
 
         frame.columnconfigure(2, weight=1)
 

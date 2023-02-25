@@ -6,8 +6,8 @@ The main module of StatQuest.
 File:
     project: StatQuest
     name: statquest.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -47,7 +47,7 @@ import ydata_profiling as pandas_profiling
 from progress import Progress
 from statquest_component import Component
 
-from statquest_relations import Relations
+from statquest_relations import Relation
 
 from statquest_locale import setup_locale_translation_gettext
 
@@ -98,13 +98,10 @@ class Launcher(Component):
             alpha = parent_component.parameters.alpha.get()
             tests = parent_component.suite.get_selected()
             observables = parent_component.input.get_observables()
-            relations = Relations.create_relations(observables, tests,
-                                                   progress=self.progress)
-            significant_relations = Relations.credible_only(relations, alpha)
+            relations = Relation.create_relations(observables, tests,
+                                                  progress=self.progress)
+            significant_relations = Relation.credible_only(relations, alpha)
 
-            parent_component.output.tests_txt(tests)
-            parent_component.output.stats_csv(observables)
-            parent_component.output.freqs_csv(observables)
             parent_component.output.tests_csv(relations, alpha)
             parent_component.output.tests_dot(significant_relations)
             parent_component.output.tests_nx(significant_relations)
@@ -114,8 +111,9 @@ class Launcher(Component):
             label['text'] = 'przeprowadzam obliczenia'
             label['state'] = 'normal'
             self._frame.master.update()
+            engine()  # @todo tylko na czas prac nad programem - hack
             try:
-                engine()
+                pass
             except Exception as ex:
                 tk.messagebox.showwarning(
                     title='StatQuest',

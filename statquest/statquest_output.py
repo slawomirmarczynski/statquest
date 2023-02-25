@@ -6,8 +6,8 @@ Output routines.
 File:
     project: StatQuest
     name: statquest_output.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -58,62 +58,6 @@ CSV_SEPARATOR = ';'
 class Output:
     def __init__(self, parent_component):
         self.parent_component = parent_component
-
-    def tests_txt(self, tests):
-        file_name = self.parent_component.files_names.tests_txt.get()
-        with open(file_name, "wt", encoding='utf-8', newline='') as file:
-            for test in tests:
-                print('=' * 80, file=file)
-                print(test.__doc__, file=file)
-            print('=' * 80, file=file)
-
-    def stats_csv(self, observables):
-        """
-        Print descriptive statistics.
-
-        Prints descriptive statistics of given observables collection
-        in CSV format.
-
-        Args:
-            observables (iterable): a collection of observables whose
-                statistics should be printed/exported to file.
-            file: file for exported data or None for console _output_content_to_file.
-        """
-        file_name = self.parent_component.files_names.stats_csv.get()
-        with open(file_name, "wt", encoding='utf-8', newline='') as file:
-            for obs in observables:
-                if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-                    keys = obs.descriptive_statistics().keys()
-                    break
-            else:
-                return  # there is no key, nothing to print
-            data_title = _('data')
-            entitled_keys = [data_title] + list(keys)
-            csv_writer = csv.DictWriter(file, entitled_keys,
-                                        delimiter=CSV_SEPARATOR)
-            csv_writer.writeheader()
-            for obs in observables:
-                if obs.IS_CONTINUOUS or obs.IS_ORDINAL:
-                    descriptive_statistics = obs.descriptive_statistics()
-                    descriptive_statistics[data_title] = str(obs)
-                    csv_writer.writerow(descriptive_statistics)
-
-    def freqs_csv(self, observables):
-        """
-        Write how many times the specified values have appeared in the data.
-
-        Args:
-            observables (iterable): a collection of observables
-            file (file): _output_content_to_file file.
-        """
-        file_name = self.parent_component.files_names.freqs_csv.get()
-        with open(file_name, "wt", encoding='utf-8', newline='') as file:
-            csv_writer = csv.writer(file, delimiter=CSV_SEPARATOR)
-            for obs in sorted(observables, key=lambda item: str(item)):
-                if obs.IS_ORDINAL or obs.IS_NOMINAL:
-                    csv_writer.writerow((obs,))
-                    csv_writer.writerows(obs.frequency_table().items())
-                    print(file=file)
 
     def tests_csv(self, relations, alpha):
         """
@@ -174,7 +118,7 @@ class Output:
                 for (a, b), rlist in relations.items():
                     label = []
                     for r in rlist:
-                        if r.test.prove_relationship:
+                        if r.test.prove_relationship: # @todo check check check
                             s = f'{r.test.name_short} 1-p = ' \
                                 f'{1 - r.p_value:#.4}'
                         else:

@@ -6,8 +6,8 @@ Tkinter GUI for StatQuest.
 File:
     project: StatQuest
     name: statquest_intro.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński

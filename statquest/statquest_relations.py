@@ -6,8 +6,8 @@ The definition of Relation and Relations classes.
 File:
     project: StatQuest
     name: statquest_relations.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -91,20 +91,8 @@ class Relation:
                 states that the relation is not credible.
         """
         if self.test.prove_relationship:
-            return self.p_value <= alpha
+            return self.p_value < alpha
         return self.p_value > 1.0 - alpha
-
-
-class Relations:
-    """
-    Relations is a collection contain relations.
-    """
-
-    def __init__(self):
-        """
-        Create an empty object of class Relation.
-        """
-        self.relations = []
 
     @staticmethod
     def create_relations(observables, tests, progress=None):
@@ -112,14 +100,15 @@ class Relations:
         Relationship factory. All possible relationships are created.
 
         Args:
-            observables (iterable): a collection of Observables
-            tests (iterable): a collection of Tests
+            observables (iterable): a collection of Observables.
+            tests (iterable): a collection of Tests.
+            progress (progress.Progress): an optional Progress object.
 
         Returns:
             dict: the mapping of tuples (a, b) to relations.
         """
         # pylint: disable=invalid-name  # short names a, b are ok
-        observables_relations = {}
+        relations = {}
         known_pairs = set((a, a) for a in observables)
         if progress:
             progress.range(len(observables))
@@ -127,77 +116,45 @@ class Relations:
             if progress:
                 progress.step()
             for b in observables:
-                if (a, b) not in known_pairs and (b, a) not in known_pairs:
+                if (a, b) not in known_pairs:
                     known_pairs.add((a, b))
                     known_pairs.add((b, a))
-                    observable_relations = Relations()
+                    rel = []
                     for test in tests:
+                        # @todo: ładniejszy sposób obsług błędów/niemożliwości
+                        #
                         if len(set(a.data.keys()) & set(b.data.keys())) < 2:
                             print(f'{a} nie może być testowane z {b}.',
                                   file=sys.stderr)
                             continue
                         if test.can_be_carried_out(a, b):
+                            # @todo: remove can_be_... - use exceptions
+                            #        instead
                             try:
-                                observable_relations.relations.append(
-                                    test(a, b))
+                                rel.append(test(a, b))
                             except:
                                 print(f'Nieudany {test} dla {a} vs. {b}',
                                       file=sys.stderr)
-                    observables_relations[(a, b)] = observable_relations
-        return observables_relations
-
-    def __len__(self):
-        """
-        Make relations transparent for len.
-
-        Returns:
-            Number of relations stored in Relations class object.
-        """
-        return len(self.relations)
-
-    def __getitem__(self, item):
-        """
-        Make relations transparent for __getitem__
-        .
-        Args:
-            item: selector of relation.
-
-        Returns:
-            Relation: relation selected by item.
-        """
-        return self.relations[item]
-
-    def credible(self, alpha):
-        """
-        Cast to bool.
-
-        Args:
-            alpha (float): alpha probability level, from 0.0 to 1.0.
-
-        Returns:
-            bool: True if any relation is significant, False otherwise.
-        """
-        for relation in self.relations:
-            if relation.credible(alpha):
-                return True
-        return False
+                    relations[(a, b)] = rel
+        return relations
 
     @staticmethod
-    def credible_only(indexed_relations, alpha):
+    def credible_only(relations, alpha):
         """
-        Filter relation by significance
+        Filter relations by significance.
 
         Args:
-            indexed_relations (dict[Relations]): an dictionary with Relations
+            relations (dict[Relations]): an dictionary with Relations
             alpha (float): significance level.
 
         Returns:
             dict[Relations]: the filtered dictionary of Relations
         """
         result = {}
-        for key, relations in indexed_relations.items():
-            if relations.credible(alpha):
-                result[key] = [r for r in relations if r.credible(alpha)]
+        for key, rel in relations.items():
+            list_ = [r for r in rel if r.credible(alpha)]
+            if list_:
+                result[key] = list_
         return result
 
 

@@ -6,8 +6,8 @@ The definition of Observable class.
 File:
     project: StatQuest
     name: statquest_observable.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -87,8 +87,7 @@ class Observable:
     CONTINUOUS_TYPES = (float, float32, float64, int, int32, int64)
     NOMINAL_TYPES = (str, object)
 
-
-    def __init__(self, name, data):
+    def __init__(self, pandas_series):
         """
         Initialize observable.
 
@@ -96,8 +95,7 @@ class Observable:
         and initalize attributes.
 
         Args:
-            name (str): the observable name as a string of characters.
-            data (dict): an dictionary or something that may be cast to dict.
+            pandas_series (pandas.Series): an object of pandas.Serie type.
 
         Raises:
             TypeError: the observable cannot be created due unknown type
@@ -106,25 +104,47 @@ class Observable:
         Examples:
             Create observables and check their names and types.
 
-            >>> o1 = Observable('example1', {1: 10, 2: 20, 3: 30})
-            >>> print(o1, o1.IS_ORDINAL, o1.IS_CONTINUOUS, o1.IS_NOMINAL)
-            example1 True True False
-
-            >>> o2 = Observable('example2', {1: 10.5, 2: 10.2, 3: 11.5})
-            >>> print(o2, o2.IS_ORDINAL, o2.IS_CONTINUOUS, o2.IS_NOMINAL)
-            example2 False True False
-
-            >>> o3 = Observable('example3', {1: 'yes', 2: 'maybe', 3: 'no'})
-            >>> print(o3, o3.IS_ORDINAL, o3.IS_CONTINUOUS, o3.IS_NOMINAL)
-            example3 False False True
+            @todo
         """
-        self.name = name
-        data = data.dropna()
-        self.data = dict(data)
+        self.data = pandas_series.dropna()
         self.IS_ORDINAL = False
         self.IS_CONTINUOUS = False
         self.IS_NOMINAL = False
-        self.__classify_data_kind(data)
+        self.__classify_data_kind()
+
+    def __classify_data_kind(self):
+        # Kacze badanie typu. Założenie - nie mamy brakujących wartości (NaN),
+        # te bowiem zostały już usunięte wcześniej.
+        #
+        score_ordinal = 0
+        score_continuous = 0
+        score_nominal = 0
+        values = self.data.to_list()
+        for v in values:
+            try:
+                i = int(v)
+                if i == v:
+                    score_ordinal += 1
+            except:
+                pass
+            try:
+                f = float(v)
+                if f == v:
+                    score_continuous += 1
+            except:
+                pass
+            try:
+                s = str(v)
+                if s == v:
+                    score_nominal += 1
+            except:
+                pass
+        length = len(values)
+        self.IS_ORDINAL = (score_ordinal == length)
+        self.IS_CONTINUOUS = (score_continuous == length)
+        self.IS_NOMINAL = (score_nominal == length)
+        if self.IS_ORDINAL or self.IS_CONTINUOUS:
+            self.IS_NOMINAL = False
         if not (self.IS_ORDINAL or self.IS_CONTINUOUS or self.IS_NOMINAL):
             raise TypeError
 
@@ -174,179 +194,7 @@ class Observable:
             >>> print(obs)
             example name
         """
-        return self.name
-
-    def nominals(self):
-        """
-        Construct a nominal scale.
-
-        Constructs a nominal scale from the values stored in observable.
-
-        Returns:
-             list: the nominal scale as a list of strings.
-
-        Note:
-            All values should be of one type.
-
-        Examples:
-            >>> x = Observable('X', {'C': 'Celina', 'B': 'Basia', 'A': 'Ala'})
-            >>> x.nominals()
-            ['Ala', 'Basia', 'Celina']
-
-            >>> y = Observable('Y', {'C': 1, 'B': 31, 'A': 2})
-            >>> y.nominals()
-            ['1', '2', '31']
-        """
-        return list(map(str, self.values_as_sorted_list()))
-
-    def ordinals(self):
-        """
-        Construct an ordinal scale.
-
-        Constructs an ordinal scale from the values stored in observable.
-
-        Returns:
-            list: an ordinal scale as a list of integers.
-
-        Note:
-            All values should be of one type.
-
-        Examples:
-            >>> x = Observable('X', {'C': 111, 'B': 777, 'A': -5})
-            >>> x.ordinals()
-            [-5, 111, 777]
-
-            >>> y = Observable('Y', {'C': '1', 'B': '5', 'A': '2'})
-            >>> y.ordinals()
-            [1, 2, 5]
-        """
-        return sorted(list(map(int, self.values_as_sorted_list())))
-
-    def values_as_sorted_list(self):
-        """
-        Return the sorted list of unique values from self.data dictionary.
-
-        Returns:
-            list: sorted list of values.
-
-        Example:
-            >>> x = Observable('X', {'C': 'Celina', 'B': 'Basia', 'A': 'Ala'})
-            >>> x.values_as_sorted_list()
-            ['Ala', 'Basia', 'Celina']
-        """
-        return sorted(set(self.data.values()))
-
-    def values_to_indices_dict(self):
-        """
-        Return values-to-indices mapping, where indices are indices of values
-        on list returned by values_as_sorted_list().
-
-        Returns:
-            dictionary
-
-        Example::
-
-            >>> x = Observable('X', {'C': 'Celina', 'B': 'Basia', 'A': 'Ala'})
-            >>> x.values_to_indices_dict()
-            {'Ala': 0, 'Basia': 1, 'Celina': 2}
-        """
-        values_as_keys = self.values_as_sorted_list()
-        return {values_as_keys[i]: i for i in range(len(values_as_keys))}
-
-    def frequency_table(self):
-        """
-        Compute frequency table for the observable.
-
-        Compute numbers of individual values occurrences for non-continuous
-        variables. This way converts from the nominal scale to ordinal
-        or continuous scale.
-
-        Returns:
-            frequency table as a dictionary.
-
-        Note:
-            works best with nominal or ordinal data.
-
-        Examples:
-            >>> obs = Observable('example', {1: 'A', 2: 'B', 3: 'A'})
-            >>> print(obs.frequency_table())
-            {'A': 2, 'B': 1}
-        """
-        # @todo: check if removing this assertion make no problem
-        # assert self.is_ordinal() or self.is_nominal()
-        freq = defaultdict(int)
-        for item in self.data.values():
-            freq[item] += 1
-        try:
-            freq = dict(sorted(tuple(freq.items())))
-        except TypeError:
-            pass  # simply freq is unchanged, i.e. freq = freq
-        return freq
-
-    # noinspection PyTypeChecker
-    def descriptive_statistics(self):
-        """
-        Compute descriptive statistics.
-
-        Returns:
-            dict: dictionary where statistics names are keys and
-                computed values are numerical values described by names.
-
-        @todo i18n, l10n
-
-        Examples:
-            >>> obs = Observable('example', {1: 10.5, 2: 10.2, 3: 10.9})
-            >>> obs.descriptive_statistics()        # doctest: +ELLIPSIS
-            {'średnia': 10.533333333333333, 'mediana': 10.5, ...
-        """
-        if self.IS_CONTINUOUS or self.IS_ORDINAL:
-            data = tuple(self.data.values())
-            # noinspection PyTypeChecker
-            return {_('mean'): np.mean(data),
-                    _('median'): np.median(data),
-                    _('lower quartile '): np.percentile(data, 25),
-                    _('upper quartile'): np.percentile(data, 75),
-                    _('minimum'): np.min(data),
-                    _('maximum'): np.max(data),
-                    _('standard deviation'): np.std(data),
-                    _('variation'): np.var(data),
-                    _('skewness'): stats.skew(data),
-                    _('kurtosis'): stats.kurtosis(data)}
-        return None  # @todo - może lepiej raise TypeError lub coś takiego?!
-
-    def __classify_data_kind(self, serie):
-        # Kacze badanie typu. Założenie - nie mamy brakujących wartości (NaN),
-        # te bowiem zostały już usunięte wcześniej: serie = serie.dropna().
-        #
-        score_ordinal = 0
-        score_continuous = 0
-        score_nominal = 0
-        values = serie.to_list()
-        for v in values:
-            try:
-                i = int(v)
-                if i == v:
-                    score_ordinal += 1
-            except:
-                pass
-            try:
-                f = float(v)
-                if f == v:
-                    score_continuous += 1
-            except:
-                pass
-            try:
-                s = str(v)
-                if s == v:
-                    score_nominal += 1
-            except:
-                pass
-        length = len(values)
-        self.IS_ORDINAL = (score_ordinal == length)
-        self.IS_CONTINUOUS = (score_continuous == length)
-        self.IS_NOMINAL = (score_nominal == length)
-        if self.IS_ORDINAL or self.IS_CONTINUOUS:
-            self.IS_NOMINAL = False
+        return self.data.name
 
 
 if __name__ == "__main__":

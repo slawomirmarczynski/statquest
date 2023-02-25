@@ -10,8 +10,8 @@ test. These tests are provided as a tuple ALL_STATISTICAL_TESTS.
 File:
     project: StatQuest
     name: statquest_tests.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
@@ -46,6 +46,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 
 import numpy as np
+import pandas as pd
 from scipy import stats
 
 import statquest_locale
@@ -213,25 +214,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         """
         if not self.can_be_carried_out(a, b):
             raise TypeError
-
-        # We count how many independent nominal(ordinal) values are so
-        # in observable and what b.
-
-        da = a.values_to_indices_dict()
-        db = b.values_to_indices_dict()
-        observed = np.zeros((len(da), len(db)), dtype=np.int32)
-
-        # In fact, key sets for observables a and b should be identical,
-        # i.e.the features described by the observables should correspond
-        # to the same entity.The common part (union of collections)
-        # guarantees that for each key will be values in both dictionaries,
-        # i.e. in dictionary a and dictionary b.
-
-        keys = set(a.data.keys()) & set(b.data.keys())
-        for k in keys:
-            observed[da[a[k]], db[b[k]]] += 1
-
-        chisq, p_value, dof, expected = stats.chi2_contingency(observed)
+        ctab = pd.crosstab(a.data, b.data)
+        chisq, p_value, dof, expected = stats.chi2_contingency(ctab)
         return Relation(a, b, self, chisq, p_value)
 
     def can_be_carried_out(self, a, b):
@@ -330,7 +314,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
                 stat_value (float): the value of the statistic
         """
         if not self.can_be_carried_out(a, b):
-            raise ValueError
+            raise TypeError
 
         # We have two observables, namely a and b. One of them should be
         # nominal or ordinal, one of them should be continuous. 
@@ -341,24 +325,11 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         # We don't check all details here, because the check was already
         # provided by self.can_be_carried_out(a, b).
         #
-        if a.IS_NOMINAL and b.IS_NOMINAL:
-            raise ValueError
-        elif a.IS_NOMINAL and b.IS_ORDINAL:
-            pass
-        elif a.IS_NOMINAL and b.IS_CONTINUOUS:
-            pass
-        elif a.IS_ORDINAL and b.IS_NOMINAL:
+        on = a.IS_ORDINAL and b.IS_NOMINAL
+        cn = a.IS_CONTINUOUS and b.IS_NOMINAL
+        co = a.IS_CONTINUOUS and b.IS_ORDINAL
+        if on or cn or co:
             a, b = b, a
-        elif a.IS_ORDINAL and b.IS_ORDINAL:
-            pass
-        elif a.IS_ORDINAL and b.IS_CONTINUOUS:
-            pass
-        elif a.IS_CONTINUOUS and b.IS_NOMINAL:
-            a, b = a, b
-        elif a.IS_CONTINUOUS and b.IS_ORDINAL:
-            a, b = a, b
-        elif a.IS_CONTINUOUS and b.IS_CONTINUOUS:
-            raise ValueError
 
         # We collect all keys common for both observables.
         # And construct a mapping (dictionary) from a-values to b-values.
@@ -492,16 +463,12 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
                 stat_name (str): the name of the statistic
                 stat_value (float): the value of the statistic
         """
-        x = []
-        y = []
-        keys = set(a.data.keys()) & set(b.data.keys())
-        for k in keys:
-            x.append(a[k])
-            y.append(b[k])
-        # @fixme: If x is monovalued or y is monovalued then bad things happen.
-        #         The problem is not trivial, because monovalued data may be
-        #         a result of missing values removal. Below we only turn-off
-        #         warnings. More general approach is still needed.
+
+        df = pd.merge(a.data, b.data, left_index=True, right_index=True)
+        df = df.dropna()
+        x = df.iloc[:, 0]
+        y = df.iloc[:, 1]
+
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore')
             r, p_value = stats.pearsonr(x, y)

@@ -6,8 +6,8 @@ The definition of Component class.
 File:
     project: StatQuest
     name: statquest_component.py
-    version: 0.5.0.5
-    date: 19.02.2023
+    version: 0.5.1.1
+    date: 25.02.2023
 
 Authors:
     Sławomir Marczyński
