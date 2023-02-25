@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-The main module of StatQuest.
+Generate test data.
 
 File:
     project: StatQuest
-    name: statquest_filenames.py
+    name: generate_1.py
     version: 0.5.1.1
     date: 25.02.2023
 
@@ -38,48 +38,41 @@ Copyright (c) 2023 Sławomir Marczyński
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-import tkinter as tk
-from tkinter import ttk
-
-from statquest_component import Component
-from statquest_locale import setup_locale_translation_gettext
-from statquest_tests import ALL_STATISTICAL_TESTS
-
-_ = setup_locale_translation_gettext()
+import csv
+from random import random, randint, choice
+import string
 
 
-class Suite(Component):
+N = 100
+M = 50
 
-    def __init__(self, parent_component, parent_frame, *args, **kwargs):
-        super().__init__(parent_component, parent_frame, *args, **kwargs)
 
-        self.tests_to_proceed = []
+def randomword(n):
+    """
+    Generate random string.
 
-        def callback(*args):
-            self.tests_to_proceed.clear()
-            for t in self.switches:
-                v, cb = self.switches[t]
-                if v.get():
-                    self.tests_to_proceed.append(t)
+    Args:
+        n: the length of the string to generate.
 
-        label = ttk.Label(self._frame, text='Uruchamiane testy')
-        label.grid(row=0, column=0, pady=(5, 20), sticky='w')
+    Returns:
+        str: the generated random string, only lowercase letters.
+    """
+    return ''.join(choice(string.ascii_lowercase) for i in range(n))
 
-        self.switches = {}
-        for i, t in enumerate(ALL_STATISTICAL_TESTS):
-            v = tk.BooleanVar(value=True)
-            cb = ttk.Checkbutton(self._frame, text=str(t), variable=v,
-                                 onvalue=True, offvalue=False)
-            cb.grid(row=i + 1, column=0, sticky='w')
-            v.trace_add('write', callback=callback)
-            self.switches[t] = v, cb
-        callback()
 
-    def get_selected(self):
-        result = []
-        for t in self.switches:
-            v, cb = self.switches[t]
-            if v.get():
-                result.append(t)
-        return result
+ordinal1 = [int(x) for x in range(N)]
+continuous1 = [float(x + 0.5) for x in range(N)]
+nominal1 = [randomword(5) for x in range(M)] + [randomword(5)] * (N - M)
+
+with open('../data/test_data_1.csv', 'w') as output_file:
+    w = csv.writer(output_file)
+
+    w.writerow([
+        'ordinal1', 'continuous1', 'nominal1',
+        'ordinal2', 'continuous2', 'nominal2',
+    ])
+    for i in range(N):
+        w.writerow([
+            ordinal1[i], continuous1[i], nominal1[i],
+            ordinal1[i], continuous1[i], nominal1[i],
+        ])

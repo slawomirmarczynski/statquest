@@ -110,32 +110,70 @@ class Relation:
         # pylint: disable=invalid-name  # short names a, b are ok
         relations = {}
         known_pairs = set((a, a) for a in observables)
+        known_triplets = set()
         if progress:
             progress.range(len(observables))
         for a in observables:
             if progress:
                 progress.step()
             for b in observables:
-                if (a, b) not in known_pairs:
-                    known_pairs.add((a, b))
-                    known_pairs.add((b, a))
-                    rel = []
-                    for test in tests:
-                        # @todo: ładniejszy sposób obsług błędów/niemożliwości
-                        #
-                        if len(set(a.data.keys()) & set(b.data.keys())) < 2:
-                            print(f'{a} nie może być testowane z {b}.',
+                if (a, b) in known_pairs:
+                    continue
+                known_pairs.add((a, b))
+                # known_pairs.add((b, a))
+                rel = []
+                for test in tests:
+                    if test in known_triplets:
+                        print('$', end='')
+                        continue
+                    known_triplets.add((a, b, test))
+                    if test.is_symetric:
+                        known_triplets.add((b, a, test))
+                    if len(set(a.data.keys()) & set(b.data.keys())) < 2:
+                        print(f'{a} nietestowalne z {b}.', file=sys.stderr)
+                        continue
+                    if test.can_be_carried_out(a, b):
+                        # @todo: remove can_be_... - use exceptions
+                        #        instead
+                        try:
+                            rel.append(test(a, b))
+                        except:
+                            print(f'Nieudany {test} dla {a} vs. {b}',
                                   file=sys.stderr)
-                            continue
-                        if test.can_be_carried_out(a, b):
-                            # @todo: remove can_be_... - use exceptions
-                            #        instead
-                            try:
-                                rel.append(test(a, b))
-                            except:
-                                print(f'Nieudany {test} dla {a} vs. {b}',
-                                      file=sys.stderr)
-                    relations[(a, b)] = rel
+                relations[(a, b)] = rel
+
+        # For symmetric relations remove (b, a) relation
+        # when is known (a, b) relation.
+        #
+        if progress:
+            progress.range(len(observables))
+        for a in observables:
+            if progress:
+                progress.step()
+            for b in observables:
+                try:
+                    relations_a_b = relations[(a, b)]
+                    relations_b_a = relations[(b, a)]
+                except KeyError:
+                    continue
+                for ab in relations_a_b:
+                    to_remove = []
+                    for ba in relations_b_a:
+                        if ab.test == ba.test and ab.test.is_symetric:
+                            to_remove.append(ba)
+                    for r in to_remove:
+                        relations_b_a.remove(r)
+
+        # Remove empty entries in relations.
+        #
+        if progress:
+            progress.range(len(observables))
+        for a in observables:
+            if progress:
+                progress.step()
+            for b in observables:
+                if (a, b) in relations and not relations[(a, b)]:
+                    del relations[(a, b)]
         return relations
 
     @staticmethod

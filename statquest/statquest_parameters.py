@@ -92,7 +92,7 @@ class Parameters(Component):
                 return value > 1
             except:
                 return False
-        registred_drop_to_short= self._frame.register(drop_too_short_validator)
+        registred_drop_to_short = self._frame.register(drop_too_short_validator)
 
 
         def callback_correlations(*args):

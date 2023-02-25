@@ -14,7 +14,6 @@ Authors:
 
 Copyright (c) 2023 Sławomir Marczyński
 """
-import threading
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -39,6 +38,7 @@ import threading
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import threading
 import tkinter as tk
 from tkinter import ttk
 
@@ -46,11 +46,8 @@ import ydata_profiling as pandas_profiling
 
 from progress import Progress
 from statquest_component import Component
-
-from statquest_relations import Relation
-
 from statquest_locale import setup_locale_translation_gettext
-
+from statquest_relations import Relation
 
 _ = setup_locale_translation_gettext()
 
@@ -111,9 +108,8 @@ class Launcher(Component):
             label['text'] = 'przeprowadzam obliczenia'
             label['state'] = 'normal'
             self._frame.master.update()
-            engine()  # @todo tylko na czas prac nad programem - hack
             try:
-                pass
+                engine()
             except Exception as ex:
                 tk.messagebox.showwarning(
                     title='StatQuest',

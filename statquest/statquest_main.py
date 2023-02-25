@@ -86,6 +86,7 @@ class Program:
     def run(self):
         self.root.mainloop()
 
+
 def main():
     matplotlib.use('TkAgg')  # todo: move to gui?
     program = Program()

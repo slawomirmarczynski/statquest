@@ -45,7 +45,6 @@ import warnings
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
-import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -87,6 +86,7 @@ class Test(ABC):
         self.h0_thesis = _('H0: null hypothesis')  # p_value > alpha
         self.h1_thesis = _('H1: alternative hypothesis')  # p_value < alpha
         self.prove_relationship = True
+        self.is_symetric = True  # test(a, b) is the same as test(b, a)
 
     def __str__(self):
         """
@@ -295,6 +295,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         self.h0_thesis = _('H0: distributions are equal')
         self.h1_thesis = _('H1: distributions are not equal')
         self.prove_relationship = False
+        self.is_symetric = False
 
     def __call__(self, a, b):
         """
@@ -475,9 +476,209 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         return Relation(a, b, self, r, p_value)
 
 
+class SpearmanRTest(Test):  # pylint: disable=C0111
+    """
+    Spearman r Test.
+
+    We have two continuous variables. We want to find out if these
+    variables are correlated or not.
+
+    We formulate the null hypothesis and the alternative hypothesis:
+
+        H0: There is no correlation.
+        H1: There is a correlation.
+
+    If p-value is too small, reject the null hypothesis if p-value
+    it is big, "we have no grounds to reject the null hypothesis"
+    (de facto we just take the null hypothesis).
+
+    It can be presented in table form:
+
+                                H0      H1      conclusion
+            -----------------------------------------------------------
+            p_value < alpha:    no      yes     there is a correlation
+            p_value > alpha:    yes     no      there is no correlation
+
+    For example, such a test could be used to check whether mass
+    the patient's body depends on his height.
+    """
+
+    def __init__(self):
+        """
+        Init test.
+
+        Note:
+            Why this initializer has no parameters (except self)? Each
+            test have completely different logic and must be hard-coded
+            from a scratch. It is useless call parametrized initializer.
+        """
+        super().__init__()
+        self.name = _('Spearman r test')
+        self.name_short = _('Spearman r')
+        self.stat_name = _('r')
+        self.h0_thesis = _('H0: data are not correlated')
+        self.h1_thesis = _('H1: data are correlated')
+        self.prove_relationship = True
+
+    def can_be_carried_out(self, a, b):
+        """
+        Check can test be preformed.
+
+        Checks whether the test can be performed on observations a and b.
+
+        Note:
+            It is a static method - there is no need for a test object
+            - we can check can_be_carried_out(a,b) before test creation.
+
+        Args:
+            a (Observable): observable class object.
+            b (Observable): an object of class Observable.
+
+        Returns:
+            bool: True if the test can be applied to data a and b,
+                False if the test cannot be used (e.g. the test requires
+                NOMINAL variables, but data is CONTINUOUS type).
+        """
+        if (a is not None) and (b is not None):
+            good_a = a.IS_ORDINAL or a.IS_CONTINUOUS
+            good_b = b.IS_ORDINAL or b.IS_CONTINUOUS
+            if good_a and good_b:
+                return True
+        return False
+
+    def __call__(self, a, b):
+        """
+        Perform a statistical test on observations a and b.
+
+        Args:
+            a (Observable): Observable class object.
+            b (Observable): an object of class Observable.
+
+        Throws:
+            TypeError: when observables aren't compatible with the test.
+
+        Returns:
+            tuple: (p_value, stat_name, stat_value); in subclasses:
+                p_value (float): p_value value
+                stat_name (str): the name of the statistic
+                stat_value (float): the value of the statistic
+        """
+
+        df = pd.merge(a.data, b.data, left_index=True, right_index=True)
+        df = df.dropna()
+        x = df.iloc[:, 0]
+        y = df.iloc[:, 1]
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            r, p_value = stats.spearmanr(x, y)
+        return Relation(a, b, self, r, p_value)
+
+
+class KendallTauTest(Test):  # pylint: disable=C0111
+    """
+    Spearman r Test.
+
+    We have two continuous variables. We want to find out if these
+    variables are correlated or not.
+
+    We formulate the null hypothesis and the alternative hypothesis:
+
+        H0: There is no correlation.
+        H1: There is a correlation.
+
+    If p-value is too small, reject the null hypothesis if p-value
+    it is big, "we have no grounds to reject the null hypothesis"
+    (de facto we just take the null hypothesis).
+
+    It can be presented in table form:
+
+                                H0      H1      conclusion
+            -----------------------------------------------------------
+            p_value < alpha:    no      yes     there is a correlation
+            p_value > alpha:    yes     no      there is no correlation
+
+    For example, such a test could be used to check whether mass
+    the patient's body depends on his height.
+    """
+
+    def __init__(self):
+        """
+        Init test.
+
+        Note:
+            Why this initializer has no parameters (except self)? Each
+            test have completely different logic and must be hard-coded
+            from a scratch. It is useless call parametrized initializer.
+        """
+        super().__init__()
+        self.name = _('Kendall tau test')
+        self.name_short = _('Kendall tau')
+        self.stat_name = _('r')
+        self.h0_thesis = _('H0: data are not correlated')
+        self.h1_thesis = _('H1: data are correlated')
+        self.prove_relationship = True
+
+    def can_be_carried_out(self, a, b):
+        """
+        Check can test be preformed.
+
+        Checks whether the test can be performed on observations a and b.
+
+        Note:
+            It is a static method - there is no need for a test object
+            - we can check can_be_carried_out(a,b) before test creation.
+
+        Args:
+            a (Observable): observable class object.
+            b (Observable): an object of class Observable.
+
+        Returns:
+            bool: True if the test can be applied to data a and b,
+                False if the test cannot be used (e.g. the test requires
+                NOMINAL variables, but data is CONTINUOUS type).
+        """
+        if (a is not None) and (b is not None):
+            good_a = a.IS_ORDINAL or a.IS_CONTINUOUS
+            good_b = b.IS_ORDINAL or b.IS_CONTINUOUS
+            if good_a and good_b:
+                return True
+        return False
+
+    def __call__(self, a, b):
+        """
+        Perform a statistical test on observations a and b.
+
+        Args:
+            a (Observable): Observable class object.
+            b (Observable): an object of class Observable.
+
+        Throws:
+            TypeError: when observables aren't compatible with the test.
+
+        Returns:
+            tuple: (p_value, stat_name, stat_value); in subclasses:
+                p_value (float): p_value value
+                stat_name (str): the name of the statistic
+                stat_value (float): the value of the statistic
+        """
+
+        df = pd.merge(a.data, b.data, left_index=True, right_index=True)
+        df = df.dropna()
+        x = df.iloc[:, 0]
+        y = df.iloc[:, 1]
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            r, p_value = stats.kendalltau(x, y)
+        return Relation(a, b, self, r, p_value)
+
+
 ALL_STATISTICAL_TESTS = (ChiSquareIndependenceTest(),
                          KruskalWallisTest(),
-                         PearsonCorrelationTest())
+                         PearsonCorrelationTest(),
+                         SpearmanRTest(),
+                         KendallTauTest())
 
 if __name__ == "__main__":
     import doctest

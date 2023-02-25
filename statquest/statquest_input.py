@@ -132,8 +132,8 @@ class Input(Component):
                         self._cbs.append((name, variable, checkbox))
 
                         try:
-                            serie = self._data_frame[name].dropna()
-                            obs = Observable(name, serie)
+                            series = self._data_frame[name].dropna()
+                            obs = Observable(series)
                             tn = 'nominal' if obs.IS_NOMINAL else '--'
                             to = 'ordinal' if obs.IS_ORDINAL else '--'
                             tc = 'continuous' if obs.IS_CONTINUOUS else '--'

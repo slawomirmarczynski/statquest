@@ -42,12 +42,10 @@ Copyright (c) 2023 Sławomir Marczyński.
 import csv
 from itertools import chain
 
-import pandas as pd
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
 
 import statquest_locale
-from statquest_component import Component
 
 _ = statquest_locale.setup_locale_translation_gettext()
 
@@ -118,11 +116,11 @@ class Output:
                 for (a, b), rlist in relations.items():
                     label = []
                     for r in rlist:
-                        if r.test.prove_relationship: # @todo check check check
+                        if r.test.prove_relationship:
+                            s = f'{r.test.name_short} p = {r.p_value:#.4}'
+                        else:
                             s = f'{r.test.name_short} 1-p = ' \
                                 f'{1 - r.p_value:#.4}'
-                        else:
-                            s = f'{r.test.name_short} p = {r.p_value:#.4}'
                         label.append(s)
                     label = '\\n'.join(label)
                     print(f'"{a}" -- "{b}" [ label="{label}" ]', file=file)
@@ -137,9 +135,10 @@ class Output:
                 label = []
                 for r in rlist:
                     if r.test.prove_relationship:
-                        s = f'{r.test.name_short}(+) p = {r.p_value:#.4}'
+                        s = f'{r.test.name_short} p = {r.p_value:#.4}'
                     else:
-                        s = f'{r.test.name_short}(-) p = {r.p_value:#.4}'
+                        s = f'{r.test.name_short} 1-p = ' \
+                            f'{1 - r.p_value:#.4}'
                     label.append(s)
                 label = '\\n'.join(label)  # @todo: ???
                 graph.add_node(a)

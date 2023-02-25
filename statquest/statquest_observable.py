@@ -39,13 +39,7 @@ Copyright (c) 2023 Sławomir Marczyński.
 #  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 #  OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from collections import defaultdict
-
-import numpy as np
 from numpy import float32, float64, int32, int64
-from scipy import stats
-
-import pandas as pd
 
 import statquest_locale
 
@@ -107,6 +101,7 @@ class Observable:
             @todo
         """
         self.data = pandas_series.dropna()
+        # self.data = self.data[self.data.str.strip().astype(bool)]
         self.IS_ORDINAL = False
         self.IS_CONTINUOUS = False
         self.IS_NOMINAL = False
