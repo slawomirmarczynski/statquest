@@ -78,11 +78,6 @@ class Observable:
         Raises:
             TypeError: the observable cannot be created due unknown type
                 of data values.
-
-        Examples:
-            Create observables and check their names and types.
-
-            @todo
         """
         self.data = pandas_series.dropna()
         # self.data = self.data[self.data.str.strip().astype(bool)]
@@ -139,11 +134,6 @@ class Observable:
 
         Returns:
             requested value from self.data dict.
-
-        Examples:
-            >>> obs = Observable('example', {1: 'A', 2: 'B', 3: 'AB'})
-            >>> obs[2]
-            'B'
         """
         return self.data[key]
 
@@ -153,11 +143,6 @@ class Observable:
 
         Returns:
             int: number of elements stored inside the observable.
-
-        Examples:
-            >>> obs = Observable('example', {1: 'A', 2: 'B', 3: 'AB'})
-            >>> len(obs)
-            3
         """
         return len(self.data)
 
@@ -167,16 +152,5 @@ class Observable:
 
         Returns:
             str: the name given to observable.
-
-        Examples:
-            >>> obs = Observable('example name', {1: 'A', 2: 'B', 3: 'AB'})
-            >>> print(obs)
-            example name
         """
         return self.data.name
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)

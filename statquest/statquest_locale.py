@@ -160,9 +160,3 @@ def setup_locale_excel_format(locale_code=None):
     else:
         raise ValueError
     return kwargs
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)

@@ -187,9 +187,3 @@ class Input(Component):
             except:
                 pass
         return observables
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)

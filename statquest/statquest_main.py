@@ -40,17 +40,17 @@ Copyright (c) 2023 Sławomir Marczyński
 
 import tkinter as tk
 
-import matplotlib  # todo: move to gui?
+import matplotlib
 
 from scrollableframe import ScrollableFrame
-from statquest_intro import Intro
-from statquest_parameters import Parameters
-from statquest_suite import Suite
 from statquest_filesnames import FilesNames
 from statquest_input import Input
+from statquest_intro import Intro
 from statquest_launcher import Launcher
-from statquest_outtro import Outtro
 from statquest_output import Output
+from statquest_outtro import Outtro
+from statquest_parameters import Parameters
+from statquest_suite import Suite
 
 
 class Program:
@@ -88,7 +88,7 @@ class Program:
 
 
 def main():
-    matplotlib.use('TkAgg')  # todo: move to gui?
+    matplotlib.use('TkAgg')
     program = Program()
     program.run()
 

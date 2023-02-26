@@ -42,10 +42,9 @@ Copyright (c) 2023 Sławomir Marczyński
 import tkinter as tk
 from tkinter import ttk
 
-
 from statquest_component import Component
-from statquest_locale import get_supported_locales, \
-    setup_locale_translation_gettext, get_default_locale_code
+from statquest_locale import get_default_locale_code, get_supported_locales, \
+    setup_locale_translation_gettext
 
 _ = setup_locale_translation_gettext()
 
@@ -84,6 +83,7 @@ class Parameters(Component):
                 return 0 <= value <= 1
             except:
                 return False
+
         registred_alpha_validator = self._frame.register(alpha_validator)
 
         def drop_too_short_validator(string):
@@ -92,8 +92,9 @@ class Parameters(Component):
                 return value > 1
             except:
                 return False
-        registred_drop_to_short = self._frame.register(drop_too_short_validator)
 
+        registred_drop_to_short = self._frame.register(
+            drop_too_short_validator)
 
         def callback_correlations(*args):
             checkbox_correlations['state'] = (

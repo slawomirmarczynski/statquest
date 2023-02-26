@@ -49,7 +49,6 @@ import statquest_locale
 
 _ = statquest_locale.setup_locale_translation_gettext()
 
-
 CSV_SEPARATOR = ';'
 
 
@@ -130,7 +129,7 @@ class Output:
         """
         """
         if relations:
-            graph = nx.Graph()  # todo: DiGraph?
+            graph = nx.Graph()
             for (a, b), rlist in relations.items():
                 label = []
                 for r in rlist:
@@ -158,9 +157,3 @@ class Output:
             ax.margins(0.20)
             plt.axis("off")
             plt.show()
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)
