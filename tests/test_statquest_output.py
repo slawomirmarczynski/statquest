@@ -20,44 +20,37 @@ from unittest.mock import ANY, MagicMock, Mock
 from statquest_output import *
 
 
+# class TestOutputX(TestCase):
+#
+#     def test_output(self):
+#         """Args transmission"""
+#         file_name = os.devnull
+#         writer = Mock()
+#         content = Mock()
+#         output(file_name, writer, content, 'param', key1=1)
+#         writer.assert_any_call(content, ANY, 'param', key1=1)
+
+
 class TestOutput(TestCase):
 
-    def test_output(self):
-        """Args transmission"""
-        file_name = os.devnull
-        writer = Mock()
-        content = Mock()
-        output(file_name, writer, content, 'param', key1=1)
-        writer.assert_any_call(content, ANY, 'param', key1=1)
+    def test___init__1(self):
+        with self.assertRaises(TypeError):
+            output = Output()
 
-    def test_write_tests_doc(self):
-        """Writing from docstring to file"""
-        content = "Something important"
-        spamer = MagicMock()
-        spamer.__doc__ = content
-        sink = Mock()
-        write_tests_doc((spamer,), sink)
-        sink.write.assert_any_call(content)
+    def test___init__2(self):
+        parent_component = None
+        output = Output(parent_component)
+        self.assertIsNotNone(output)
 
-    def test_write_descriptive_statistics_csv(self):
-        obs = Mock()
-        obs.IS_CONTINUOUS = True
-        obs.descriptive_statistics.return_value = {'A': 123.45, 'B': 777.89}
-        sink = Mock()
-        write_descriptive_statistics_csv((obs,), sink)
+    def test___init__3(self):
+        parent_component = Mock()
+        output = Output(parent_component)
+        self.assertIsNotNone(output)
 
-    def test_write_elements_freq_csv(self):
-        obs = Mock()
-        obs.IS_ORDINAL = True
-        obs.frequency_table.return_value = {1: 10, 2: 20, 3: 1}
-        sink = Mock()
-        write_elements_freq_csv((obs,), sink)
-        sink.write.assert_called()
-
-    # @todo: Unit tests for writers of relation/relations.
-    #
-    # def test_write_relations_csv(self):
-    #     self.fail()
-    #
-    # def test_write_relations_dot(self):
-    #     self.fail()
+    def test_tests_csv(self):
+        parent_component = Mock()
+        parent_component.files_names.tests_csv.get.return_value = os.devnull
+        output = Output(parent_component)
+        relations = {(Mock(), Mock()): [Mock(), Mock(), Mock()]}
+        alpha = 0.05
+        output.tests_csv(relations, alpha)

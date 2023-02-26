@@ -48,28 +48,12 @@ _ = statquest_locale.setup_locale_translation_gettext()
 
 class Observable:
     """
-    Observable is the class whose objects hold labelled data.
+    Observable is the class whose objects hold data as Pandas Series.
 
-    Lets a database contain some values indexed by a primary key.
-    The Observable object encapsulate mapping (in fact a dict object)
-    between keys (some id) and values (for example height or most
-    favourite colour or number of children). Additionally, Observable
-    provide means to distinguish (and convert) nominal, ordinal and
-    continuous data, to compute frequency tables, means, variations etc.
-    And last but not least: observables are labelled objects, i.e. each
-    observable has got a name.
-
-    Observable types can be nominal, ordinal, or continuous.
-    An observable is continuous if its values are float point numbers.
-    An observable is ordinal if its values are int numbers.
-    An observable is nominal if its values are strings of characters.
-
-    Attributes:
-        name (str): the observable name.
-        data (dict): the observable data.
-        IS_CONTINUOUS (bool): read-only, True for a continuous scale
-        IS_NOMINAL (bool): read-only, True for a nominal scale
-        IS_ORDINAL (bool): read-only, True for an ordinal scale
+    Observable types can be nominal, ordinal, or continuous. An observable
+    is continuous if its values can be used as float point numbers. It is
+    ordinal if its values can be used as integer numbers. It is nominal if
+    its values can be used as strings of characters.
     """
 
     # Integer types are promoted to float-point in computations,

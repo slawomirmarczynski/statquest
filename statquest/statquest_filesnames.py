@@ -69,10 +69,7 @@ class FilesNames(Component):
         self.input_csv = tk.StringVar()
         self.tests_dot = tk.StringVar()
         self.profi_htm = tk.StringVar()
-        self.freqs_csv = tk.StringVar()
-        self.stats_csv = tk.StringVar()
         self.tests_csv = tk.StringVar()
-        self.tests_txt = tk.StringVar()
 
         def callback_input(*args):
             """
@@ -99,10 +96,7 @@ class FilesNames(Component):
             name, extension = os.path.splitext(tail)
             name = re.sub(r'_links$', '', name)
             self.profi_htm.set(os.path.join(head, name + '_profile' + '.html'))
-            self.freqs_csv.set(os.path.join(head, name + '_freqs' + '.csv'))
-            self.stats_csv.set(os.path.join(head, name + '_stats' + '.csv'))
             self.tests_csv.set(os.path.join(head, name + '_tests' + '.csv'))
-            self.tests_txt.set(os.path.join(head, name + '_tests' + '.txt'))
             self.callback(*args)
 
         def pick_open():
@@ -139,10 +133,7 @@ class FilesNames(Component):
         self.input_csv.trace_add('write', callback_input)
         self.tests_dot.trace_add('write', callback_output)
         self.profi_htm.trace_add('write', self.callback)
-        self.freqs_csv.trace_add('write', self.callback)
-        self.stats_csv.trace_add('write', self.callback)
         self.tests_csv.trace_add('write', self.callback)
-        self.tests_txt.trace_add('write', self.callback)
 
         # An abbreviation of self._frame.
         #

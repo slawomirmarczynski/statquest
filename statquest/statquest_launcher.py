@@ -47,7 +47,7 @@ import ydata_profiling as pandas_profiling
 from progress import Progress
 from statquest_component import Component
 from statquest_locale import setup_locale_translation_gettext
-from statquest_relations import Relation
+from statquest_relation import Relation
 
 _ = setup_locale_translation_gettext()
 
@@ -115,6 +115,7 @@ class Launcher(Component):
                     title='StatQuest',
                     message='Coś nie tak, może po prostu brak danych?\n'
                             'Sprawdź i spróbuj ponownie')
+                raise ex
             label['text'] = ''
             enable_siblings(True)
             self.progress.set(0)

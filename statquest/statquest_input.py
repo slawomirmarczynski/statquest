@@ -64,14 +64,15 @@ class Input(Component):
         self._code = None
         self.is_csv_file = False
         self.is_excel_file = False
-        self._cbs = []
+        self._name_variable_list = []
+        self._marked_for_destroy = []
 
         def select_all(*args):
-            for name, variable, checkbox in self._cbs:
+            for variable in self._name_variable_list:
                 variable.set(True)
 
         def select_none(*args):
-            for name, variable, checkbox in self._cbs:
+            for variable in self._name_variable_list:
                 variable.set(False)
 
         label = ttk.Label(
@@ -101,10 +102,12 @@ class Input(Component):
                 self._code = code
                 self.is_csv_file = False
                 self.is_excel_file = False
-                for name, variable, checkbox in self._cbs:
-                    checkbox.destroy()
+                for widget in self._marked_for_destroy:
+                    widget.destroy()
+                self._marked_for_destroy.clear()
+                for name, variable in self._name_variable_list:
                     del variable
-                self._cbs.clear()
+                self._name_variable_list.clear()
                 if self._file_name and os.path.exists(self._file_name):
                     __, extension = os.path.splitext(self._file_name)
                     if extension.lower() == '.xlsx':
@@ -129,10 +132,11 @@ class Input(Component):
                             onvalue=True,
                             offvalue=False)
                         checkbox.grid(row=i, column=1, sticky='we')
-                        self._cbs.append((name, variable, checkbox))
+                        self._name_variable_list.append((name, variable))
+                        self._marked_for_destroy.append(checkbox)
 
                         try:
-                            series = self._data_frame[name].dropna()
+                            series = self._data_frame[name]
                             obs = Observable(series)
                             tn = 'nominal' if obs.IS_NOMINAL else '--'
                             to = 'ordinal' if obs.IS_ORDINAL else '--'
@@ -143,6 +147,9 @@ class Input(Component):
                             ln.grid(row=i, column=2, sticky='w', padx=10)
                             lo.grid(row=i, column=3, sticky='w', padx=10)
                             lc.grid(row=i, column=4, sticky='w', padx=10)
+                            self._marked_for_destroy.append(ln)
+                            self._marked_for_destroy.append(lo)
+                            self._marked_for_destroy.append(lc)
                         except:
                             pass
         except:
@@ -158,7 +165,7 @@ class Input(Component):
 
     def get_data_frame(self):
         headers = []
-        for name, variable, checkbox in self._cbs:
+        for name, variable in self._name_variable_list:
             if variable.get():
                 headers.append(name)
         try:

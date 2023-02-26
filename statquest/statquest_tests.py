@@ -49,7 +49,7 @@ import pandas as pd
 from scipy import stats
 
 import statquest_locale
-from statquest_relations import Relation
+from statquest_relation import Relation
 
 _ = statquest_locale.setup_locale_translation_gettext()
 
