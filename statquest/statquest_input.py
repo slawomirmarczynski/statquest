@@ -77,13 +77,13 @@ class Input(Component):
 
         label = ttk.Label(
             self._frame,
-            text=_('Wybór kolumn'))
+            text=_('Selecting columns with data for testing'))
         button_all = ttk.Button(
             self._frame,
-            text=_('wszystkie'),
+            text=_('all'),
             command=select_all)
         button_none = ttk.Button(
-            self._frame, text=_('żadna'),
+            self._frame, text=_('none'),
             command=select_none)
         label_spacer = ttk.Label(self._frame)
 
@@ -138,9 +138,9 @@ class Input(Component):
                         try:
                             series = self._data_frame[name]
                             obs = Observable(series)
-                            tn = 'nominal' if obs.IS_NOMINAL else '--'
-                            to = 'ordinal' if obs.IS_ORDINAL else '--'
-                            tc = 'continuous' if obs.IS_CONTINUOUS else '--'
+                            tn = _('nominal') if obs.IS_NOMINAL else '--'
+                            to = _('ordinal') if obs.IS_ORDINAL else '--'
+                            tc = _('continuous') if obs.IS_CONTINUOUS else '--'
                             ln = ttk.Label(self._frame, text=tn, width=10)
                             lo = ttk.Label(self._frame, text=to, width=10)
                             lc = ttk.Label(self._frame, text=tc, width=10)
@@ -187,9 +187,3 @@ class Input(Component):
             except:
                 pass
         return observables
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)

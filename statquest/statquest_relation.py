@@ -122,11 +122,9 @@ class Relation:
                 if (a, b) in known_pairs:
                     continue
                 known_pairs.add((a, b))
-                # known_pairs.add((b, a))
                 rel = []
                 for test in tests:
                     if test in known_triplets:
-                        print('$', end='')
                         continue
                     known_triplets.add((a, b, test))
                     if test.is_symetric:
@@ -135,8 +133,6 @@ class Relation:
                         print(f'{a} nietestowalne z {b}.', file=sys.stderr)
                         continue
                     if test.can_be_carried_out(a, b):
-                        # @todo: remove can_be_... - use exceptions
-                        #        instead
                         try:
                             rel.append(test(a, b))
                         except:
@@ -196,9 +192,3 @@ class Relation:
             if list_:
                 result[key] = list_
         return result
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)

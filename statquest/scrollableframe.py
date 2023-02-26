@@ -49,12 +49,11 @@ class ScrollableFrame(ttk.Frame):
 
     def __init__(self, *args, **kwargs):
         """
-        Tworzenie subklasy tkinter.ttk.Frame umożliwiającej przewijanie
-        pionowe.
+        Creating a tkinter.ttk.Frame subclass to allow vertical scrolling.
 
         Args:
-            *args: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
-            **kwargs: takie same jak dla klasy bazowej, tj. tkinter.tk.Frame.
+            *args: the same as for the base class, i.e. tkinter.tk.Frame.
+            **kwargs: the same as for the base class, i.e. tkinter.tk.Frame.
         """
         super().__init__(*args, **kwargs)
 
@@ -85,10 +84,8 @@ class ScrollableFrame(ttk.Frame):
         # be refreshed in this situation.
         #
         self._scrollable_frame = ttk.Frame(canvas)
-        self._scrollable_frame.bind(
-            '<Configure>',
-            lambda event: canvas.configure(scrollregion=canvas.bbox('all'))
-        )
+        self._scrollable_frame.bind('<Configure>',
+            lambda event: canvas.configure(scrollregion=canvas.bbox('all')))
 
         # Adding content - another widget - to the canvas is done method
         # create_window. The name may be associated with some factory or
@@ -98,8 +95,8 @@ class ScrollableFrame(ttk.Frame):
         # After inserting, we get the ID of the inserted element, which will
         # be very useful to us soon.
         #
-        scrollable_frame_canvas_id = canvas.create_window(
-            (0, 0), window=self._scrollable_frame, anchor='nw')
+        scrollable_frame_canvas_id = canvas.create_window((0, 0),
+            window=self._scrollable_frame, anchor='nw')
 
         # Now the hard part - we add an observer to watch over the width of
         # the canvas matched the width of the area what is available. If we
@@ -110,8 +107,8 @@ class ScrollableFrame(ttk.Frame):
         #
         def update_scrollable_frame_width(event):
             if self._scrollable_frame.winfo_reqwidth() != canvas.winfo_width():
-                canvas.itemconfigure(
-                    scrollable_frame_canvas_id, width=canvas.winfo_width())
+                canvas.itemconfigure(scrollable_frame_canvas_id,
+                    width=canvas.winfo_width())
 
         canvas.bind('<Configure>', update_scrollable_frame_width)
 
@@ -123,16 +120,14 @@ class ScrollableFrame(ttk.Frame):
 
         # We're also adding mouse wheel scrolling.
         #
-        canvas.bind_all(
-            "<MouseWheel>",
-            lambda event:
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-        )
+        canvas.bind_all("<MouseWheel>",
+            lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)),
+                                              "units"))
 
     @property
     def scrollable_frame(self):
         """
-        Scrollable window as read-only property.
+        The scrollable window as a read-only property.
 
         Returns:
             tkinter.ttk.Frame class object where widgets can be embedded.

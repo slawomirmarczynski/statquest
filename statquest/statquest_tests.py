@@ -177,11 +177,6 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
-
-        Note:
-            Why this initializer has no parameters (except self)? Each
-            test have completely different logic and must be hard-coded
-            from a scratch. It is useless call parametrized initializer.
         """
         super().__init__()  # not necessary, but it is safer
 
@@ -282,11 +277,6 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
-
-        Note:
-            Why this initializer has no parameters (except self)? Each
-            test have completely different logic and must be hard-coded
-            from a scratch. It is useless call parametrized initializer.
         """
         super().__init__()
         self.name = _('Kruskal-Wallis Test')
@@ -407,11 +397,6 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
-
-        Note:
-            Why this initializer has no parameters (except self)? Each
-            test have completely different logic and must be hard-coded
-            from a scratch. It is useless call parametrized initializer.
         """
         super().__init__()
         self.name = _('Pearson Correlation Test')
@@ -506,11 +491,6 @@ class SpearmanRTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
-
-        Note:
-            Why this initializer has no parameters (except self)? Each
-            test have completely different logic and must be hard-coded
-            from a scratch. It is useless call parametrized initializer.
         """
         super().__init__()
         self.name = _('Spearman r test')
@@ -605,11 +585,6 @@ class KendallTauTest(Test):  # pylint: disable=C0111
     def __init__(self):
         """
         Init test.
-
-        Note:
-            Why this initializer has no parameters (except self)? Each
-            test have completely different logic and must be hard-coded
-            from a scratch. It is useless call parametrized initializer.
         """
         super().__init__()
         self.name = _('Kendall tau test')
@@ -679,8 +654,3 @@ ALL_STATISTICAL_TESTS = (ChiSquareIndependenceTest(),
                          PearsonCorrelationTest(),
                          SpearmanRTest(),
                          KendallTauTest())
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod(optionflags=doctest.ELLIPSIS)

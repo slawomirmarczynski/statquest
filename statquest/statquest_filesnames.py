@@ -141,12 +141,12 @@ class FilesNames(Component):
 
         # Create widgets: labels.
         #
-        label_input = ttk.Label(frame, text=_('Dane wejściowe'))
-        label_output = ttk.Label(frame, text=_('Wyniki obliczeń'))
-        label_input_csv = ttk.Label(frame, text=_('Dane (CSV lub XSLX):'))
-        label_tests_dot = ttk.Label(frame, text=_('Graf zależności:'))
-        label_profi_htm = ttk.Label(frame, text=_('Profil:'))
-        label_tests_csv = ttk.Label(frame, text=_('Wyniki testów:'))
+        label_input = ttk.Label(frame, text=_('Input data files'))
+        label_output = ttk.Label(frame, text=_('Output data files'))
+        label_input_csv = ttk.Label(frame, text=_('Input worksheet:'))
+        label_tests_dot = ttk.Label(frame, text=_('Dependency graph:'))
+        label_profi_htm = ttk.Label(frame, text=_('Profile:'))
+        label_tests_csv = ttk.Label(frame, text=_('Detail results:'))
 
         # Create widgets: entry fields with models (i.e. traced variables).
         #
@@ -159,19 +159,19 @@ class FilesNames(Component):
         #
         button_input_csv = ttk.Button(
             frame,
-            text=_('zmień wszystko'),
+            text=_('change all files'),
             command=lambda: pick_open())
         button_tests_dot = ttk.Button(
             frame,
-            text=_('zmień pozostałe'),
+            text=_('change output files'),
             command=lambda: pick_save(self.tests_dot, ".txt"))
         button_profi_htm = ttk.Button(
             frame,
-            text=_('zmień'),
+            text=_('change'),
             command=lambda: pick_save(self.profi_htm, ".csv"))
         button_tests_csv = ttk.Button(
             frame,
-            text=_('zmień'),
+            text=_('change'),
             command=lambda: pick_save(self.tests_csv, ".csv"))
 
         # TL;DR - all elements are placed by the grid manager
