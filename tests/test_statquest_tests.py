@@ -21,12 +21,19 @@ from statquest_tests import *
 class TestTest(TestCase):
 
     def setUp(self):
-        data_int = {1: 1, 2: 2, 3: 4, 4: 5, 5: 66, 6: 34, 7: -2}
-        data_float = {1: 1.5, 2.3: 2, 3: 4, 4: 5, 5: 66, 6: 34, 7: -2.5}
-        data_str = {1: 'a', 2: 'b', 3: 'c', 4: 'cc', 5: 'abc'}
-        self.obs_ordinal = Observable('ord obs', data_int)
-        self.obs_continuous = Observable('cont obs', data_float)
-        self.obs_nominal = Observable('nom obs', data_str)
+        self.N = 100
+        data_int = pd.Series(
+            {i: int(100 * i) for i in range(1, self.N + 1)}, name='di')
+        data_float = pd.Series(
+            {i: float(100 * i + 0.5) for i in range(1, self.N + 1)}, name='df')
+        data_str = pd.Series(
+            {i: str(100 * i) for i in range(1, self.N + 1)}, name='ds')
+        self.observable_ordinal = Observable(data_int)
+        self.observable_continuous = Observable(data_float)
+        self.observable_nominal = Observable(data_str)
+        del data_int
+        del data_float
+        del data_str
 
     def test___init__(self):
         # with self.assertRaises(TypeError):

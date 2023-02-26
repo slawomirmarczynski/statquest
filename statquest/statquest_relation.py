@@ -109,6 +109,8 @@ class Relation:
         """
         # pylint: disable=invalid-name  # short names a, b are ok
         relations = {}
+        if not observables or not tests:
+            return relations
         known_pairs = set((a, a) for a in observables)
         known_triplets = set()
         if progress:
