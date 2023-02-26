@@ -28,9 +28,9 @@ class TestTest(TestCase):
             {i: float(100 * i + 0.5) for i in range(1, self.N + 1)}, name='df')
         data_str = pd.Series(
             {i: str(100 * i) for i in range(1, self.N + 1)}, name='ds')
-        self.observable_ordinal = Observable(data_int)
-        self.observable_continuous = Observable(data_float)
-        self.observable_nominal = Observable(data_str)
+        self.obs_ordinal = Observable(data_int)
+        self.obs_continuous = Observable(data_float)
+        self.obs_nominal = Observable(data_str)
         del data_int
         del data_float
         del data_str
@@ -90,6 +90,18 @@ class TestKruskalWallisTest(TestTest):
 
 
 class TestPearsonCorrelationTest(TestTest):
+    def setUp(self):
+        super().setUp()
+        self.test = PearsonCorrelationTest()
+
+
+class TestSpearmanRTest(TestTest):
+    def setUp(self):
+        super().setUp()
+        self.test = PearsonCorrelationTest()
+
+
+class TestKendallTauTest(TestTest):
     def setUp(self):
         super().setUp()
         self.test = PearsonCorrelationTest()
