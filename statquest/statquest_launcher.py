@@ -105,7 +105,7 @@ class Launcher(Component):
 
         def callback(*args):
             enable_siblings(False)
-            label['text'] = 'przeprowadzam obliczenia'
+            label['text'] = _('running computations')
             label['state'] = 'normal'
             self._frame.master.update()
             try:
@@ -113,15 +113,15 @@ class Launcher(Component):
             except Exception as ex:
                 tk.messagebox.showwarning(
                     title='StatQuest',
-                    message='Coś nie tak, może po prostu brak danych?\n'
-                            'Sprawdź i spróbuj ponownie')
+                    message=_('Something goes wrong... missing data?\n'
+                              'Check and run again.'))
                 raise ex
             label['text'] = ''
             enable_siblings(True)
             self.progress.set(0)
 
         button = ttk.Button(self._frame,
-                            text="Uruchom obliczenia",
+                            text=_("Run"),
                             command=callback)
         button.grid(row=0, column=0, padx=20)
 

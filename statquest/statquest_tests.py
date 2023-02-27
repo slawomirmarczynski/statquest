@@ -180,8 +180,8 @@ class ChiSquareIndependenceTest(Test):  # pylint: disable=C0111
         """
         super().__init__()  # not necessary, but it is safer
 
-        self.name = _("Pearson's Chi-Square Test of Independence")
-        self.name_short = _("chi-square")  # should not exceed n chars
+        self.name = _("Pearson's Chi-Square test of independence")
+        self.name_short = _("chi-square independence")
         self.stat_name = 'chi-square'
         self.h0_thesis = _('H0: variables are independent')
         self.h1_thesis = _('H1: variables are not independent')
@@ -279,7 +279,7 @@ class KruskalWallisTest(Test):  # pylint: disable=C0111
         Init test.
         """
         super().__init__()
-        self.name = _('Kruskal-Wallis Test')
+        self.name = _('Kruskal-Wallis test')
         self.name_short = _("Kruskal-Wallis")  # should not exceed n chars
         self.stat_name = 'H'
         self.h0_thesis = _('H0: distributions are equal')
@@ -399,9 +399,9 @@ class PearsonCorrelationTest(Test):  # pylint: disable=C0111
         Init test.
         """
         super().__init__()
-        self.name = _('Pearson Correlation Test')
-        self.name_short = _('Pearson Correlation')
-        self.stat_name = _('r')
+        self.name = _('Pearson correlation test')
+        self.name_short = _('Pearson r')
+        self.stat_name = 'r'
         self.h0_thesis = _('H0: data are not correlated')
         self.h1_thesis = _('H1: data are correlated')
         self.prove_relationship = True
@@ -495,7 +495,7 @@ class SpearmanRTest(Test):  # pylint: disable=C0111
         super().__init__()
         self.name = _('Spearman r test')
         self.name_short = _('Spearman r')
-        self.stat_name = _('r')
+        self.stat_name = 'r'
         self.h0_thesis = _('H0: data are not correlated')
         self.h1_thesis = _('H1: data are correlated')
         self.prove_relationship = True
@@ -589,7 +589,7 @@ class KendallTauTest(Test):  # pylint: disable=C0111
         super().__init__()
         self.name = _('Kendall tau test')
         self.name_short = _('Kendall tau')
-        self.stat_name = _('r')
+        self.stat_name = 'r'
         self.h0_thesis = _('H0: data are not correlated')
         self.h1_thesis = _('H1: data are correlated')
         self.prove_relationship = True

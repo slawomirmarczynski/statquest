@@ -130,13 +130,15 @@ class Relation:
                     if test.is_symetric:
                         known_triplets.add((b, a, test))
                     if len(set(a.data.keys()) & set(b.data.keys())) < 2:
-                        print(f'{a} nietestowalne z {b}.', file=sys.stderr)
+                        print(_('{} cannot be tested vs. {}').format(a, b),
+                              file=sys.stderr)
                         continue
                     if test.can_be_carried_out(a, b):
                         try:
                             rel.append(test(a, b))
                         except:
-                            print(f'Nieudany {test} dla {a} vs. {b}',
+                            print(_('Unable perform {} for {} vs. {}')
+                                  .format(test, a, b),
                                   file=sys.stderr)
                 relations[(a, b)] = rel
 

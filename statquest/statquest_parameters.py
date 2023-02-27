@@ -106,11 +106,12 @@ class Parameters(Component):
         self.need_correlations.trace_add('write', self.callback)
         self.locale_code.trace_add('write', self.callback)
 
-        label = ttk.Label(self._frame, text=_('Parametry'))
+        label = ttk.Label(self._frame, text=_('Parameters'))
         label.grid(row=0, column=0, columnspan=4, sticky='w')
 
         label_alpha = ttk.Label(
-            self._frame, text=_('α jako krytyczna wartość dla p-value:'))
+            self._frame,
+            text=_('The significance level α for p-value:'))
         label_alpha.grid(row=1, column=0, sticky='e')
 
         spinbox_alpha = ttk.Spinbox(
@@ -121,28 +122,30 @@ class Parameters(Component):
         spinbox_alpha.grid(row=1, column=1, sticky='w')
         label_alpha_comment = ttk.Label(
             self._frame,
-            text=_('Wartość parametru α musi spełniać warunek 0 ⩽ α ⩽ 1.'))
+            text=_('The α value is a probability, therefore 0 ⩽ α ⩽ 1.'))
         label_alpha_comment.grid(row=1, column=2, sticky='w')
 
         checkbox_profile = ttk.Checkbutton(
-            self._frame, text=_('generowanie raportu Ydata Profile'),
+            self._frame,
+            text=_('should generate Ydata Profile'),
             variable=self.need_profile, onvalue=True, offvalue=False)
         checkbox_profile.grid(row=2, column=0, sticky='w')
-        label_profile_comment = ttk.Label(self._frame, text=_(
-            'Oblicza statystyki. Nie wpływa na testy.'))
+        label_profile_comment = ttk.Label(
+            self._frame,
+            text=_('This option is not dependent on tests.'))
         label_profile_comment.grid(row=2, column=2, sticky='w')
         checkbox_correlations = ttk.Checkbutton(
-            self._frame, text=_('korelacje w raporcie Ydata Profile '),
+            self._frame,
+            text=_('should compute correlations in Ydata Profile '),
             variable=self.need_correlations,
             onvalue=True, offvalue=False)
         checkbox_correlations.grid(row=3, column=0, sticky='w')
         label_profile_comment_correlations = ttk.Label(
             self._frame,
-            text='Włącza obliczanie korelacji w raporcie Ydata Profile.'
-                 ' Nie wpływa na testy.')
+            text=_('Turn on correlations in Ydata Profile.'))
         label_profile_comment_correlations.grid(row=3, column=2, sticky='w')
 
-        label_locale = ttk.Label(self._frame, text='ustawienia regionalne:')
+        label_locale = ttk.Label(self._frame, text=_('locale settings:'))
         label_locale.grid(row=4, column=0, sticky='e')
         combobox_locale = ttk.Combobox(self._frame, width=8,
                                        textvariable=self.locale_code)
@@ -150,10 +153,12 @@ class Parameters(Component):
         combobox_locale['values'] = get_supported_locales()
         label_locale_comment = ttk.Label(
             self._frame,
-            text=_('Ustala szczegóły takie jak znak przecinka dziesiętnego.'))
+            text=_('The decimal separator, the CSV separator encodings.'))
         label_locale_comment.grid(row=4, column=2, sticky='w')
 
-        label_drop = ttk.Label(self._frame, text='progowa liczba danych:')
+        label_drop = ttk.Label(
+            self._frame,
+            text=_('the data threshold:'))
         label_drop.grid(row=5, column=0, sticky='e')
         spinbox_drop = ttk.Spinbox(
             self._frame, from_=2, to=1000000, increment=1,
@@ -163,9 +168,9 @@ class Parameters(Component):
         spinbox_drop.grid(row=5, column=1, sticky='w')
         leabel_drop_comment = ttk.Label(
             self._frame,
-            text='Jeżeli ilość danych w kolumnie będzie mniejsza, to cała '
-                 'kolumna zostanie odrzucona jako niereprezentatywna dla '
-                 'danych.')
+            text=_("If the amount of data in the column is less than the"
+                   " threshold, then whole column will be rejected as not"
+                   " representative of the data."))
         leabel_drop_comment.grid(row=5, column=2, sticky='w')
 
         for widget in self._frame.winfo_children():
