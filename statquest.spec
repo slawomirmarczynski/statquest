@@ -8,8 +8,12 @@ my_prefix = os.getenv('CONDA_PREFIX')
 my_site = my_prefix + r'\Lib\site-packages'
 my_pcg = r'\ydata_profiling\report\presentation\flavours\html\templates'
 
+my_locale = r'statquest\locale'
+my_locale_dest = r'locale'
+
 added_files = [
-    (my_site + my_pcg, '.' + my_pcg)
+    (my_site + my_pcg, '.' + my_pcg),
+    (my_locale, my_locale_dest),
 ]
 
 a = Analysis(
