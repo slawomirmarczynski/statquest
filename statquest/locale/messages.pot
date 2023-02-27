@@ -1,0 +1,243 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2023-02-27 23:03+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: redgettext 3.4.2\n"
+
+#: statquest\statquest_filesnames.py:144
+msgid "Input data files"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:145
+msgid "Output data files"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:146
+msgid "Input worksheet:"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:147
+msgid "Dependency graph:"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:148
+msgid "Profile:"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:149
+msgid "Detail results:"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:162
+msgid "change all files"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:166
+msgid "change output files"
+msgstr ""
+
+#: statquest\statquest_filesnames.py:170 statquest\statquest_filesnames.py:174
+msgid "change"
+msgstr ""
+
+#: statquest\statquest_input.py:80
+msgid "Selecting columns with data for testing"
+msgstr ""
+
+#: statquest\statquest_input.py:83
+msgid "all"
+msgstr ""
+
+#: statquest\statquest_input.py:86
+msgid "none"
+msgstr ""
+
+#: statquest\statquest_input.py:141
+msgid "nominal"
+msgstr ""
+
+#: statquest\statquest_input.py:142
+msgid "ordinal"
+msgstr ""
+
+#: statquest\statquest_input.py:143
+msgid "continuous"
+msgstr ""
+
+#: statquest\statquest_launcher.py:108
+msgid "running computations"
+msgstr ""
+
+#: statquest\statquest_launcher.py:116
+msgid ""
+"Something goes wrong... missing data?\n"
+"Check and run again."
+msgstr ""
+
+#: statquest\statquest_launcher.py:124
+msgid "Run"
+msgstr ""
+
+#: statquest\statquest_output.py:75
+msgid "data1"
+msgstr ""
+
+#: statquest\statquest_output.py:75
+msgid "data2"
+msgstr ""
+
+#: statquest\statquest_output.py:76
+msgid "related?"
+msgstr ""
+
+#: statquest\statquest_output.py:77 statquest\statquest_tests.py:83
+#: statquest\statquest_tests.py:84
+msgid "test"
+msgstr ""
+
+#: statquest\statquest_output.py:77
+msgid "stat"
+msgstr ""
+
+#: statquest\statquest_output.py:78
+msgid "value"
+msgstr ""
+
+#: statquest\statquest_output.py:78
+msgid "p_value"
+msgstr ""
+
+#: statquest\statquest_parameters.py:109
+msgid "Parameters"
+msgstr ""
+
+#: statquest\statquest_parameters.py:114
+msgid "The significance level α for p-value:"
+msgstr ""
+
+#: statquest\statquest_parameters.py:125
+msgid "The α value is a probability, therefore 0 ⩽ α ⩽ 1."
+msgstr ""
+
+#: statquest\statquest_parameters.py:130
+msgid "should generate Ydata Profile"
+msgstr ""
+
+#: statquest\statquest_parameters.py:135
+msgid "This option is not dependent on tests."
+msgstr ""
+
+#: statquest\statquest_parameters.py:139
+msgid "should compute correlations in Ydata Profile "
+msgstr ""
+
+#: statquest\statquest_parameters.py:145
+msgid "Turn on correlations in Ydata Profile."
+msgstr ""
+
+#: statquest\statquest_parameters.py:148
+msgid "locale settings:"
+msgstr ""
+
+#: statquest\statquest_parameters.py:156
+msgid "The decimal separator, the CSV separator encodings."
+msgstr ""
+
+#: statquest\statquest_parameters.py:161
+msgid "the data threshold:"
+msgstr ""
+
+#: statquest\statquest_parameters.py:171
+msgid ""
+"If the amount of data in the column is less than the threshold, then whole "
+"column will be rejected as not representative of the data."
+msgstr ""
+
+#: statquest\statquest_relation.py:133
+msgid "{} cannot be tested vs. {}"
+msgstr ""
+
+#: statquest\statquest_relation.py:140
+msgid "Unable perform {} for {} vs. {}"
+msgstr ""
+
+#: statquest\statquest_tests.py:86
+msgid "H0: null hypothesis"
+msgstr ""
+
+#: statquest\statquest_tests.py:87
+msgid "H1: alternative hypothesis"
+msgstr ""
+
+#: statquest\statquest_tests.py:183
+msgid "Pearson's Chi-Square test of independence"
+msgstr ""
+
+#: statquest\statquest_tests.py:184
+msgid "chi-square independence"
+msgstr ""
+
+#: statquest\statquest_tests.py:186
+msgid "H0: variables are independent"
+msgstr ""
+
+#: statquest\statquest_tests.py:187
+msgid "H1: variables are not independent"
+msgstr ""
+
+#: statquest\statquest_tests.py:282
+msgid "Kruskal-Wallis test"
+msgstr ""
+
+#: statquest\statquest_tests.py:283
+msgid "Kruskal-Wallis"
+msgstr ""
+
+#: statquest\statquest_tests.py:285
+msgid "H0: distributions are equal"
+msgstr ""
+
+#: statquest\statquest_tests.py:286
+msgid "H1: distributions are not equal"
+msgstr ""
+
+#: statquest\statquest_tests.py:402
+msgid "Pearson correlation test"
+msgstr ""
+
+#: statquest\statquest_tests.py:403
+msgid "Pearson r"
+msgstr ""
+
+#: statquest\statquest_tests.py:405 statquest\statquest_tests.py:499
+#: statquest\statquest_tests.py:593
+msgid "H0: data are not correlated"
+msgstr ""
+
+#: statquest\statquest_tests.py:406 statquest\statquest_tests.py:500
+#: statquest\statquest_tests.py:594
+msgid "H1: data are correlated"
+msgstr ""
+
+#: statquest\statquest_tests.py:496
+msgid "Spearman r test"
+msgstr ""
+
+#: statquest\statquest_tests.py:497
+msgid "Spearman r"
+msgstr ""
+
+#: statquest\statquest_tests.py:590
+msgid "Kendall tau test"
+msgstr ""
+
+#: statquest\statquest_tests.py:591
+msgid "Kendall tau"
+msgstr ""
