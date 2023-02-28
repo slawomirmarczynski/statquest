@@ -14,6 +14,7 @@ Authors:
 
 Copyright (c) 2023 Sławomir Marczyński
 """
+import os
 #  Copyright (c) 2023 Sławomir Marczyński. All rights reserved.
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -40,10 +41,12 @@ Copyright (c) 2023 Sławomir Marczyński
 
 
 import re
+import sys
 import textwrap
 from tkinter import ttk
 
 from statquest_component import Component
+from statquest_locale import get_default_locale_code
 
 
 def dedentln(string):
@@ -68,43 +71,15 @@ class Intro(Component):
         super().__init__(parent_component, parent_frame, *args, **kwargs)
 
         text = dedentln(
-            # '''
-            # StatQuest, aplikacja metod statystycznych do analizy danych.
-            #
-            # Program StatQuest służy do analizy danych wskaźnikowych,
-            # porządkowych i kategorycznych. Nie obsługiwane są w nim dane
-            # przedziałowe.
-            #
-            # Przykładem danych wskaźnikowych może być wartości napięcia ogniw
-            # AAA mierzone w woltach. Będą to wartości wyrażone liczbami
-            # zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52.
-            # W takim przypadku mamy wartości dla których sens ma obliczanie
-            # średniej arytmetycznej, odchylenia standardowego itp.
-            #
-            # Dane porządkowe są w programie StatQuest rozumiane jako takie które
-            # można opisać liczbami całkowitymi. Czy ma sens obliczanie średniej
-            # dla takich danych? Może mieć, może nie mieć. Przykładowo jeżeli
-            # osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
-            # dla danej populacji średnia coś mówi o tym jaki procent ludzi jest
-            # wysokich w tej populacji. Jeżeli dodamy jeszcze kod 2 dla rudych
-            # oraz kod 3 dla mieszkańców małych miasteczek... to obliczona
-            # technikami statystycznymi średnia nie ma sensu.
-            # Choć same obliczenia są/byłyby dość proste.
-            #
-            # Dane kategoryczne to takie dane które nie są wyrażalne liczbami.
-            # Dobrym przykładem może być kolor oczu: niebieskie, zielone, ...
-            # Każda wartość jest wyrażona nie-liczbowo, nie da się obliczyć
-            # średniej czy odchylenia standardowego.
-            # '''
             '''
-            StatQuest, an application of statistical methods for data analysis.
+            StatQuest - statistical methods for data analysis.
     
-            The StatQuest program is used to analyze indicator data, ordinal
-            and categorical. Data is not supported compartment. 
+            The StatQuest program is intended for to statistical analysis
+            of nominal, ordinal and continuous data. 
     
-            An example of indicator data can be cell voltage values AAA
-            measured in volts. These will be values expressed in numbers
-            floating points such as 1.45, 1.39, 1.52. In this case, we have
+            An example of continuous data can be AAA cell voltage values 
+            measured in volts. These will be values expressed in floating 
+            point numbers like 1.45, 1.39, 1.52. In this case, we have
             values for which the calculation makes sense arithmetic mean,
             standard deviation, etc.
     
@@ -112,12 +87,10 @@ class Intro(Component):
              described with integers. Does it make sense to calculate the 
              average for such data? Might have, might not have. For example if
              we will assign 1 as code to tall people and 0 to short people,
-             then it is calculated For a given population, the mean says
+             then it is calculated for a given population, the mean says
              something about what percentage of people there are high in this
-             population. If we add code 2 for redheads and code 3 for small
-             town residents... it's calculated with statistical techniques,
-             the average makes no sense. Although the calculations themselves
-             are/would be quite simple.
+             population. If we add code 2 for big city and code 3 for small
+             town... then the average makes no sense.
     
              Categorical data is data that cannot be expressed in numbers.
              A good example would be the color of the eyes: blue, green, ...
@@ -126,6 +99,14 @@ class Intro(Component):
              '''
         )
 
+        try:
+            code = get_default_locale_code()
+            with open(os.path.join('locale', code, 'intro.txt')) as file:
+                text = file.read()
+        except:
+            pass
+
+        text = dedentln(text)
         label = ttk.Label(self._frame, text=text)
         label.bind('<Configure>',
                    lambda event: label.config(wraplength=label.winfo_width()))

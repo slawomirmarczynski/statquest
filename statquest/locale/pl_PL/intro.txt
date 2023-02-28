@@ -1,0 +1,26 @@
+StatQuest, aplikacja metod statystycznych do analizy danych.
+
+Program StatQuest s³u¿y do analizy danych wskaŸnikowych,
+porz¹dkowych i kategorycznych. Nie obs³ugiwane s¹ w nim dane
+przedzia³owe.
+
+Przyk³adem danych wskaŸnikowych mo¿e byæ wartoœci napiêcia ogniw
+AAA mierzone w woltach. Bêd¹ to wartoœci wyra¿one liczbami
+zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52.
+W takim przypadku mamy wartoœci dla których sens ma obliczanie
+œredniej arytmetycznej, odchylenia standardowego itp.
+
+Dane porz¹dkowe s¹ w programie StatQuest rozumiane jako takie które
+mo¿na opisaæ liczbami ca³kowitymi. Czy ma sens obliczanie œredniej
+dla takich danych? Mo¿e mieæ, mo¿e nie mieæ. Przyk³adowo je¿eli
+osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
+dla danej populacji œrednia coœ mówi o tym jaki procent ludzi jest
+wysokich w tej populacji. Je¿eli dodamy jeszcze kod 2 dla rudych
+oraz kod 3 dla mieszkañców ma³ych miasteczek... to obliczona
+technikami statystycznymi œrednia nie ma sensu.
+Choæ same obliczenia s¹/by³yby doœæ proste.
+
+Dane kategoryczne to takie dane które nie s¹ wyra¿alne liczbami.
+Dobrym przyk³adem mo¿e byæ kolor oczu: niebieskie, zielone, ...
+Ka¿da wartoœæ jest wyra¿ona nie-liczbowo, nie da siê obliczyæ
+œredniej czy odchylenia standardowego.
