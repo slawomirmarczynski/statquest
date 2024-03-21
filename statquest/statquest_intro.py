@@ -6,8 +6,8 @@ Tkinter GUI for StatQuest.
 File:
     project: StatQuest
     name: statquest_intro.py
-    version: 0.5.1.1
-    date: 25.02.2023
+    version: 0.5.1.2
+    date: 21.03.2024
 
 Authors:
     Sławomir Marczyński
@@ -70,7 +70,7 @@ class Intro(Component):
     def __init__(self, parent_component, parent_frame, *args, **kwargs):
         super().__init__(parent_component, parent_frame, *args, **kwargs)
 
-        text = dedentln(
+        text = (
             '''
             StatQuest - statistical methods for data analysis.
     
@@ -83,25 +83,26 @@ class Intro(Component):
             values for which the calculation makes sense arithmetic mean,
             standard deviation, etc.
     
-             Ordinal data is understood in StatQuest as data that can be
-             described with integers. Does it make sense to calculate the 
-             average for such data? Might have, might not have. For example if
-             we will assign 1 as code to tall people and 0 to short people,
-             then it is calculated for a given population, the mean says
-             something about what percentage of people there are high in this
-             population. If we add code 2 for big city and code 3 for small
-             town... then the average makes no sense.
-    
-             Categorical data is data that cannot be expressed in numbers.
-             A good example would be the color of the eyes: blue, green, ...
-             Each value is expressed non-numerically, cannot be calculated
-             mean or standard deviation.
-             '''
+            Ordinal data is understood in StatQuest as data that can be
+            described with integers. Does it make sense to calculate the 
+            average for such data? Might have, might not have. For example if
+            we will assign 1 as code to tall people and 0 to short people,
+            then it is calculated for a given population, the mean says
+            something about what percentage of people there are high in this
+            population. If we add code 2 for big city and code 3 for small
+            town... then the average makes no sense.
+            
+            Categorical data is data that cannot be expressed in numbers.
+            A good example would be the color of the eyes: blue, green, ...
+            Each value is expressed non-numerically, cannot be calculated
+            mean or standard deviation.
+            '''
         )
 
         try:
             code = get_default_locale_code()
-            with open(os.path.join('locale', code, 'intro.txt')) as file:
+            file_name = os.path.join('locale', code, 'intro.txt')
+            with open(file_name, encoding='utf-8') as file:
                 text = file.read()
         except:
             pass

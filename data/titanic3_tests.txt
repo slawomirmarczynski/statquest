@@ -1,0 +1,37 @@
+================================================================================
+
+    Pearson's Chi-Square Test of Independence.
+
+    We have got cases that are described using two categorical variables
+    using appropriate nominal scales. We want to find out if these
+    variables are independent, i.e. whether the features described by
+    the scales are significantly different.
+
+    We formulate the null hypothesis and the alternative hypothesis:
+
+        H0: There is no relationship between the categorical variables.
+        H1: Categorical variables are not independent.
+
+    We calculate the chi-square statistic for the corresponding crosstab,
+    then we compare the p-value with the alpha significance level.
+    Customary the alpha significance level is assumed to be 0.05
+    (i.e. 5%), specifying it as "significant". A significance level of
+    0.001 is sometimes referred to as "highly significant".
+
+    If p-value is too small, the test reject the null hypothesis.
+
+    If p-value is  big - "we have no grounds to reject the null
+    hypothesis" - de facto we just take the null hypothesis.
+
+    In the table form it looks like this:
+
+                                  H0    H1
+                -----------------------------------------------
+                p_value < alpha:  no    yes   are dependent
+                p_value > alpha:  yes   no    are NOT dependent
+
+    See also:
+        https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
+        https://online.stat.psu.edu/stat500/lesson/8
+    
+================================================================================

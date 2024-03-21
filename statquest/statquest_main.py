@@ -6,8 +6,8 @@ The main module of StatQuest.
 File:
     project: StatQuest
     name: statquest.py
-    version: 0.5.1.1
-    date: 25.02.2023
+    version: 0.5.1.2
+    date: 21.03.2024
 
 Authors:
     Sławomir Marczyński
@@ -56,7 +56,7 @@ from statquest_suite import Suite
 class Program:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title('StatQuest (version: 0.5.1.1)')
+        self.root.title('StatQuest (version: 0.5.1.2)')
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         root_width = int(screen_width * 0.75)

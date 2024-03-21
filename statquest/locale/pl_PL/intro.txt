@@ -1,26 +1,26 @@
 StatQuest, aplikacja metod statystycznych do analizy danych.
 
-Program StatQuest s³u¿y do analizy danych wskaŸnikowych,
-porz¹dkowych i kategorycznych. Nie obs³ugiwane s¹ w nim dane
-przedzia³owe.
+Program StatQuest sÅ‚uÅ¼y do analizy danych wskaÅºnikowych,
+porzÄ…dkowych i kategorycznych. Nie obsÅ‚ugiwane sÄ… w nim dane
+przedziaÅ‚owe.
 
-Przyk³adem danych wskaŸnikowych mo¿e byæ wartoœci napiêcia ogniw
-AAA mierzone w woltach. Bêd¹ to wartoœci wyra¿one liczbami
+PrzykÅ‚adem danych wskaÅºnikowych moÅ¼e byÄ‡ wartoÅ›ci napiÄ™cia ogniw
+AAA mierzone w woltach. BÄ™dÄ… to wartoÅ›ci wyraÅ¼one liczbami
 zmiennoprzecinkowymi takimi jak 1.45, 1.39, 1.52.
-W takim przypadku mamy wartoœci dla których sens ma obliczanie
-œredniej arytmetycznej, odchylenia standardowego itp.
+W takim przypadku mamy wartoÅ›ci dla ktÃ³rych sens ma obliczanie
+Å›redniej arytmetycznej, odchylenia standardowego itp.
 
-Dane porz¹dkowe s¹ w programie StatQuest rozumiane jako takie które
-mo¿na opisaæ liczbami ca³kowitymi. Czy ma sens obliczanie œredniej
-dla takich danych? Mo¿e mieæ, mo¿e nie mieæ. Przyk³adowo je¿eli
+Dane porzÄ…dkowe sÄ… w programie StatQuest rozumiane jako takie ktÃ³re
+moÅ¼na opisaÄ‡ liczbami caÅ‚kowitymi. Czy ma sens obliczanie Å›redniej
+dla takich danych? MoÅ¼e mieÄ‡, moÅ¼e nie mieÄ‡. PrzykÅ‚adowo jeÅ¼eli
 osobom wysokim przypiszemy jako kod 1, a niskim 0, to obliczona
-dla danej populacji œrednia coœ mówi o tym jaki procent ludzi jest
-wysokich w tej populacji. Je¿eli dodamy jeszcze kod 2 dla rudych
-oraz kod 3 dla mieszkañców ma³ych miasteczek... to obliczona
-technikami statystycznymi œrednia nie ma sensu.
-Choæ same obliczenia s¹/by³yby doœæ proste.
+dla danej populacji Å›rednia coÅ› mÃ³wi o tym jaki procent ludzi jest
+wysokich w tej populacji. JeÅ¼eli dodamy jeszcze kod 2 dla rudych
+oraz kod 3 dla mieszkaÅ„cÃ³w maÅ‚ych miasteczek... to obliczona
+technikami statystycznymi Å›rednia nie ma sensu.
+ChoÄ‡ same obliczenia sÄ…/byÅ‚yby doÅ›Ä‡ proste.
 
-Dane kategoryczne to takie dane które nie s¹ wyra¿alne liczbami.
-Dobrym przyk³adem mo¿e byæ kolor oczu: niebieskie, zielone, ...
-Ka¿da wartoœæ jest wyra¿ona nie-liczbowo, nie da siê obliczyæ
-œredniej czy odchylenia standardowego.
+Dane kategoryczne to takie dane ktÃ³re nie sÄ… wyraÅ¼alne liczbami.
+Dobrym przykÅ‚adem moÅ¼e byÄ‡ kolor oczu: niebieskie, zielone, ...
+KaÅ¼da wartoÅ›Ä‡ jest wyraÅ¼ona nie-liczbowo, nie da siÄ™ obliczyÄ‡
+Å›redniej czy odchylenia standardowego.

@@ -6,8 +6,8 @@ Output routines.
 File:
     project: StatQuest
     name: statquest_output.py
-    version: 0.5.1.1
-    date: 25.02.2023
+    version: 0.5.1.2
+    date: 21.03.2024
 
 Authors:
     Sławomir Marczyński

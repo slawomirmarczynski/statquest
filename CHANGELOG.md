@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1.2
+
+### Changes
+
+### Fixes
+
+- Typo in pl_PL. Was: "całakolumna". Should be: "cała kolumna".
+
+
 ## 0.4.2.1
 
 ### Changes

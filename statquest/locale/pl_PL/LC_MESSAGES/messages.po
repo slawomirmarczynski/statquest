@@ -161,7 +161,7 @@ msgid ""
 "If the amount of data in the column is less than the threshold, then whole "
 "column will be rejected as not representative of the data."
 msgstr ""
-"Jeżeli ilość danych w danej kolumnie jest mniejsza, to wtedy cała"
+"Jeżeli ilość danych w danej kolumnie jest mniejsza, to wtedy cała "
 "kolumna jest odrzucana jako nieistotna."
 
 #: statquest\statquest_relation.py:133

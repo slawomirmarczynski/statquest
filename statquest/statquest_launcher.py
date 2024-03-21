@@ -6,8 +6,8 @@ The main module of StatQuest.
 File:
     project: StatQuest
     name: statquest.py
-    version: 0.5.1.1
-    date: 25.02.2023
+    version: 0.5.1.2
+    date: 21.03.2024
 
 Authors:
     Sławomir Marczyński
@@ -42,7 +42,7 @@ import threading
 import tkinter as tk
 from tkinter import ttk
 
-import ydata_profiling as pandas_profiling
+import ydata_profiling as pandas_profiling  # look for ydata-profiling on PyPI
 
 from progress import Progress
 from statquest_component import Component
